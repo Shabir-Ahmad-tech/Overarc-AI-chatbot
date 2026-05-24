@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SmartBot — AI Assistant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <style>
+        :root {
+            --brand: #E8471C;
+            --brand-dark: #C2410C;
+            --bg: #080808;
+            --surface: #111;
+            --surface-2: #181818;
+            --border: rgba(255, 255, 255, 0.07);
+            --text: #F4F4F4;
+            --text-muted: rgba(244, 244, 244, 0.55);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 20px;
+            background: var(--surface-2);
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+
+        .header-info {
+            flex: 1;
+        }
+
+        .name {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .status {
+            font-size: 12px;
+            color: #22c55e;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status::before {
+            content: '';
+            width: 7px;
+            height: 7px;
+            background: #22c55e;
+            border-radius: 50%;
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .messages::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .messages::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        .msg {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .msg.user {
+            align-items: flex-end;
+        }
+
+        .msg.bot {
+            align-items: flex-start;
+        }
+
+        .bubble {
+            max-width: 82%;
+            padding: 10px 14px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.55;
+            word-wrap: break-word;
+        }
+
+        .msg.user .bubble {
+            background: var(--brand);
+            color: #fff;
+            border-bottom-right-radius: 4px;
+        }
+
+        .msg.bot .bubble {
+            background: #222;
+            color: var(--text);
+            border-bottom-left-radius: 4px;
+        }
+
+        .typing {
+            display: flex;
+            gap: 5px;
+            padding: 12px 15px;
+            background: #222;
+            border-radius: 18px;
+            border-bottom-left-radius: 4px;
+            width: fit-content;
+        }
+
+        .dot {
+            width: 7px;
+            height: 7px;
+            background: var(--text-muted);
+            border-radius: 50%;
+            animation: bounce 1.2s infinite;
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            60%,
+            100% {
+                transform: translateY(0);
+            }
+
+            30% {
+                transform: translateY(-6px);
+            }
+        }
+
+        .input-bar {
+            display: flex;
+            gap: 10px;
+            padding: 14px 16px;
+            border-top: 1px solid var(--border);
+            background: var(--surface);
+            flex-shrink: 0;
+        }
+
+        #input {
+            flex: 1;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 10px 16px;
+            color: var(--text);
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+        }
+
+        #input:focus {
+            border-color: var(--brand);
+        }
+
+        #send {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #send:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 10px;
+            color: var(--text-muted);
+            padding: 6px 0;
+            background: var(--surface);
+        }
+
+        .footer a {
+            color: var(--brand);
+            text-decoration: none;
+        }
+
+        .lead-form {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            margin: 4px 0;
+        }
+
+        .lead-form p {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .lead-form input {
+            width: 100%;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 12px;
+            color: var(--text);
+            font-size: 13px;
+            margin-bottom: 8px;
+            outline: none;
+        }
+
+        .lead-form input:focus {
+            border-color: var(--brand);
+        }
+
+        .lead-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .chip {
+            background: transparent;
+            border: 1px solid var(--brand);
+            color: var(--brand);
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .chip:hover {
+            background: var(--brand);
+            color: #fff;
+        }
+
+        .quick-replies {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="avatar" id="avatar">💬</div>
+        <div class="header-info">
+            <div class="name" id="name">SmartBot</div>
+            <div class="status">Online · Ready to help</div>
+        </div>
+    </div>
+    <div class="messages" id="messages"></div>
+    <div class="input-bar">
+        <input id="input" type="text" placeholder="Type your message..." autocomplete="off" />
+        <button id="send"><i data-lucide="send"></i></button>
+    </div>
+    <div class="footer">Powered by <a href="/">Overarc</a></div>
+
+    <script>
+        // Get botId from URL: /chat/CLINIC or /chat.html?botId=clinic
+        const pathParts = window.location.pathname.split('/');
+        const botId = pathParts[pathParts.length - 1] || new URLSearchParams(window.location.search).get('botId') || 'clinic';
+        const baseUrl = window.location.origin;
+
+        let msgCount = 0, leadCaptured = false, leadFormShown = false;
+        let chatHistory = [];
+        let config = null;
+
+        async function init() {
+            try {
+                const res = await fetch(`${baseUrl}/api/widget-config?botId=${botId}`);
+                config = await res.json();
+                document.getElementById('name').textContent = config.name;
+                document.getElementById('avatar').textContent = config.emoji || '💬';
+                document.documentElement.style.setProperty('--brand', config.color || '#E8471C');
+                document.documentElement.style.setProperty('--brand-dark', config.dark_color || '#C2410C');
+                setTimeout(() => addBotMsg(config.greeting || 'Hello! How can I help you?', true), 500);
+                setTimeout(showQuickReplies, 1000);
+            } catch (e) {
+                addBotMsg('Welcome! How can I help you today?', true);
+            }
+        }
+
+        function escapeHTML(s) {
+            return s.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>').replace(/"/g, '"');
+        }
+
+        function addBotMsg(text, first = false) {
+            const msgs = document.getElementById('messages');
+            const typing = document.createElement('div');
+            typing.className = 'msg bot';
+            typing.innerHTML = '<div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+            msgs.appendChild(typing);
+            msgs.scrollTop = msgs.scrollHeight;
+
+            setTimeout(() => {
+                typing.remove();
+                const div = document.createElement('div');
+                div.className = 'msg bot';
+                div.innerHTML = `<div class="bubble">${escapeHTML(text).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</div>`;
+                msgs.appendChild(div);
+                msgs.scrollTop = msgs.scrollHeight;
+                chatHistory.push({ role: 'assistant', content: text });
+                if (window.lucide) window.lucide.createIcons();
+            }, first ? 400 : 1000 + Math.random() * 500);
+        }
+
+        function addUserMsg(text) {
+            const msgs = document.getElementById('messages');
+            const div = document.createElement('div');
+            div.className = 'msg user';
+            div.innerHTML = `<div class="bubble">${escapeHTML(text)}</div>`;
+            msgs.appendChild(div);
+            msgs.scrollTop = msgs.scrollHeight;
+            chatHistory.push({ role: 'user', content: text });
+        }
+
+        function showQuickReplies() {
+            if (!config || !config.quick_replies || !config.quick_replies.length) return;
+            const msgs = document.getElementById('messages');
+            const div = document.createElement('div');
+            div.className = 'quick-replies';
+            config.quick_replies.forEach(r => {
+                const btn = document.createElement('button');
+                btn.className = 'chip';
+                btn.textContent = r;
+                btn.onclick = () => { div.remove(); handleInput(r); };
+                div.appendChild(btn);
+            });
+            msgs.appendChild(div);
+            msgs.scrollTop = msgs.scrollHeight;
+        }
+
+        function showLeadForm() {
+            if (leadFormShown) return;
+            leadFormShown = true;
+            addBotMsg("By the way — can I get your **name and phone number** so our team can follow up with you? 😊");
+            setTimeout(() => {
+                const msgs = document.getElementById('messages');
+                const div = document.createElement('div');
+                div.className = 'msg bot';
+                div.innerHTML = `
+          <div class="lead-form">
+            <p>Leave your details and we'll reach out shortly:</p>
+            <input type="text" id="lead-name" placeholder="Your full name" />
+            <input type="tel" id="lead-phone" placeholder="Phone number" />
+            <button class="lead-btn" id="lead-submit">Send Details</button>
+          </div>`;
+                msgs.appendChild(div);
+                msgs.scrollTop = msgs.scrollHeight;
+                document.getElementById('lead-submit').onclick = () => {
+                    const name = document.getElementById('lead-name').value.trim();
+                    const phone = document.getElementById('lead-phone').value.trim();
+                    if (!name || !phone) { alert('Please enter both name and phone'); return; }
+                    div.remove();
+                    leadCaptured = true;
+                    fetch(`${baseUrl}/api/leads`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name, phone, bot: botId, message: 'Lead from standalone chat page' })
+                    }).catch(() => { });
+                    addBotMsg(`Thank you, **${name}**! ✅ I've passed your details to our team. Someone will contact you at **${phone}** shortly. Is there anything else I can help you with?`);
+                };
+            }, 800);
+        }
+
+        function lockInput() {
+            document.getElementById('input').disabled = true;
+            document.getElementById('input').placeholder = 'AI is thinking...';
+            document.getElementById('send').disabled = true;
+        }
+        function unlockInput() {
+            document.getElementById('input').disabled = false;
+            document.getElementById('input').placeholder = 'Type your message...';
+            document.getElementById('send').disabled = false;
+            document.getElementById('input').focus();
+        }
+
+        async function handleInput(text) {
+            if (!text.trim()) return;
+            addUserMsg(text);
+            msgCount++;
+            lockInput();
+
+            if (msgCount >= 3 && !leadCaptured) showLeadForm();
+
+            try {
+                const res = await fetch(`${baseUrl}/api/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ bot: botId, message: text, history: chatHistory.slice(0, -1) })
+                });
+                const data = await res.json();
+                addBotMsg(data.reply || 'Sorry, I had an issue. Please try again.');
+            } catch (e) {
+                addBotMsg("I'm having a small technical issue right now. Please contact us directly!");
+            }
+            unlockInput();
+        }
+
+        document.getElementById('send').onclick = () => {
+            const t = document.getElementById('input').value.trim();
+            if (t) { document.getElementById('input').value = ''; handleInput(t); }
+        };
+        document.getElementById('input').onkeydown = (e) => {
+            if (e.key === 'Enter') {
+                const t = document.getElementById('input').value.trim();
+                if (t) { document.getElementById('input').value = ''; handleInput(t); }
+            }
+        };
+
+        init();
+        if (window.lucide) window.lucide.createIcons();
+    </script>
+</body>
+
+</html>

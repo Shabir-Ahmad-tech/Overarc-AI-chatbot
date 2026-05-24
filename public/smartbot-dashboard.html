@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartBot SaaS — Client Dashboard Panel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #080808;
+      --surface: #111111;
+      --surface-2: #181818;
+      --border: rgba(255, 255, 255, 0.07);
+      --border-hover: rgba(255, 255, 255, 0.15);
+      --text: #f4f4f4;
+      --text-muted: rgba(244, 244, 244, 0.55);
+      --accent: #e8471c;
+      --accent-glow: rgba(232, 71, 28, 0.25);
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --radius-full: 9999px;
+      --transition: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* ============================================================
+       PASSWORD GATE MODULE
+    ============================================================ */
+    #auth-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(8, 8, 8, 0.95);
+      backdrop-filter: blur(16px);
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .auth-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 36px;
+      width: min(420px, 90vw);
+      text-align: center;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+    }
+
+    .auth-card h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.6rem;
+      margin-bottom: 8px;
+    }
+
+    .auth-card p {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    .auth-card input {
+      width: 100%;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+      text-align: center;
+      margin-bottom: 16px;
+      transition: var(--transition);
+    }
+
+    .auth-card input:focus {
+      border-color: var(--accent);
+    }
+
+    .auth-btn {
+      width: 100%;
+      background: linear-gradient(135deg, var(--accent) 0%, #ff6235 100%);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px;
+      transition: var(--transition);
+    }
+
+    .auth-btn:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    /* ============================================================
+       SIDEBAR & SHELL
+    ============================================================ */
+    .sidebar {
+      width: 260px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    .brand-logo {
+      padding: 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .brand-logo span {
+      color: var(--accent);
+    }
+
+    .nav-list {
+      flex: 1;
+      padding: 20px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      color: var(--text-muted);
+      text-decoration: none;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      background: transparent;
+      border: none;
+      text-align: left;
+      width: 100%;
+    }
+
+    .nav-item:hover,
+    .nav-item.active {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .nav-item.active {
+      border-left: 3px solid var(--accent);
+      background: rgba(232, 71, 28, 0.08);
+      color: #fff;
+    }
+
+    .nav-item svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .sidebar-footer {
+      padding: 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .avatar-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--surface-2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .client-details {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .client-name {
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .client-role {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* ============================================================
+       MAIN CONTENT PANEL
+    ============================================================ */
+    .main-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .topbar {
+      height: 70px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      flex-shrink: 0;
+    }
+
+    .page-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(34, 197, 94, 0.12);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      border-radius: var(--radius-full);
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--success);
+    }
+
+    .badge-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--success);
+      border-radius: 50%;
+    }
+
+    .content-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 32px;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* ============================================================
+       CARDS & GRID LAYOUTS
+    ============================================================ */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .stat-lbl {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stat-val {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .embed-card {
+      background: rgba(232, 71, 28, 0.05);
+      border: 1px dashed var(--accent);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      margin-bottom: 32px;
+    }
+
+    .embed-card h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      margin-bottom: 8px;
+      font-size: 1.15rem;
+    }
+
+    .embed-card p {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+
+    .snippet-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 13px;
+      color: var(--text-muted);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .copy-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 600;
+      transition: var(--transition);
+      flex-shrink: 0;
+    }
+
+    .copy-btn:hover {
+      opacity: 0.9;
+    }
+
+    /* ============================================================
+       FORM & CUSTOMIZATION STYLES
+    ============================================================ */
+    .form-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 28px;
+      margin-bottom: 24px;
+    }
+
+    .form-section h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-group label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .form-control {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      color: #fff;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      transition: var(--transition);
+    }
+
+    .form-control:focus {
+      border-color: var(--accent);
+    }
+
+    textarea.form-control {
+      min-height: 120px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    .color-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .color-picker-input {
+      width: 50px;
+      height: 40px;
+      padding: 0;
+      border: none;
+      background: none;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    /* FAQ & Service Table builders */
+    .faq-builder-row,
+    .service-builder-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+      align-items: flex-start;
+    }
+
+    .faq-builder-row input,
+    .service-builder-row input {
+      flex: 1;
+    }
+
+    .remove-row-btn {
+      background: rgba(239, 68, 68, 0.12);
+      color: var(--danger);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .remove-row-btn:hover {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .add-row-btn {
+      background: rgba(255, 255, 255, 0.04);
+      color: #fff;
+      border: 1px dashed var(--border);
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      width: 100%;
+      font-weight: 600;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .add-row-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--text-muted);
+    }
+
+    .submit-bar {
+      margin-top: 32px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .save-btn {
+      background: linear-gradient(135deg, var(--accent) 0%, #ff6235 100%);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 14px 36px;
+      font-weight: 600;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: var(--transition);
+    }
+
+    .save-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    /* ============================================================
+       LEADS TABLE CRM STYLES
+    ============================================================ */
+    .leads-table-container {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .leads-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    .leads-table th,
+    .leads-table td {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13.5px;
+    }
+
+    .leads-table th {
+      background: var(--surface-2);
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+    }
+
+    .leads-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .leads-table td span.crm-badge {
+      background: rgba(232, 71, 28, 0.12);
+      border: 1px solid rgba(232, 71, 28, 0.3);
+      color: var(--accent);
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 10.5px;
+      font-weight: 600;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--success);
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: var(--radius-full);
+      font-size: 14px;
+      font-weight: 600;
+      z-index: 999999;
+      opacity: 0;
+      transition: var(--transition);
+      pointer-events: none;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ======================================================
+       PASSWORD ACCESS SHIELD
+  ====================================================== -->
+  <div id="auth-overlay">
+    <div class="auth-card">
+      <h2>🔑 SmartBot Dashboard Login</h2>
+      <p>Please enter your administrative password to access settings and CRM lead data.</p>
+      <input type="password" id="auth-pass" placeholder="Enter password..." />
+      <button class="auth-btn" onclick="checkAuth()">Authenticate Panel</button>
+    </div>
+  </div>
+
+  <!-- ======================================================
+       SIDEBAR NAV PANEL
+  ====================================================== -->
+  <div class="sidebar">
+    <div class="brand-logo"><i data-lucide="zap"></i> Smart<span>Bot</span></div>
+
+    <div class="nav-list">
+      <button class="nav-item active" onclick="switchTab('overview', this)">
+        <i data-lucide="layout-dashboard"></i> Overview
+      </button>
+      <button class="nav-item" onclick="switchTab('settings', this)">
+        <i data-lucide="sliders"></i> Customize Bot
+      </button>
+      <button class="nav-item" onclick="switchTab('crm', this)">
+        <i data-lucide="users"></i> Leads CRM
+      </button>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="avatar-icon" id="foot-avatar">🏥</div>
+      <div class="client-details">
+        <div class="client-name" id="foot-name">Loading Profile...</div>
+        <div class="client-role">SaaS Client Portal</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================
+       MAIN CONTENT VIEW
+  ====================================================== -->
+  <div class="main-panel">
+    <!-- Header -->
+    <div class="topbar">
+      <div class="page-title" id="page-head-title">SaaS Business Assistant Console</div>
+      <div class="topbar-actions">
+        <div class="badge">
+          <div class="badge-dot"></div> Live & Active
+        </div>
+      </div>
+    </div>
+
+    <!-- Scrollable Space -->
+    <div class="content-area">
+
+      <!-- ==================================================
+           TAB: OVERVIEW
+      ================================================== -->
+      <div class="tab-content active" id="tab-overview">
+        <!-- Stats cards -->
+        <div class="dashboard-grid">
+          <div class="stat-card">
+            <div class="stat-lbl">Captured Customer Leads</div>
+            <div class="stat-val" id="stat-total-leads">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-lbl">Active Billing Plan</div>
+            <div class="stat-val" style="font-size: 1.8rem; line-height: 2.2rem; color:#22c55e;">Pro ($250)</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-lbl">Platform Maintenance</div>
+            <div class="stat-val" style="font-size: 1.8rem; line-height: 2.2rem; color:#f59e0b;">$30/mo</div>
+          </div>
+        </div>
+
+        <!-- 1-Click Embed Snippet generator -->
+        <div class="embed-card">
+          <h3>🔌 Copy Embeddable Website Widget Script</h3>
+          <p>
+            Copy and paste this script tag right before the closing <code>&lt;/body&gt;</code> tag of your website.
+            The floating AI chatbot widget will instantly mount and handle leads capture 24/7!
+          </p>
+          <div class="snippet-box">
+            <span id="embed-code-text"></span>
+            <button class="copy-btn" onclick="copyEmbed()">Copy Embed Code</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================================================
+           TAB: BOT SETTINGS
+      ================================================== -->
+      <div class="tab-content" id="tab-settings">
+        <!-- General branding -->
+        <div class="form-section">
+          <h3>🎨 Brand Styling & Core Customizations</h3>
+
+          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+            <div class="form-group">
+              <label>Business Name (Displayed in Header)</label>
+              <input type="text" class="form-control" id="form-name" placeholder="e.g. City Dental Clinic" />
+            </div>
+            <div class="form-group">
+              <label>Avatar Character Emoji</label>
+              <input type="text" class="form-control" id="form-emoji" placeholder="e.g. 🏥"
+                style="text-align: center;" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>WhatsApp Escalation Contact Number</label>
+            <input type="text" class="form-control" id="form-whatsapp" placeholder="e.g. +923249116764" />
+          </div>
+
+          <div class="form-group">
+            <label>Chat Widget Greeting Message</label>
+            <input type="text" class="form-control" id="form-greeting" placeholder="Welcome message..." />
+          </div>
+
+          <div class="form-group">
+            <label>Brand Theme Color</label>
+            <div class="color-row">
+              <input type="color" class="color-picker-input" id="form-color-picker" oninput="syncColors(this.value)" />
+              <input type="text" class="form-control" id="form-color" placeholder="#10B981" style="width: 140px;"
+                oninput="syncPicker(this.value)" />
+              <span style="font-size: 12px; color: var(--text-muted);">This color theme will render on the embedded
+                chatbot bubbles and widgets dynamically!</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI System Prompt context -->
+        <div class="form-section">
+          <h3>🧠 Train AI System Prompt context</h3>
+          <div class="form-group">
+            <label>System Instructions (Tells the AI how to act, location details, prices & guidelines)</label>
+            <textarea class="form-control" id="form-prompt"
+              placeholder="Write full AI context details here..."></textarea>
+          </div>
+        </div>
+
+        <!-- Dynamic FAQ table rows builders -->
+        <div class="form-section">
+          <h3>❓ Business FAQs Builder</h3>
+          <div style="margin-bottom: 16px; font-size: 13px; color: var(--text-muted);">
+            Manage common question & answer pairs below. These are loaded dynamically so the AI knows exact facts:
+          </div>
+          <div id="faq-rows-container"></div>
+          <button class="add-row-btn" onclick="addFaqRow()"><i data-lucide="plus" class="w-4 h-4"></i> Add FAQ Question
+            Pair</button>
+        </div>
+
+        <!-- Dynamic Menu Highlights & Services Builder -->
+        <div class="form-section">
+          <h3>🍽️ Menu Highlights & Services Builder</h3>
+          <div style="margin-bottom: 16px; font-size: 13px; color: var(--text-muted);">
+            Manage your active menu dishes or business services and prices below. These are dynamically injected into
+            the AI system context:
+          </div>
+          <div id="service-rows-container"></div>
+          <button class="add-row-btn" onclick="addServiceRow()"><i data-lucide="plus" class="w-4 h-4"></i> Add Menu /
+            Service Item</button>
+        </div>
+
+        <!-- Sticky save changes triggers -->
+        <div class="submit-bar">
+          <button class="save-btn" id="save-settings-btn" onclick="saveSettings()">
+            <i data-lucide="save"></i> Save Customizations
+          </button>
+        </div>
+      </div>
+
+      <!-- ==================================================
+           TAB: LEADS CRM TABLE
+      ================================================== -->
+      <div class="tab-content" id="tab-crm">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <div style="font-size: 14px; color: var(--text-muted);">Manage and view captured clients leads generated in
+            real time:</div>
+          <button class="copy-btn" onclick="exportCSV()"><i data-lucide="download"
+              style="width:12px; height:12px; display:inline; margin-right:4px;"></i> Export Leads CSV</button>
+        </div>
+
+        <div class="leads-table-container">
+          <table class="leads-table">
+            <thead>
+              <tr>
+                <th>Customer Name</th>
+                <th>Phone Number</th>
+                <th>Inquiry Context</th>
+                <th>Date Registered</th>
+                <th>Badge Status</th>
+              </tr>
+            </thead>
+            <tbody id="crm-table-body">
+              <!-- Dynamically populated rows -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Toast notification -->
+  <div class="toast" id="toast">Settings saved successfully!</div>
+
+  <script>
+    // =========================================================================
+    // RESOLVE ACTIVE TENANT BOTID
+    // =========================================================================
+    const urlParts = window.location.pathname.split('/');
+    const botId = urlParts[urlParts.length - 1] || "clinic";
+    const baseUrl = window.location.origin;
+
+    const state = {
+      profile: null,
+      leads: []
+    };
+
+    // =========================================================================
+    // PASSWORD SECURITY SYSTEM
+    // =========================================================================
+    // =========================================================================
+    // AUTHENTICATION (uses .env ADMIN_PASSWORD via API)
+    // =========================================================================
+    function checkAuth() {
+      const pass = document.getElementById("auth-pass").value.trim();
+
+      // Call the backend to verify the password against .env
+      fetch(`${baseUrl}/api/auth/check`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: pass })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.authorized) {
+            localStorage.setItem('sb_dash_auth_' + botId, 'authorized');
+            document.getElementById("auth-overlay").style.display = "none";
+            loadDashboardData();
+            showToast("🔒 Administrative access granted!");
+          } else {
+            alert("Invalid administrative password!");
+          }
+        })
+        .catch(() => {
+          alert("Could not reach the server. Make sure the backend is running.");
+        });
+    }
+
+    // Auto load settings if authorized already
+    if (localStorage.getItem('sb_dash_auth_' + botId) === 'authorized') {
+      document.getElementById("auth-overlay").style.display = "none";
+      loadDashboardData();
+    }
+
+    // =========================================================================
+    // RENDER & INITIAL LOAD DATA
+    // =========================================================================
+    function loadDashboardData() {
+      // 1. Load active settings profile
+      fetch(`${baseUrl}/api/settings?botId=${botId}`)
+        .then(res => res.json())
+        .then(data => {
+          state.profile = data;
+          populateSettingsForm();
+          updateHeaderProfile();
+        })
+        .catch(err => console.error("Error loading settings:", err));
+
+      // 2. Load CRM captured leads
+      fetch(`${baseUrl}/api/leads?botId=${botId}`)
+        .then(res => res.json())
+        .then(leads => {
+          state.leads = leads;
+          populateLeadsCRM();
+        })
+        .catch(err => console.error("Error loading leads:", err));
+
+      // 3. Set snippet text
+      const snippet = `<script src="${baseUrl}/widget.js?botId=${botId}"><\/script>`;
+      document.getElementById("embed-code-text").textContent = snippet;
+    }
+
+    function populateSettingsForm() {
+      const biz = state.profile;
+      document.getElementById("form-name").value = biz.name;
+      document.getElementById("form-emoji").value = biz.emoji;
+      document.getElementById("form-whatsapp").value = biz.whatsapp;
+      document.getElementById("form-greeting").value = biz.greeting;
+      document.getElementById("form-color").value = biz.color;
+      document.getElementById("form-color-picker").value = biz.color;
+      document.getElementById("form-prompt").value = biz.system_prompt;
+
+      // Populate FAQ rows builders
+      const faqs = biz.faqs || [];
+      const container = document.getElementById("faq-rows-container");
+      container.innerHTML = "";
+      faqs.forEach(faq => {
+        addFaqRow(faq.q, faq.a);
+      });
+
+      // Populate Service rows builders
+      const services = biz.services || [];
+      const sContainer = document.getElementById("service-rows-container");
+      sContainer.innerHTML = "";
+      services.forEach(s => {
+        addServiceRow(s.name, s.price);
+      });
+    }
+
+    function updateHeaderProfile() {
+      const biz = state.profile;
+      document.getElementById("foot-avatar").textContent = biz.emoji;
+      document.getElementById("foot-name").textContent = biz.name;
+      document.getElementById("page-head-title").textContent = `${biz.name} — Settings Panel`;
+    }
+
+    function populateLeadsCRM() {
+      const tableBody = document.getElementById("crm-table-body");
+      tableBody.innerHTML = "";
+
+      document.getElementById("stat-total-leads").textContent = state.leads.length;
+
+      if (!state.leads.length) {
+        tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:32px;">No leads captured yet. Keep the bot active!</td></tr>`;
+        return;
+      }
+
+      state.leads.forEach(lead => {
+        const tr = document.createElement("tr");
+        const date = new Date(lead.timestamp).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+        tr.innerHTML = `
+          <td style="font-weight:600; color:#fff;">${lead.name}</td>
+          <td>${lead.phone}</td>
+          <td>${lead.topic || 'General Inquiry'}</td>
+          <td>${date}</td>
+          <td><span class="crm-badge">Active Lead</span></td>
+        `;
+        tableBody.appendChild(tr);
+      });
+    }
+
+    // =========================================================================
+    // COLOR SYNCS
+    // =========================================================================
+    function syncColors(val) {
+      document.getElementById("form-color").value = val;
+    }
+    function syncPicker(val) {
+      if (val.startsWith('#') && val.length === 7) {
+        document.getElementById("form-color-picker").value = val;
+      }
+    }
+
+    // =========================================================================
+    // FAQ BUILDER DYNAMICS ROW ACTIONS
+    // =========================================================================
+    function addFaqRow(q = "", a = "") {
+      const container = document.getElementById("faq-rows-container");
+      const row = document.createElement("div");
+      row.className = "faq-builder-row";
+      row.innerHTML = `
+        <input type="text" class="form-control faq-q" placeholder="Common question..." value="${q}" />
+        <input type="text" class="form-control faq-a" placeholder="Answer text..." value="${a}" />
+        <button class="remove-row-btn" onclick="this.closest('.faq-builder-row').remove()"><i data-lucide="trash" class="w-4 h-4"></i></button>
+      `;
+      container.appendChild(row);
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    // =========================================================================
+    // SERVICE/MENU BUILDER DYNAMICS ROW ACTIONS
+    // =========================================================================
+    function addServiceRow(name = "", price = "") {
+      const container = document.getElementById("service-rows-container");
+      const row = document.createElement("div");
+      row.className = "service-builder-row";
+      row.innerHTML = `
+        <input type="text" class="form-control service-name" placeholder="Item/Service Name (e.g. Chapli Kebab)..." value="${name}" />
+        <input type="text" class="form-control service-price" placeholder="Price (e.g. PKR 350)..." value="${price}" />
+        <button class="remove-row-btn" onclick="this.closest('.service-builder-row').remove()"><i data-lucide="trash" class="w-4 h-4"></i></button>
+      `;
+      container.appendChild(row);
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    // =========================================================================
+    // SAVE CONFIGURATION TRIGGERS
+    // =========================================================================
+    function saveSettings() {
+      const btn = document.getElementById("save-settings-btn");
+      btn.disabled = true;
+      btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Saving changes...`;
+      if (window.lucide) window.lucide.createIcons();
+
+      const color = document.getElementById("form-color").value.trim();
+
+      // Calculate simple shading for dark hover colors dynamically
+      const darkColor = color; // can fallback to same, or simply match hex values
+
+      // Reconstruct FAQ arrays
+      const faqRows = document.querySelectorAll(".faq-builder-row");
+      const faqs = [];
+      faqRows.forEach(row => {
+        const q = row.querySelector(".faq-q").value.trim();
+        const a = row.querySelector(".faq-a").value.trim();
+        if (q && a) {
+          faqs.push({ q, a });
+        }
+      });
+
+      // Reconstruct Service arrays
+      const serviceRows = document.querySelectorAll(".service-builder-row");
+      const services = [];
+      serviceRows.forEach(row => {
+        const name = row.querySelector(".service-name").value.trim();
+        const price = row.querySelector(".service-price").value.trim();
+        if (name && price) {
+          services.push({ name, price });
+        }
+      });
+
+      const updatedPayload = {
+        id: botId,
+        name: document.getElementById("form-name").value.trim(),
+        emoji: document.getElementById("form-emoji").value.trim(),
+        color: color,
+        dark_color: darkColor,
+        whatsapp: document.getElementById("form-whatsapp").value.trim(),
+        greeting: document.getElementById("form-greeting").value.trim(),
+        system_prompt: document.getElementById("form-prompt").value.trim(),
+        faqs: faqs,
+        services: services
+      };
+
+      fetch(`${baseUrl}/api/settings`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedPayload)
+      })
+        .then(res => res.json())
+        .then(data => {
+          btn.disabled = false;
+          btn.innerHTML = `<i data-lucide="save"></i> Save Customizations`;
+          if (window.lucide) window.lucide.createIcons();
+
+          state.profile = updatedPayload;
+          updateHeaderProfile();
+          showToast("🎨 Settings updated successfully!");
+        })
+        .catch(err => {
+          btn.disabled = false;
+          btn.innerHTML = `<i data-lucide="save"></i> Save Customizations`;
+          if (window.lucide) window.lucide.createIcons();
+          console.error("Save error:", err);
+          alert("Failed to save settings.");
+        });
+    }
+
+    // =========================================================================
+    // GENERAL CORE UTILS (COPY & TABS & EXPORTS)
+    // =========================================================================
+    function switchTab(tabId, btn) {
+      document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+      document.getElementById("tab-" + tabId).classList.add("active");
+
+      document.querySelectorAll(".nav-item").forEach(i => i.classList.remove("active"));
+      btn.classList.add("active");
+    }
+
+    function copyEmbed() {
+      const code = document.getElementById("embed-code-text").textContent;
+      navigator.clipboard.writeText(code).then(() => {
+        showToast("📋 Code copied to clipboard!");
+      });
+    }
+
+    function exportCSV() {
+      if (!state.leads.length) {
+        alert("No leads available to export.");
+        return;
+      }
+
+      const headers = "Customer Name,Phone Number,Topic,Date Registered\n";
+      const rows = state.leads.map(l => {
+        const date = new Date(l.timestamp).toISOString();
+        return `"${l.name}","${l.phone}","${l.topic || 'General Inquiry'}","${date}"`;
+      }).join("\n");
+
+      const blob = new Blob([headers + rows], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `leads-${botId}.csv`;
+      a.click();
+      showToast("💾 CSV Leads log exported!");
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById("toast");
+      toast.textContent = msg;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 3000);
+    }
+
+    // Init Icons
+    if (window.lucide) window.lucide.createIcons();
+  </script>
+</body>
+
+</html>

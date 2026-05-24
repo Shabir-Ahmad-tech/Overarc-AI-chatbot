@@ -723,6 +723,159 @@
       #chat-window { width: calc(100vw - 24px); right: 12px; bottom: 90px; height: 520px; }
       .demo-switcher { display: none; }
     }
+
+    /* ============================================================
+       RICH SERVICES / MENU DISPLAY
+    ============================================================ */
+    .rich-services-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 10px;
+      width: 100%;
+    }
+    .rich-service-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 12px 14px;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      text-align: left;
+    }
+    .rich-service-item:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: var(--brand);
+      transform: translateX(2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    .rich-service-item.selected {
+      border-color: var(--brand);
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .rich-service-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1;
+      text-align: left;
+    }
+    .rich-service-name {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #ffffff;
+      line-height: 1.4;
+    }
+    .rich-service-price {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--brand);
+    }
+    .rich-qty-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 2px;
+    }
+    .rich-qty-btn {
+      background: transparent;
+      border: none;
+      color: #fff;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+    .rich-qty-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    .rich-qty-btn.inc:hover {
+      background: var(--brand);
+    }
+    .rich-qty-val {
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      min-width: 14px;
+      text-align: center;
+    }
+    .rich-cart-summary {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-left: 3px solid var(--brand);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-top: 14px;
+      width: 100%;
+      animation: slide-up 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      text-align: left;
+    }
+    @keyframes slide-up {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .rich-cart-details {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .rich-cart-count {
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.5);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+    .rich-cart-total {
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .rich-cart-submit-btn {
+      background: var(--brand);
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .rich-cart-submit-btn:hover {
+      opacity: 0.95;
+      transform: translateY(-1px);
+    }
+    .rich-cart-submit-btn i {
+      width: 12px;
+      height: 12px;
+    }
+    .msg-text-part {
+      margin-bottom: 8px;
+      line-height: 1.5;
+      width: 100%;
+      text-align: left;
+    }
   </style>
 </head>
 <body>
@@ -1005,7 +1158,7 @@ YOUR JOB:
       state.chatOpen ? closeChat() : openChat();
     }
 
-    function openChat() {
+    async function openChat() {
       state.chatOpen = true;
       document.getElementById('chat-window').classList.add('open');
       
@@ -1018,8 +1171,14 @@ YOUR JOB:
       document.getElementById('notif-dot').style.display = 'none';
 
       if (state.messageCount === 0) {
-        setTimeout(() => sendBotMessage(BOTS[state.currentBot].greeting, true), 400);
-        setTimeout(() => showQuickReplies(), 900);
+        try {
+          const res = await fetch(`/api/settings?botId=${state.currentBot}`);
+          const bot = await res.json();
+          setTimeout(() => sendBotMessage(bot.greeting, true), 400);
+          setTimeout(() => showQuickReplies(bot), 900);
+        } catch (err) {
+          console.error("Error loading chat greeting:", err);
+        }
       }
 
       document.getElementById('chat-input').focus();
@@ -1070,6 +1229,173 @@ YOUR JOB:
         .replace(/'/g, '&#039;');
     }
 
+    function parseRichServices(text, botId) {
+      const lines = text.split('\n');
+      const otherLines = [];
+      
+      const actionText = bId => {
+        if (bId === 'restaurant') return 'Order';
+        if (bId === 'clinic') return 'Book';
+        if (bId === 'realestate') return 'Inquire';
+        return 'Select';
+      };
+
+      const menuId = 'menu-' + Math.random().toString(36).substr(2, 9);
+      window.widgetCarts = window.widgetCarts || {};
+      window.widgetCarts[menuId] = {};
+
+      let hasService = false;
+      let serviceHtml = `<div class="rich-services-list">`;
+
+      lines.forEach(line => {
+        const trimmed = line.trim();
+        const match = trimmed.match(/^[-*]\s+(.+?)\s*:\s*(.+)$/);
+        if (match) {
+          const name = match[1].replace(/\*\*/g, '').trim();
+          const price = match[2].replace(/\*\*/g, '').trim();
+          const action = actionText(botId);
+          
+          hasService = true;
+          serviceHtml += `
+            <div class="rich-service-item" data-name="${name}" data-price="${price}">
+              <div class="rich-service-info">
+                <div class="rich-service-name">${name}</div>
+                <div class="rich-service-price">${price}</div>
+              </div>
+              <div class="rich-qty-controls">
+                <button class="rich-qty-btn dec" onclick="event.stopPropagation(); window.changeWidgetQty('${menuId}', '${name.replace(/'/g, "\\'")}', -1, this)">-</button>
+                <span class="rich-qty-val">0</span>
+                <button class="rich-qty-btn inc" onclick="event.stopPropagation(); window.changeWidgetQty('${menuId}', '${name.replace(/'/g, "\\'")}', 1, this)">+</button>
+              </div>
+            </div>
+          `;
+        } else {
+          otherLines.push(line);
+        }
+      });
+
+      serviceHtml += `
+        <div class="rich-cart-summary" id="summary-${menuId}" style="display: none;">
+          <div class="rich-cart-details">
+            <span class="rich-cart-count">0 items selected</span>
+            <span class="rich-cart-total">Total: PKR 0</span>
+          </div>
+          <button class="rich-cart-submit-btn" onclick="window.submitWidgetCart('${menuId}')">
+            <span>Confirm & Order</span>
+            <i data-lucide="arrow-right"></i>
+          </button>
+        </div>
+      `;
+
+      serviceHtml += `</div>`;
+
+      if (hasService) {
+        const textBefore = otherLines.join('\n').trim();
+        const formattedTextBefore = textBefore
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;')
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        return {
+          hasService: true,
+          html: (formattedTextBefore ? `<div class="msg-text-part">${formattedTextBefore}</div>` : '') + serviceHtml
+        };
+      }
+
+      const sanitized = text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+      return { hasService: false, html: sanitized.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') };
+    }
+
+    window.changeWidgetQty = function(menuId, itemName, delta, btnEl) {
+      const cart = window.widgetCarts[menuId];
+      cart[itemName] = cart[itemName] || { qty: 0, priceStr: '', priceVal: 0 };
+      
+      const rowEl = btnEl.closest('.rich-service-item');
+      const priceStr = rowEl.getAttribute('data-price');
+      const cleanPrice = parseInt(priceStr.replace(/[^0-9]/g, ''), 10) || 0;
+      
+      cart[itemName].qty = Math.max(0, cart[itemName].qty + delta);
+      cart[itemName].priceStr = priceStr;
+      cart[itemName].priceVal = cleanPrice;
+      
+      const qtySpan = rowEl.querySelector('.rich-qty-val');
+      qtySpan.textContent = cart[itemName].qty;
+      
+      if (cart[itemName].qty > 0) {
+        rowEl.classList.add('selected');
+      } else {
+        rowEl.classList.remove('selected');
+      }
+      
+      let totalItems = 0;
+      let totalPrice = 0;
+      let currency = priceStr.match(/^[A-Za-z$]+/)?.[0] || 'PKR';
+      
+      for (const item in cart) {
+        totalItems += cart[item].qty;
+        totalPrice += cart[item].qty * cart[item].priceVal;
+      }
+      
+      const summaryEl = document.getElementById(`summary-${menuId}`);
+      if (totalItems > 0) {
+        summaryEl.style.display = 'flex';
+        summaryEl.querySelector('.rich-cart-count').textContent = `${totalItems} item${totalItems > 1 ? 's' : ''} selected`;
+        summaryEl.querySelector('.rich-cart-total').textContent = `Total: ${currency} ${totalPrice.toLocaleString()}`;
+      } else {
+        summaryEl.style.display = 'none';
+      }
+    };
+
+    window.submitWidgetCart = function(menuId) {
+      const cart = window.widgetCarts[menuId];
+      const selected = [];
+      let totalPrice = 0;
+      let currency = 'PKR';
+      
+      for (const item in cart) {
+        if (cart[item].qty > 0) {
+          selected.push(`${cart[item].qty}x ${item} (${cart[item].priceStr})`);
+          totalPrice += cart[item].qty * cart[item].priceVal;
+          currency = cart[item].priceStr.match(/^[A-Za-z$]+/)?.[0] || 'PKR';
+        }
+      }
+      
+      if (selected.length === 0) return;
+      
+      const action = state.currentBot === 'restaurant' ? 'order / reserve' :
+                     state.currentBot === 'clinic' ? 'book' : 'inquire about';
+                     
+      const msg = `I would like to ${action}:\n${selected.join('\n')}\nTotal: ${currency} ${totalPrice.toLocaleString()}`;
+      
+      const summaryEl = document.getElementById(`summary-${menuId}`);
+      if (summaryEl) summaryEl.remove();
+      
+      // Disable quantity buttons
+      const menuContainer = document.getElementById(`summary-${menuId}`)?.parentNode;
+      if (menuContainer) {
+        menuContainer.querySelectorAll('.rich-qty-btn').forEach(btn => {
+          btn.disabled = true;
+          btn.style.opacity = '0.5';
+          btn.style.cursor = 'not-allowed';
+        });
+      }
+      
+      const input = document.getElementById("chat-input");
+      if (input) input.value = "";
+      
+      const qr = document.getElementById("quick-replies");
+      if (qr) qr.remove();
+      
+      handleUserInput(msg);
+    }
+
     function addMessage(role, text) {
       const container = document.getElementById('chat-messages');
       const div = document.createElement('div');
@@ -1077,16 +1403,23 @@ YOUR JOB:
 
       const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       
-      // Sanitise HTML first to prevent XSS vulnerability, then render bold formatting
-      const sanitized = escapeHTML(text);
-      const formatted = sanitized.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      let htmlContent = '';
+      if (role === 'bot') {
+        const parsed = parseRichServices(text, state.currentBot);
+        htmlContent = parsed.html;
+      } else {
+        const sanitized = escapeHTML(text);
+        htmlContent = sanitized.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      }
 
       div.innerHTML = `
-        <div class="msg-bubble">${formatted}</div>
+        <div class="msg-bubble">${htmlContent}</div>
         <div class="msg-time">${time}</div>
       `;
       container.appendChild(div);
       scrollToBottom();
+
+      if (window.lucide) window.lucide.createIcons();
 
       // Add to history for OpenAI
       state.conversationHistory.push({ role: role === 'bot' ? 'assistant' : 'user', content: text });
@@ -1098,14 +1431,15 @@ YOUR JOB:
       }
     }
 
-    function showQuickReplies() {
-      const bot = BOTS[state.currentBot];
+    function showQuickReplies(bot) {
+      if (!bot) return;
       const container = document.getElementById('chat-messages');
       const div = document.createElement('div');
       div.className = 'quick-replies';
       div.id = 'quick-replies';
 
-      bot.quickReplies.forEach(reply => {
+      const replies = bot.quick_replies || [];
+      replies.forEach(reply => {
         const btn = document.createElement('button');
         btn.className = 'qr-chip';
         btn.textContent = reply;
@@ -1295,38 +1629,43 @@ YOUR JOB:
     // ============================================================
     // DEMO SWITCHER
     // ============================================================
-    function switchDemo(botId) {
+    async function switchDemo(botId) {
       state.currentBot = botId;
       state.messageCount = 0;
       state.leadCaptured = false;
       state.leadFormShown = false;
       state.conversationHistory = [];
-      scriptedIndex[botId] = 0;
 
-      const bot = BOTS[botId];
+      try {
+        const res = await fetch(`/api/settings?botId=${botId}`);
+        if (!res.ok) throw new Error("Failed to fetch settings");
+        const bot = await res.json();
 
-      // Update CSS vars
-      document.documentElement.style.setProperty('--brand', bot.color);
-      document.documentElement.style.setProperty('--brand-dark', bot.dark);
+        // Update CSS vars
+        document.documentElement.style.setProperty('--brand', bot.color);
+        document.documentElement.style.setProperty('--brand-dark', bot.dark_color || bot.color);
 
-      // Update header
-      document.getElementById('header-avatar').textContent = bot.emoji;
-      document.getElementById('header-name').textContent  = bot.name;
+        // Update header
+        document.getElementById('header-avatar').textContent = bot.emoji;
+        document.getElementById('header-name').textContent  = bot.name;
 
-      // Update switcher buttons
-      document.querySelectorAll('.sw-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById(`sw-${botId}`).classList.add('active');
+        // Update switcher buttons
+        document.querySelectorAll('.sw-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`sw-${botId}`).classList.add('active');
 
-      // Update landing cards
-      document.querySelectorAll('.demo-card').forEach(c => c.classList.remove('active'));
-      document.getElementById(`card-${botId}`).classList.add('active');
+        // Update landing cards
+        document.querySelectorAll('.demo-card').forEach(c => c.classList.remove('active'));
+        document.getElementById(`card-${botId}`).classList.add('active');
 
-      // Clear messages
-      document.getElementById('chat-messages').innerHTML = '';
+        // Clear messages
+        document.getElementById('chat-messages').innerHTML = '';
 
-      if (state.chatOpen) {
-        setTimeout(() => sendBotMessage(bot.greeting, true), 200);
-        setTimeout(() => showQuickReplies(), 800);
+        if (state.chatOpen) {
+          setTimeout(() => sendBotMessage(bot.greeting, true), 200);
+          setTimeout(() => showQuickReplies(bot), 800);
+        }
+      } catch (err) {
+        console.error("Error switching demo dynamically:", err);
       }
     }
 
@@ -1378,6 +1717,9 @@ YOUR JOB:
           document.getElementById('notif-dot').style.display = 'block';
         }
       }, 3000);
+
+      // Auto-load clinic settings from server JSON database on initialization
+      switchDemo('clinic');
     });
   </script>
   <script>

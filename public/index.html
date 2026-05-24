@@ -577,6 +577,377 @@
       .cta-btns .btn{width:100%;justify-content:center}
       .how-grid{gap:32px}
     }
+    
+    /* ============================================================
+       NATIVE CUSTOM VECTOR DIAGRAMS & SAAS DASHBOARD STYLES
+    ============================================================ */
+    /* Flowchart / Stepper Visuals */
+    .flow-container {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      position: relative;
+      padding: 10px 0;
+    }
+    .flow-step-line {
+      position: absolute;
+      left: 19px;
+      top: 24px;
+      bottom: 24px;
+      width: 2px;
+      background: linear-gradient(180deg, var(--o) 0%, rgba(232,71,28,0.1) 100%);
+      z-index: 0;
+    }
+    .flow-step-item {
+      display: flex;
+      gap: 20px;
+      position: relative;
+      z-index: 1;
+    }
+    .flow-step-badge {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--s2);
+      border: 1px solid var(--b2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--o);
+      flex-shrink: 0;
+      box-shadow: 0 0 15px rgba(232,71,28,0.1);
+      transition: var(--ease);
+    }
+    .flow-step-item:hover .flow-step-badge {
+      border-color: var(--o);
+      box-shadow: 0 0 20px rgba(232,71,28,0.3);
+      transform: scale(1.05);
+    }
+    
+    /* Interactive Flowchart Diagram */
+    .workflow-card {
+      background: var(--s1);
+      border: 1px solid var(--b2);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .workflow-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(232,71,28,0.03) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .diagram-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+      position: relative;
+    }
+    .diagram-node {
+      width: 100%;
+      max-width: 320px;
+      background: rgba(24, 24, 24, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--b1);
+      border-radius: 14px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: var(--ease);
+      position: relative;
+    }
+    .diagram-node:hover {
+      border-color: var(--b3);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+    .diagram-node.active-core {
+      border-color: var(--o);
+      background: rgba(232, 71, 28, 0.03);
+      box-shadow: 0 0 30px rgba(232, 71, 28, 0.08);
+    }
+    .diagram-node.active-core:hover {
+      border-color: var(--o2);
+      box-shadow: 0 0 40px rgba(232, 71, 28, 0.15);
+    }
+    .diagram-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--b2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--m);
+      flex-shrink: 0;
+      transition: var(--ease);
+    }
+    .diagram-node:hover .diagram-icon {
+      color: var(--w);
+      border-color: var(--b3);
+    }
+    .active-core .diagram-icon {
+      background: var(--od);
+      border-color: rgba(232, 71, 28, 0.3);
+      color: var(--o);
+      animation: pulse-core 2.5s infinite;
+    }
+    @keyframes pulse-core {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(232, 71, 28, 0.2); }
+      50% { box-shadow: 0 0 0 8px rgba(232, 71, 28, 0); }
+    }
+    .diagram-text {
+      flex: 1;
+    }
+    .diagram-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--w);
+      margin-bottom: 2px;
+    }
+    .diagram-desc {
+      font-size: 11px;
+      color: var(--m);
+      line-height: 1.4;
+    }
+    .diagram-arrow {
+      height: 24px;
+      width: 2px;
+      position: relative;
+      background: linear-gradient(180deg, var(--b2) 0%, var(--o) 50%, var(--b2) 100%);
+      animation: line-pulse 2s infinite ease-in-out;
+    }
+    @keyframes line-pulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; }
+    }
+    
+    /* Native Dashboard Preview */
+    .dashboard-preview {
+      background: #0d0d0d;
+      border: 1px solid var(--b2);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 40px rgba(232,71,28,0.03);
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      max-width: 680px;
+      margin: 0 auto;
+      transition: var(--ease);
+    }
+    .dashboard-preview:hover {
+      border-color: rgba(232,71,28,0.25);
+      box-shadow: 0 25px 60px rgba(0,0,0,0.6), 0 0 50px rgba(232,71,28,0.06);
+    }
+    .dash-topbar {
+      height: 40px;
+      background: #141414;
+      border-bottom: 1px solid var(--b1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+    }
+    .dash-dots {
+      display: flex;
+      gap: 6px;
+    }
+    .dash-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+    }
+    .dash-search {
+      width: 180px;
+      height: 20px;
+      background: #080808;
+      border: 1px solid var(--b1);
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      font-size: 9px;
+      color: var(--d);
+      gap: 5px;
+    }
+    .dash-body {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+    .dash-sidebar {
+      width: 130px;
+      background: #111;
+      border-right: 1px solid var(--b1);
+      padding: 16px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--m);
+      transition: var(--ease);
+    }
+    .sidebar-item.active {
+      background: var(--od);
+      color: var(--o);
+      font-weight: 600;
+    }
+    .dash-content {
+      flex: 1;
+      background: #080808;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      overflow-y: auto;
+    }
+    .dash-kpis {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .kpi-card {
+      background: #141414;
+      border: 1px solid var(--b1);
+      border-radius: 10px;
+      padding: 10px;
+    }
+    .kpi-label {
+      font-size: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--d);
+    }
+    .kpi-val {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--w);
+      margin-top: 2px;
+    }
+    .kpi-val span {
+      color: var(--o);
+    }
+    .dash-table-card {
+      background: #111;
+      border: 1px solid var(--b1);
+      border-radius: 10px;
+      padding: 12px 14px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .table-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--w);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .table-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .table-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 10px;
+      background: #161616;
+      border: 1px solid var(--b1);
+      border-radius: 6px;
+      font-size: 10px;
+      transition: var(--ease);
+    }
+    .table-row:hover {
+      border-color: var(--b2);
+      background: #1c1c1c;
+    }
+    .row-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .row-avatar {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--od);
+      color: var(--o);
+      font-size: 8px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .row-info {
+      display: flex;
+      flex-direction: column;
+    }
+    .row-name {
+      font-weight: 600;
+      color: var(--w);
+    }
+    .row-phone {
+      color: var(--d);
+      font-size: 8px;
+      margin-top: 1px;
+    }
+    .row-biz {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--b1);
+      color: var(--m);
+      font-size: 8px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      font-weight: 500;
+    }
+    .row-status {
+      font-weight: 600;
+      color: var(--g);
+      font-size: 8px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .row-status::before {
+      content: '';
+      width: 4px;
+      height: 4px;
+      background: var(--g);
+      border-radius: 50%;
+    }
   </style>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -733,68 +1104,88 @@
   <div class="wrap">
     <div class="how-grid">
       <!-- Left -->
-      <div class="sr">
+      <div class="sr flex flex-col justify-center">
         <div class="label">The Process</div>
-        <h2 class="h2">From order to live<br/>in <span class="orange">3 days flat.</span></h2>
-        <p class="body-l" style="margin-top:16px;max-width:420px">
-          No technical meetings. No developer jargon. You share your business info,
-          we do everything else, and deliver a working bot.
+        <h2 class="h2 mb-6">From order to live<br/>in <span class="orange">3 days flat.</span></h2>
+        <p class="body-l mb-8" style="max-width:420px">
+          No technical meetings. No developer jargon. You share your business info, we do everything else, and deliver a working system.
         </p>
 
-        <div class="steps">
-          <div class="step">
-            <div class="step-n">01</div>
-            <div class="step-b">
-              <h3>You fill a 15-minute form</h3>
-              <p>Services, prices, working hours, FAQs, and logo — on your phone or laptop. Simple Google Form.</p>
+        <div class="flow-container">
+          <div class="flow-step-line"></div>
+          
+          <div class="flow-step-item">
+            <div class="flow-step-badge">01</div>
+            <div>
+              <h3 class="font-semibold text-white text-base">15-Min Briefing</h3>
+              <p class="text-xs text-[#F4F4F4]/50 leading-relaxed mt-1">Submit your services, hours, FAQs, and brand logo in a simple form.</p>
             </div>
           </div>
-          <div class="step">
-            <div class="step-n">02</div>
-            <div class="step-b">
-              <h3>We build &amp; train your bot</h3>
-              <p>We configure the AI with your exact data, match your branding, and test every conversation flow end to end.</p>
+          
+          <div class="flow-step-item">
+            <div class="flow-step-badge">02</div>
+            <div>
+              <h3 class="font-semibold text-white text-base">AI Core Training</h3>
+              <p class="text-xs text-[#F4F4F4]/50 leading-relaxed mt-1">We train the model on your exact business data and match your brand styles.</p>
             </div>
           </div>
-          <div class="step">
-            <div class="step-n">03</div>
-            <div class="step-b">
-              <h3>You go live everywhere</h3>
-              <p>Shareable chat link, website embed code, and a private admin dashboard — all delivered with a walkthrough video.</p>
+          
+          <div class="flow-step-item">
+            <div class="flow-step-badge">03</div>
+            <div>
+              <h3 class="font-semibold text-white text-base">One-Click Launch</h3>
+              <p class="text-xs text-[#F4F4F4]/50 leading-relaxed mt-1">Go live with a website snippet, shareable link, and admin dashboard.</p>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Right -->
-      <div class="cards-stack sr d2">
-        <div class="card">
-          <div class="card-head">
-            <div class="card-ico"><i data-lucide="brain-circuit"></i></div>
-            <div class="card-title">AI That Knows Your Business</div>
+      <div class="workflow-card sr d2">
+        <div class="diagram-grid">
+          
+          <!-- Node 1: Website Visitor -->
+          <div class="diagram-node">
+            <div class="diagram-icon">
+              <i data-lucide="user" class="w-5 h-5"></i>
+            </div>
+            <div class="diagram-text">
+              <div class="diagram-title">Website Visitor</div>
+              <div class="diagram-desc">Browses site &amp; asks a late-night question</div>
+            </div>
+            <div class="absolute right-3 top-3 w-2 h-2 rounded-full bg-white/20 animate-pulse"></div>
           </div>
-          <p>Trained on your exact services and FAQs — not generic responses. It feels like a real team member, not a chatbot.</p>
-        </div>
-        <div class="card">
-          <div class="card-head">
-            <div class="card-ico"><i data-lucide="link-2"></i></div>
-            <div class="card-title">No Website? No Problem.</div>
+          
+          <!-- Arrow 1 -->
+          <div class="diagram-arrow"></div>
+          
+          <!-- Node 2: SmartBot Core (AI Engine) -->
+          <div class="diagram-node active-core">
+            <div class="diagram-icon">
+              <i data-lucide="sparkles" class="w-5 h-5"></i>
+            </div>
+            <div class="diagram-text">
+              <div class="diagram-title text-[#E8471C]">SmartBot™ AI Engine</div>
+              <div class="diagram-desc">Understands intent, answers in English/Urdu, offers pricing</div>
+            </div>
+            <div class="absolute right-3 top-3 w-2 h-2 rounded-full bg-[#E8471C] animate-ping"></div>
           </div>
-          <p>You get a standalone link shareable on WhatsApp, Instagram bio, or anywhere. Website embed code included if you have one.</p>
-        </div>
-        <div class="card">
-          <div class="card-head">
-            <div class="card-ico"><i data-lucide="languages"></i></div>
-            <div class="card-title">Urdu &amp; English, Automatically</div>
+          
+          <!-- Arrow 2 -->
+          <div class="diagram-arrow"></div>
+          
+          <!-- Node 3: Business CRM Sync -->
+          <div class="diagram-node">
+            <div class="diagram-icon">
+              <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+            </div>
+            <div class="diagram-text">
+              <div class="diagram-title">Your Admin Dashboard</div>
+              <div class="diagram-desc">Lead details auto-saved &amp; email notification fired instantly</div>
+            </div>
+            <div class="absolute right-3 top-3 w-2 h-2 rounded-full bg-[#22C55E]"></div>
           </div>
-          <p>Detects the language your customer uses and responds in the same language. Full Urdu, Roman Urdu, English — no config needed.</p>
-        </div>
-        <div class="card">
-          <div class="card-head">
-            <div class="card-ico"><i data-lucide="layout-dashboard"></i></div>
-            <div class="card-title">Your Data, Your Dashboard</div>
-          </div>
-          <p>Every lead, booking, and chat log is stored in your private admin dashboard. Export to CSV, update info yourself, no code needed.</p>
+          
         </div>
       </div>
     </div>
@@ -823,36 +1214,157 @@
       </div>
     </div>
 
-    <div class="feat-grid sr d1">
-      <div class="feat">
-        <div class="feat-ico" style="background:var(--od);color:var(--o)"><i data-lucide="bot"></i></div>
-        <h3>Real AI — Not Buttons</h3>
-        <p>Powered by GPT-4o-mini. Understands natural conversation. Handles questions it was never explicitly trained on.</p>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mt-12">
+      <!-- Left: Interactive SaaS Dashboard Preview -->
+      <div class="lg:col-span-7 sr d1">
+        <div class="dashboard-preview">
+          <!-- Top Browser Bar -->
+          <div class="dash-topbar">
+            <div class="dash-dots">
+              <div class="dash-dot" style="background:#EF4444"></div>
+              <div class="dash-dot" style="background:#F59E0B"></div>
+              <div class="dash-dot" style="background:#22C55E"></div>
+            </div>
+            <div class="dash-search">
+              <i data-lucide="lock" class="w-2.5 h-2.5 text-[#22C55E]"></i>
+              <span>overarc.co/dashboard/dental-clinic</span>
+            </div>
+            <div class="w-8"></div>
+          </div>
+          
+          <!-- Dashboard Body -->
+          <div class="dash-body">
+            <!-- Sidebar -->
+            <div class="dash-sidebar">
+              <div class="sidebar-item active cursor-pointer animate-fade-in" id="p-nav-leads" onclick="switchPreviewTab('leads')">
+                <i data-lucide="layout-dashboard" class="w-3.5 h-3.5"></i>
+                <span>Leads Center</span>
+              </div>
+              <div class="sidebar-item cursor-pointer" id="p-nav-settings" onclick="switchPreviewTab('settings')">
+                <i data-lucide="settings" class="w-3.5 h-3.5"></i>
+                <span>Bot Settings</span>
+              </div>
+              <div class="sidebar-item cursor-pointer" id="p-nav-bookings" onclick="switchPreviewTab('bookings')">
+                <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+                <span>Bookings</span>
+              </div>
+              <div class="sidebar-item cursor-pointer" id="p-nav-chats" onclick="switchPreviewTab('chats')">
+                <i data-lucide="message-square" class="w-3.5 h-3.5"></i>
+                <span>Chat History</span>
+              </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="dash-content">
+              <!-- KPI row -->
+              <div class="dash-kpis">
+                <div class="kpi-card">
+                  <div class="kpi-label">Active Status</div>
+                  <div class="kpi-val flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-[#22C55E] inline-block animate-pulse"></span>
+                    <span class="text-xs font-semibold text-white">Live</span>
+                  </div>
+                </div>
+                <div class="kpi-card">
+                  <div class="kpi-label">Total Leads</div>
+                  <div class="kpi-val text-white" id="p-stat-leads">142</div>
+                </div>
+                <div class="kpi-card">
+                  <div class="kpi-label">AI Accuracy</div>
+                  <div class="kpi-val text-white" id="p-stat-accuracy">99.4%</div>
+                </div>
+              </div>
+              
+              <!-- Leads List Mockup -->
+              <div class="dash-table-card" id="p-main-card">
+                <div class="table-title">
+                  <span id="p-card-title">RECENT CAPTURED LEADS</span>
+                  <span class="text-[9px] text-[#E8471C] font-semibold flex items-center gap-1" id="p-card-badge">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#E8471C] animate-ping"></span> Sync Live
+                  </span>
+                </div>
+                <div class="table-rows" id="p-card-rows">
+                  <div class="table-row">
+                    <div class="row-meta">
+                      <div class="row-avatar" style="background:var(--od);color:var(--o)">AK</div>
+                      <div class="row-info">
+                        <span class="row-name">Dr. Ahmad Khan</span>
+                        <span class="row-phone">0300-9876543</span>
+                      </div>
+                    </div>
+                    <span class="row-biz">City Dental Clinic</span>
+                    <span class="row-status">Whitening Booking</span>
+                  </div>
+                  <div class="table-row">
+                    <div class="row-meta">
+                      <div class="row-avatar" style="background:rgba(168,85,247,0.1);color:#A855F7;">BR</div>
+                      <div class="row-info">
+                        <span class="row-name">Bilal Rehman</span>
+                        <span class="row-phone">0333-1234567</span>
+                      </div>
+                    </div>
+                    <span class="row-biz">Al-Noor Real Estate</span>
+                    <span class="row-status" style="color:#A855F7;">Property Inquiry</span>
+                  </div>
+                  <div class="table-row">
+                    <div class="row-meta">
+                      <div class="row-avatar" style="background:rgba(245,158,11,0.1);color:#F59E0B;">FM</div>
+                      <div class="row-info">
+                        <span class="row-name">Faisal Mehmood</span>
+                        <span class="row-phone">0345-5558882</span>
+                      </div>
+                    </div>
+                    <span class="row-biz">Taste of Swat</span>
+                    <span class="row-status" style="color:#F59E0B;">Table Reserv.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="feat">
-        <div class="feat-ico" style="background:rgba(34,197,94,.1);color:#22C55E"><i data-lucide="user-plus"></i></div>
-        <h3>Auto Lead Capture</h3>
-        <p>After a few messages, it asks for name and phone number, saves them to your dashboard, and emails you instantly.</p>
-      </div>
-      <div class="feat">
-        <div class="feat-ico" style="background:rgba(168,85,247,.1);color:#A855F7"><i data-lucide="calendar-check-2"></i></div>
-        <h3>Appointment Booking</h3>
-        <p>Customers pick service, date, and time through conversation. It records everything and sends you a notification.</p>
-      </div>
-      <div class="feat">
-        <div class="feat-ico" style="background:rgba(245,158,11,.1);color:#F59E0B"><i data-lucide="gauge"></i></div>
-        <h3>Admin Dashboard</h3>
-        <p>Password-protected. See all leads, bookings, and chat logs. Update services and FAQs without any code.</p>
-      </div>
-      <div class="feat">
-        <div class="feat-ico" style="background:rgba(6,182,212,.1);color:#06B6D4"><i data-lucide="code-2"></i></div>
-        <h3>One-Line Embed</h3>
-        <p>Paste a single script tag before &lt;/body&gt; and the chat bubble appears on any website. That's the whole integration.</p>
-      </div>
-      <div class="feat">
-        <div class="feat-ico" style="background:rgba(239,68,68,.1);color:#EF4444"><i data-lucide="paintbrush-2"></i></div>
-        <h3>Fully Custom Branded</h3>
-        <p>Your logo, colors, and business name. Visitors never know it's AI. Feels like talking to a real team member.</p>
+      
+      <!-- Right: Short bullet points -->
+      <div class="lg:col-span-5 flex flex-col gap-6 sr d2">
+        <div class="flex gap-4 items-start">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#E8471C] to-[#FF6235] text-white flex items-center justify-center shrink-0">
+            <i data-lucide="sparkles" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-white text-base">Gemini AI Core Engine</h3>
+            <p class="text-xs text-[#F4F4F4]/50 leading-relaxed mt-1">Stunningly natural Urdu &amp; English replies. Understands client intent instantly without rigid buttons.</p>
+          </div>
+        </div>
+        
+        <div class="flex gap-4 items-start">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#22C55E] to-[#4ADE80] text-white flex items-center justify-center shrink-0">
+            <i data-lucide="user-plus" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-white text-base">Instant Lead capture &amp; CRM</h3>
+            <p class="text-xs text-[#F4F4F4]/50 leading-relaxed mt-1">Conversational lead capture system saving customer details straight to your dashboard logs.</p>
+          </div>
+        </div>
+
+        <div class="flex gap-4 items-start">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#A855F7] to-[#C084FC] text-white flex items-center justify-center shrink-0">
+            <i data-lucide="code-2" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-white text-base">10-Second Website Embed</h3>
+            <p class="text-xs text-[#F4F4F4]/50 leading-relaxed mt-1">Lightweight copy-paste snippet injection matching any theme in seconds.</p>
+          </div>
+        </div>
+
+        <div class="flex gap-4 items-start">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#F59E0B] to-[#FBBF24] text-white flex items-center justify-center shrink-0">
+            <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-white text-base">Interactive Admin Console</h3>
+            <p class="text-xs text-[#F4F4F4]/50 leading-relaxed mt-1">Easily update brand colors, FAQs, and system prompts on the fly with zero technical knowledge.</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -922,14 +1434,14 @@
         <div class="pkr">one-time setup</div>
         <div class="pline"></div>
         <ul class="pfs">
-          <li class="pf y"><i data-lucide="check-circle-2"></i>AI chatbot setup &amp; training</li>
+          <li class="pf y"><i data-lucide="check-circle-2"></i>AI chatbot core setup</li>
           <li class="pf y"><i data-lucide="check-circle-2"></i>Unlimited FAQ answering</li>
-          <li class="pf y"><i data-lucide="check-circle-2"></i>Lead capture system</li>
-          <li class="pf y"><i data-lucide="check-circle-2"></i>Admin dashboard</li>
-          <li class="pf y"><i data-lucide="check-circle-2"></i>Standalone chat link</li>
-          <li class="pf y"><i data-lucide="check-circle-2"></i>1 month support</li>
+          <li class="pf y"><i data-lucide="check-circle-2"></i>Conversational lead capture</li>
+          <li class="pf y"><i data-lucide="check-circle-2"></i>Private admin dashboard</li>
+          <li class="pf y"><i data-lucide="check-circle-2"></i>Standalone share link</li>
+          <li class="pf y"><i data-lucide="check-circle-2"></i>1-Month support</li>
           <li class="pf n"><i data-lucide="minus-circle"></i>Appointment booking</li>
-          <li class="pf n"><i data-lucide="minus-circle"></i>Website embed code</li>
+          <li class="pf n"><i data-lucide="minus-circle"></i>Website custom embed</li>
         </ul>
         <button class="pbtn out" onclick="window.open('https://wa.me/923249116764?text=Hi%20Overarc,%20I\'m%20interested%20in%20the%20Starter%20Package!','_blank')">Get Started</button>
       </div>
@@ -944,11 +1456,11 @@
         <ul class="pfs">
           <li class="pf y"><i data-lucide="check-circle-2"></i>Everything in Starter</li>
           <li class="pf y"><i data-lucide="check-circle-2"></i>Appointment booking flow</li>
-          <li class="pf y"><i data-lucide="check-circle-2"></i>Website embed code</li>
-          <li class="pf y"><i data-lucide="check-circle-2"></i>Urdu + English support</li>
-          <li class="pf y"><i data-lucide="check-circle-2"></i>Email lead notifications</li>
-          <li class="pf y"><i data-lucide="check-circle-2"></i>3 months support</li>
-          <li class="pf n"><i data-lucide="minus-circle"></i>Monthly PDF report</li>
+          <li class="pf y"><i data-lucide="check-circle-2"></i>Website inline embed</li>
+          <li class="pf y"><i data-lucide="check-circle-2"></i>Urdu &amp; English support</li>
+          <li class="pf y"><i data-lucide="check-circle-2"></i>Email lead alerts</li>
+          <li class="pf y"><i data-lucide="check-circle-2"></i>3-Months premium support</li>
+          <li class="pf n"><i data-lucide="minus-circle"></i>Monthly PDF leads report</li>
         </ul>
         <button class="pbtn solid" onclick="window.open('https://wa.me/923249116764?text=Hi%20Overarc,%20I\'m%20interested%20in%20the%20Pro%20Package!','_blank')">
           <i data-lucide="zap" style="width:15px;height:15px"></i>
@@ -964,11 +1476,11 @@
         <div class="pline"></div>
         <ul class="pfs">
           <li class="pf y"><i data-lucide="check-circle-2"></i>Everything in Pro</li>
-          <li class="pf y"><i data-lucide="check-circle-2"></i>Full custom branding</li>
+          <li class="pf y"><i data-lucide="check-circle-2"></i>Complete custom branding</li>
           <li class="pf y"><i data-lucide="check-circle-2"></i>Monthly PDF leads report</li>
-          <li class="pf y"><i data-lucide="check-circle-2"></i>Priority support</li>
-          <li class="pf y"><i data-lucide="check-circle-2"></i>6 months free support</li>
-          <li class="pf y"><i data-lucide="check-circle-2"></i>Free tweaks anytime</li>
+          <li class="pf y"><i data-lucide="check-circle-2"></i>Priority support queue</li>
+          <li class="pf y"><i data-lucide="check-circle-2"></i>6-Months free support</li>
+          <li class="pf y"><i data-lucide="check-circle-2"></i>Unlimited tweaks anytime</li>
         </ul>
         <button class="pbtn out" onclick="window.open('https://wa.me/923249116764?text=Hi%20Overarc,%20I\'m%20interested%20in%20the%20Premium%20Package!','_blank')">Get Started</button>
       </div>
@@ -1730,7 +2242,7 @@
 
       try {
         // Send lead to local Python backend
-        const response = await fetch("http://localhost:5000/api/leads", {
+        const response = await fetch("/api/leads", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -1803,7 +2315,7 @@
 
     const generateAIResponse = async (userText, typingId) => {
       try {
-        const response = await fetch("http://localhost:5000/api/chat", {
+        const response = await fetch("/api/chat", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -1873,6 +2385,8 @@
       generateAIResponse(text, typingId);
     };
 
+    };
+
     chatSend.addEventListener('click', handleSend);
     chatInput.addEventListener('keypress', (e) => {
       if(e.key === 'Enter') handleSend();
@@ -1887,7 +2401,337 @@
         handleSend();
       });
     });
+
+    // ============================================================
+    // WORKABLE MINI DASHBOARD PREVIEW LOGIC
+    // ============================================================
+    let activePreviewTab = 'leads';
+    let activePreviewBiz = 'clinic';
+    let activePreviewColor = '#E8471C';
+    let activePreviewGreeting = "Hello! 👋 Welcome to City Dental Clinic. How can I help you today?";
+
+    const mockLeadsData = {
+      clinic: [
+        { name: "Dr. Ahmad Khan", phone: "0300-9876543", biz: "City Dental Clinic", status: "Whitening Booking", avatar: "AK", colorClass: "rgba(34,197,94,0.1)", textCol: "#22C55E" },
+        { name: "Sana Malik", phone: "0321-4567890", biz: "City Dental Clinic", status: "Scaling Inquire", avatar: "SM", colorClass: "rgba(34,197,94,0.1)", textCol: "#22C55E" },
+        { name: "Zain Ali", phone: "0333-8889991", biz: "City Dental Clinic", status: "Root Canal Check", avatar: "ZA", colorClass: "rgba(34,197,94,0.1)", textCol: "#22C55E" }
+      ],
+      realestate: [
+        { name: "Bilal Rehman", phone: "0333-1234567", biz: "Al-Noor Real Estate", status: "Property Inquiry", avatar: "BR", colorClass: "rgba(168,85,247,0.1)", textCol: "#A855F7" },
+        { name: "M. Haris", phone: "0312-9994445", biz: "Al-Noor Real Estate", status: "5-Marla Plot Booking", avatar: "MH", colorClass: "rgba(168,85,247,0.1)", textCol: "#A855F7" },
+        { name: "Ayesha Bibi", phone: "0345-7776663", biz: "Al-Noor Real Estate", status: "Commercial Rent", avatar: "AB", colorClass: "rgba(168,85,247,0.1)", textCol: "#A855F7" }
+      ],
+      restaurant: [
+        { name: "Faisal Mehmood", phone: "0345-5558882", biz: "Taste of Swat", status: "Table Reserv.", avatar: "FM", colorClass: "rgba(245,158,11,0.1)", textCol: "#F59E0B" },
+        { name: "Hamza Khan", phone: "0300-3334445", biz: "Taste of Swat", status: "Menu Inquiry", avatar: "HK", colorClass: "rgba(245,158,11,0.1)", textCol: "#F59E0B" },
+        { name: "Kamil Shah", phone: "0311-2228889", biz: "Taste of Swat", status: "Home Delivery", avatar: "KS", colorClass: "rgba(245,158,11,0.1)", textCol: "#F59E0B" }
+      ]
+    };
+
+    const mockBookingsData = {
+      clinic: [
+        { name: "Teeth Whitening  Dr. Ahmad Khan", time: "Saturday, 10:00 AM", biz: "City Dental Clinic", status: "Confirmed", colorClass: "rgba(34,197,94,0.1)", textCol: "#22C55E" },
+        { name: "Scaling Inquire  Sana Malik", time: "Monday, 11:30 AM", biz: "City Dental Clinic", status: "Confirmed", colorClass: "rgba(34,197,94,0.1)", textCol: "#22C55E" },
+        { name: "Root Canal Check  Zain Ali", time: "Tuesday, 4:00 PM", biz: "City Dental Clinic", status: "Confirmed", colorClass: "rgba(34,197,94,0.1)", textCol: "#22C55E" }
+      ],
+      realestate: [
+        { name: "5-Marla Site Tour  Bilal Rehman", time: "Sunday, 3:00 PM", biz: "Al-Noor Real Estate", status: "Confirmed", colorClass: "rgba(168,85,247,0.1)", textCol: "#A855F7" },
+        { name: "Commercial Office Tour  M. Haris", time: "Wednesday, 2:00 PM", biz: "Al-Noor Real Estate", status: "Confirmed", colorClass: "rgba(168,85,247,0.1)", textCol: "#A855F7" }
+      ],
+      restaurant: [
+        { name: "Table for 4  Faisal Mehmood", time: "Tonight, 8:30 PM", biz: "Taste of Swat", status: "Confirmed", colorClass: "rgba(245,158,11,0.1)", textCol: "#F59E0B" },
+        { name: "Birthday Party for 12  Kamil Shah", time: "Friday, 9:00 PM", biz: "Taste of Swat", status: "Confirmed", colorClass: "rgba(245,158,11,0.1)", textCol: "#F59E0B" }
+      ]
+    };
+
+    const mockChatsData = {
+      clinic: [
+        { sender: 'bot', text: 'Hello! 👋 Welcome to **City Dental Clinic**. How can I help you?' },
+        { sender: 'user', text: 'How much is teeth whitening?' },
+        { sender: 'bot', text: 'Teeth whitening is **PKR 5,000** per session and takes 1 hour. Want to book a slot?' },
+        { sender: 'user', text: 'Yes please, Saturday 10 AM' },
+        { sender: 'bot', text: 'Perfect! Saved. May I have your **name and phone number** to lock your appointment?' },
+        { sender: 'user', text: 'Ahmad Khan, 0300-9876543' },
+        { sender: 'bot', text: 'Thank you, Dr. Ahmad Khan! ✅ Appointment locked for Sat 10:00 AM. See you soon!' }
+      ],
+      realestate: [
+        { sender: 'bot', text: 'Hello! 👋 Welcome to **Al-Noor Real Estate**. Looking to buy, sell, or rent?' },
+        { sender: 'user', text: 'Any 5-marla plots in Swat?' },
+        { sender: 'bot', text: 'Yes, we have prime 5-marla plots starting at **PKR 2,500,000** with flexible installments. Can I save your details for our agent to call?' },
+        { sender: 'user', text: 'Sure, 0333-1234567, Bilal Rehman' },
+        { sender: 'bot', text: 'Thank you, Bilal Rehman! ✅ Contact registered. Our agent will call you within 10 minutes.' }
+      ],
+      restaurant: [
+        { sender: 'bot', text: 'Hello! 👋 Welcome to **Taste of Swat Restaurant**. Table booking or menu inquiry?' },
+        { sender: 'user', text: 'Reserve a table for tonight at 8:30 PM for 4 people.' },
+        { sender: 'bot', text: 'Sure! We have a table available in our family section. What name and phone should we save?' },
+        { sender: 'user', text: 'Faisal Mehmood, 0345-5558882' },
+        { sender: 'bot', text: 'Done, Faisal Mehmood! ✅ Table for 4 reserved for tonight at 8:30 PM. See you soon!' }
+      ]
+    };
+
+    window.switchPreviewTab = function(tab) {
+      activePreviewTab = tab;
+      
+      // Update sidebar nav UI classes
+      document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+      const activeNav = document.getElementById(`p-nav-${tab}`);
+      if(activeNav) activeNav.classList.add('active');
+
+      const cardTitle = document.getElementById('p-card-title');
+      const cardRows = document.getElementById('p-card-rows');
+      const cardBadge = document.getElementById('p-card-badge');
+
+      if (tab === 'leads') {
+        cardTitle.textContent = "RECENT CAPTURED LEADS";
+        cardBadge.style.display = 'flex';
+        renderPreviewLeads();
+      } 
+      else if (tab === 'settings') {
+        cardTitle.textContent = "BOT VISUAL CONFIGURATOR";
+        cardBadge.style.display = 'none';
+        renderPreviewSettings();
+      } 
+      else if (tab === 'bookings') {
+        cardTitle.textContent = "ACTIVE RESERVATIONS";
+        cardBadge.style.display = 'flex';
+        renderPreviewBookings();
+      } 
+      else if (tab === 'chats') {
+        cardTitle.textContent = "RECENT CONVERSATION LOGS";
+        cardBadge.style.display = 'none';
+        renderPreviewChats();
+      }
+    };
+
+    function renderPreviewLeads() {
+      const rowsContainer = document.getElementById('p-card-rows');
+      const leads = mockLeadsData[activePreviewBiz];
+      rowsContainer.innerHTML = '';
+      
+      leads.forEach(lead => {
+        const row = document.createElement('div');
+        row.className = 'table-row';
+        row.innerHTML = `
+          <div class="row-meta">
+            <div class="row-avatar" style="background:${lead.colorClass};color:${lead.textCol}; font-weight:700;">${lead.avatar}</div>
+            <div class="row-info">
+              <span class="row-name">${lead.name}</span>
+              <span class="row-phone">${lead.phone}</span>
+            </div>
+          </div>
+          <span class="row-biz">${lead.biz}</span>
+          <span class="row-status" style="color:${lead.textCol};">${lead.status}</span>
+        `;
+        rowsContainer.appendChild(row);
+      });
+    }
+
+    function renderPreviewSettings() {
+      const rowsContainer = document.getElementById('p-card-rows');
+      
+      // We will render form controls dynamically
+      rowsContainer.innerHTML = `
+        <div class="flex flex-col gap-3 text-[11px] text-white">
+          <div class="flex flex-col gap-1">
+            <label class="text-[9px] text-white/50 font-bold uppercase">BUSINESS TYPE</label>
+            <div class="flex gap-2">
+              <button onclick="previewSelectBiz('clinic')" id="biz-btn-clinic" class="flex-1 px-3 py-1.5 rounded-lg border font-semibold text-center cursor-pointer transition-all ${activePreviewBiz === 'clinic' ? 'bg-[#E8471C] border-[#E8471C] text-white shadow-lg' : 'bg-[#181818] border-white/10 text-white/70'}">Clinic 🏥</button>
+              <button onclick="previewSelectBiz('realestate')" id="biz-btn-realestate" class="flex-1 px-3 py-1.5 rounded-lg border font-semibold text-center cursor-pointer transition-all ${activePreviewBiz === 'realestate' ? 'bg-[#E8471C] border-[#E8471C] text-white shadow-lg' : 'bg-[#181818] border-white/10 text-white/70'}">Real Estate 🏠</button>
+              <button onclick="previewSelectBiz('restaurant')" id="biz-btn-restaurant" class="flex-1 px-3 py-1.5 rounded-lg border font-semibold text-center cursor-pointer transition-all ${activePreviewBiz === 'restaurant' ? 'bg-[#E8471C] border-[#E8471C] text-white shadow-lg' : 'bg-[#181818] border-white/10 text-white/70'}">Restaurant 🍔</button>
+            </div>
+          </div>
+          
+          <div class="flex flex-col gap-1 mt-1">
+            <label class="text-[9px] text-white/50 font-bold uppercase">ACCENT COLOR (DASHBOARD HIGHLIGHT)</label>
+            <div class="flex gap-3 items-center py-1">
+              <button onclick="previewSelectColor('#E8471C')" class="w-6 h-6 rounded-full bg-[#E8471C] border-2 cursor-pointer transition-all ${activePreviewColor === '#E8471C' ? 'border-white scale-110' : 'border-transparent'}"></button>
+              <button onclick="previewSelectColor('#22C55E')" class="w-6 h-6 rounded-full bg-[#22C55E] border-2 cursor-pointer transition-all ${activePreviewColor === '#22C55E' ? 'border-white scale-110' : 'border-transparent'}"></button>
+              <button onclick="previewSelectColor('#A855F7')" class="w-6 h-6 rounded-full bg-[#A855F7] border-2 cursor-pointer transition-all ${activePreviewColor === '#A855F7' ? 'border-white scale-110' : 'border-transparent'}"></button>
+              <button onclick="previewSelectColor('#06B6D4')" class="w-6 h-6 rounded-full bg-[#06B6D4] border-2 cursor-pointer transition-all ${activePreviewColor === '#06B6D4' ? 'border-white scale-110' : 'border-transparent'}"></button>
+              <span class="text-[9px] text-white/40 italic ml-2">Click to paint layout!</span>
+            </div>
+          </div>
+          
+          <div class="flex flex-col gap-1 mt-1">
+            <label class="text-[9px] text-white/50 font-bold uppercase">CUSTOM BOT GREETING</label>
+            <div class="relative flex items-center">
+              <input type="text" id="preview-greeting-input" value="${activePreviewGreeting}" class="w-full bg-[#181818] border border-white/10 rounded-lg px-3 py-2 text-[10px] text-white focus:outline-none focus:border-[#E8471C]" oninput="previewUpdateGreeting(this.value)">
+              <span class="absolute right-3 text-[9px] text-white/30 font-medium">Auto Save</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    window.previewSelectBiz = function(biz) {
+      activePreviewBiz = biz;
+      
+      // Update statistics mock metrics dynamically
+      const leadsStat = document.getElementById('p-stat-leads');
+      const accuracyStat = document.getElementById('p-stat-accuracy');
+      const searchUrl = document.querySelector('.dash-search span');
+      
+      if (biz === 'clinic') {
+        leadsStat.textContent = "142";
+        accuracyStat.textContent = "99.4%";
+        searchUrl.textContent = "overarc.co/dashboard/dental-clinic";
+        activePreviewGreeting = "Hello! 👋 Welcome to City Dental Clinic. How can I help you today?";
+        previewSelectColor('#22C55E');
+      } else if (biz === 'realestate') {
+        leadsStat.textContent = "87";
+        accuracyStat.textContent = "98.1%";
+        searchUrl.textContent = "overarc.co/dashboard/real-estate";
+        activePreviewGreeting = "Hi! 🏡 Welcome to Al-Noor Real Estate. Looking to buy or sell?";
+        previewSelectColor('#A855F7');
+      } else if (biz === 'restaurant') {
+        leadsStat.textContent = "264";
+        accuracyStat.textContent = "99.0%";
+        searchUrl.textContent = "overarc.co/dashboard/taste-of-swat";
+        activePreviewGreeting = "Welcome! 🍔 Ready to book a table at Taste of Swat?";
+        previewSelectColor('#E8471C');
+      }
+
+      // Re-render active tab to show the selected business's mock data
+      switchPreviewTab(activePreviewTab);
+    };
+
+    window.previewSelectColor = function(color) {
+      activePreviewColor = color;
+      
+      // Apply theme color dynamically to mini dashboard elements
+      document.documentElement.style.setProperty('--o', color);
+      document.documentElement.style.setProperty('--o2', color);
+      
+      // Re-render settings to show selected ring
+      if (activePreviewTab === 'settings') {
+        renderPreviewSettings();
+      }
+    };
+
+    window.previewUpdateGreeting = function(val) {
+      activePreviewGreeting = val;
+    };
+
+    function renderPreviewBookings() {
+      const rowsContainer = document.getElementById('p-card-rows');
+      const bookings = mockBookingsData[activePreviewBiz] || [];
+      rowsContainer.innerHTML = '';
+      
+      const wrapper = document.createElement('div');
+      wrapper.className = 'table-rows';
+      
+      bookings.forEach(b => {
+        const row = document.createElement('div');
+        row.className = 'table-row';
+        row.innerHTML = `
+          <div class="row-meta">
+            <div class="row-avatar" style="background:${b.colorClass};color:${b.textCol}; font-weight:700; display:flex; align-items:center; justify-content:center;">
+              <i data-lucide="check" class="w-3.5 h-3.5"></i>
+            </div>
+            <div class="row-info">
+              <span class="row-name">${b.name}</span>
+              <span class="row-phone">${b.time}</span>
+            </div>
+          </div>
+          <span class="row-biz">${b.biz}</span>
+          <span class="row-status" style="color:${b.textCol};">${b.status}</span>
+        `;
+        wrapper.appendChild(row);
+      });
+      rowsContainer.appendChild(wrapper);
+      if(window.lucide) window.lucide.createIcons();
+    }
+
+    function renderPreviewChats() {
+      const rowsContainer = document.getElementById('p-card-rows');
+      rowsContainer.innerHTML = `
+        <div class="table-rows">
+          <div class="table-row cursor-pointer" onclick="previewShowChatLog('clinic')">
+            <div class="row-meta">
+              <div class="row-avatar">AK</div>
+              <div class="row-info">
+                <span class="row-name">General Inquiry: Teeth Whitening</span>
+                <span class="row-phone">Last message: PKR 5,000 per session...</span>
+              </div>
+            </div>
+            <span class="row-biz">City Dental Clinic</span>
+            <span class="row-status flex items-center gap-1" style="color:#E8471C;"><i data-lucide="eye" class="w-3 h-3 inline"></i> View Log</span>
+          </div>
+          
+          <div class="table-row cursor-pointer" onclick="previewShowChatLog('realestate')">
+            <div class="row-meta">
+              <div class="row-avatar" style="background:rgba(168,85,247,0.1);color:#A855F7;">BR</div>
+              <div class="row-info">
+                <span class="row-name">Lead Capture: Swat 5-Marla Plot</span>
+                <span class="row-phone">Last message: Contact saved, agent notified...</span>
+              </div>
+            </div>
+            <span class="row-biz">Al-Noor Real Estate</span>
+            <span class="row-status flex items-center gap-1" style="color:#E8471C;"><i data-lucide="eye" class="w-3 h-3 inline"></i> View Log</span>
+          </div>
+
+          <div class="table-row cursor-pointer" onclick="previewShowChatLog('restaurant')">
+            <div class="row-meta">
+              <div class="row-avatar" style="background:rgba(245,158,11,0.1);color:#F59E0B;">FM</div>
+              <div class="row-info">
+                <span class="row-name">Table Booking &amp; Menu Inquiry</span>
+                <span class="row-phone">Last message: Table for 4 tonight reserved...</span>
+              </div>
+            </div>
+            <span class="row-biz">Taste of Swat</span>
+            <span class="row-status flex items-center gap-1" style="color:#E8471C;"><i data-lucide="eye" class="w-3 h-3 inline"></i> View Log</span>
+          </div>
+        </div>
+      `;
+      if(window.lucide) window.lucide.createIcons();
+    }
+
+    window.previewShowChatLog = function(biz) {
+      const cardTitle = document.getElementById('p-card-title');
+      const rowsContainer = document.getElementById('p-card-rows');
+      const messages = mockChatsData[biz];
+      
+      let bizLabel = biz === 'clinic' ? 'City Dental Clinic' : biz === 'realestate' ? 'Al-Noor Real Estate' : 'Taste of Swat';
+      cardTitle.textContent = `CHAT LOG — ${bizLabel.toUpperCase()}`;
+      
+      let chatHtml = `
+        <div class="flex flex-col gap-2 max-h-[160px] overflow-y-auto pr-1 mb-2 font-sans" style="scroll-behavior:smooth;">
+      `;
+      
+      messages.forEach(m => {
+        if (m.sender === 'bot') {
+          chatHtml += `
+            <div class="flex items-start gap-1.5 max-w-[85%]">
+              <div class="w-4 h-4 rounded-full bg-[#E8471C] flex items-center justify-center shrink-0 mt-0.5" style="background:${activePreviewColor};">
+                <i data-lucide="bot" class="text-white w-2.5 h-2.5"></i>
+              </div>
+              <div class="bg-[#181818] border border-white/5 text-white/90 text-[9px] px-2 py-1.5 rounded-xl rounded-tl-sm shadow-sm leading-relaxed">${m.text}</div>
+            </div>
+          `;
+        } else {
+          chatHtml += `
+            <div class="flex items-start justify-end gap-1.5 max-w-[85%] self-end">
+              <div class="bg-[#222] text-white/90 text-[9px] px-2 py-1.5 rounded-xl rounded-tr-sm shadow-sm leading-relaxed" style="background:${activePreviewColor}; color:#fff;">${m.text}</div>
+            </div>
+          `;
+        }
+      });
+      
+      chatHtml += `
+        </div>
+        <button onclick="switchPreviewTab('chats')" class="w-full bg-[#181818] hover:bg-[#222] border border-white/10 text-white/80 text-[10px] font-semibold py-1.5 rounded-lg transition-colors cursor-pointer text-center flex items-center justify-center gap-1">
+          <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Back to Conversation Logs
+        </button>
+      `;
+      
+      rowsContainer.innerHTML = chatHtml;
+      if(window.lucide) window.lucide.createIcons();
+    };
+
+    // Initialize dynamic dashboard view on load
+    switchPreviewTab('leads');
+
   });
-</script>
 </body>
 </html>
