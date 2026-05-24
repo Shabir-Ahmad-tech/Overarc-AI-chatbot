@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /onboarding
+
+Sitemap: https://overarc.co/sitemap.xml

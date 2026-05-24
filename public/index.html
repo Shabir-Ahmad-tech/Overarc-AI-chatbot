@@ -3,8 +3,95 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>Overarc — AI Chatbots Built for Real Businesses</title>
-  <meta name="description" content="Overarc builds custom AI chatbots that answer questions 24/7, capture leads, and book appointments. Delivered in 3 days. Starting at $499."/>
+  <title>Overarc — AI Chatbots for Pakistani Businesses | Mingora Swat KPK</title>
+  <meta name="description" content="Overarc builds custom AI chatbots for clinics, restaurants, and real estate businesses in Pakistan. 24/7 lead capture, appointment booking. Delivered in 3 days.">
+  <meta name="keywords" content="AI chatbot Pakistan, AI chatbot Mingora, AI chatbot Swat, WhatsApp chatbot Pakistan, chatbot for clinic Pakistan, affordable AI chatbot">
+  <meta property="og:title" content="Overarc — AI Chatbots for Pakistani Businesses | Mingora Swat KPK">
+  <meta property="og:description" content="Overarc builds custom AI chatbots for clinics, restaurants, and real estate businesses in Pakistan. 24/7 lead capture, appointment booking. Delivered in 3 days.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://overarc.co">
+  <meta property="og:image" content="https://overarc.co/Icons/Icon%20Transparent.png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "Overarc",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Mingora",
+      "addressRegion": "KPK",
+      "addressCountry": "Pakistan"
+    },
+    "url": "https://overarc.co",
+    "priceRange": "$150-$400",
+    "telephone": "+923249116764",
+    "description": "Overarc builds custom AI chatbots for clinics, restaurants, and real estate businesses in Pakistan."
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Do I need a website to use this?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. You get a standalone chat link you can share on WhatsApp, Instagram bio, Google Business, or anywhere. If you do have a website, we include a one-line embed code."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How long does delivery actually take?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "3 business days after you send your form. Day 1: we configure. Day 2: we build and test. Day 3: we deliver with a Loom walkthrough video. Some clients go live on Day 2."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does it really understand Urdu?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes — full Urdu, Roman Urdu, and English. The AI detects whichever language the customer types in and responds in that same language automatically. No extra configuration."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I update the bot after delivery?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Your admin dashboard lets you edit services, prices, and FAQs yourself — no coding. Or message us and we'll update it for you free during your support period."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is it real AI or just a scripted button bot?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Real AI — GPT-4o-mini via OpenRouter. It understands natural conversation and handles questions it was never explicitly trained on. Not click-and-button menus."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What's the payment structure?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "50% upfront to start, 50% when you approve the final version. No hidden fees. The optional $30/month plan covers hosting, updates, and priority support."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can medium or larger businesses use this?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The current product is best for businesses handling up to ~200 daily conversations. For enterprise or high-volume operations, we build a custom solution on proper backend infrastructure — contact us to discuss."
+        }
+      }
+    ]
+  }
+  </script>
   <link rel="icon" type="image/png" href="Icons/Icon Transparent.png"/>
   <link rel="canonical" href="https://overarc.co"/>
 
@@ -16,6 +103,13 @@
 
   <!-- Lucide Icons (modern, clean, consistent) -->
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <!-- Tailwind CSS for Chatbot Widget (No Preflight) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      corePlugins: { preflight: false }
+    }
+  </script>
 
   <style>
     /* ============================================================
@@ -1717,7 +1811,7 @@
         <div class="f-col">
           <div class="f-col-lbl">Contact</div>
           <a href="https://wa.me/923249116764?text=Hi%20Overarc,%20I'm%20interested%20in%20an%20AI%20Chatbot!" target="_blank">WhatsApp</a>
-          <a href="mailto:hello@overarc.co">hello@overarc.co</a>
+          <a href="mailto:shabir@overarc.co">shabir@overarc.co</a>
           <a href="#faq">FAQ</a>
         </div>
       </div>
@@ -1907,7 +2001,7 @@
   const hamIcon = document.getElementById('ham-icon');
 
   window.addEventListener('scroll', () => {
-    nav.classList.toggle('lit', window.scrollY > 30);
+    // nav.classList.toggle('lit', window.scrollY > 30);
   }, {passive: true});
 
   window.toggleMobileNav = function() {
@@ -2358,7 +2452,7 @@
       } catch (err) {
         console.error(err);
         document.getElementById(typingId).remove();
-        appendBotMsg("⚠️ Server is not running or encountered an error. Please contact hello@overarc.co directly.");
+        appendBotMsg("⚠️ Server is not running or encountered an error. Please contact shabir@overarc.co directly.");
         unlockInput();
       }
     };
@@ -2383,8 +2477,6 @@
 
       const typingId = showTyping();
       generateAIResponse(text, typingId);
-    };
-
     };
 
     chatSend.addEventListener('click', handleSend);
@@ -2733,5 +2825,6 @@
     switchPreviewTab('leads');
 
   });
+</script>
 </body>
 </html>

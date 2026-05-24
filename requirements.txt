@@ -7,3 +7,5 @@ bcrypt
 flask-limiter
 openai
 pypdf2
+gunicorn
+apscheduler

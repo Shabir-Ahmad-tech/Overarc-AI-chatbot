@@ -74,3 +74,11 @@ CREATE TABLE IF NOT EXISTS documents (
 );
 
 CREATE INDEX IF NOT EXISTS idx_documents_bot_id ON documents (bot_id);
+
+-- =============================================================================
+-- ADDITIONAL: Add status column to businesses table (if using schema.sql)
+-- Run only if you already applied schema.sql and need to upgrade:
+-- =============================================================================
+-- ALTER TABLE businesses ADD COLUMN IF NOT EXISTS email TEXT;
+-- ALTER TABLE businesses ADD COLUMN IF NOT EXISTS password_hash TEXT;
+-- ALTER TABLE businesses ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'active';

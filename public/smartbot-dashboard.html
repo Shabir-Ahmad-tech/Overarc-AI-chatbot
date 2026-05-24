@@ -1,2174 +1,1041 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SmartBot SaaS — Client Dashboard Panel</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
-    rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Overarc SmartBot — Client Dashboard</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg: #080808;
-      --surface: #111111;
-      --surface-2: #181818;
-      --border: rgba(255, 255, 255, 0.07);
-      --border-hover: rgba(255, 255, 255, 0.15);
-      --text: #f4f4f4;
-      --text-muted: rgba(244, 244, 244, 0.55);
-      --accent: #e8471c;
-      --accent-glow: rgba(232, 71, 28, 0.25);
-      --success: #22c55e;
+      --bg: #0f1117;
+      --card: #1a1d27;
+      --card2: #1e2133;
+      --border: #2d3142;
+      --accent: #6366f1;
+      --accent-hover: #4f52d6;
+      --accent-glow: rgba(99,102,241,0.15);
+      --text: #e2e8f0;
+      --text-muted: #8b94b3;
+      --success: #10b981;
       --warning: #f59e0b;
-      --danger: #ef4444;
+      --error: #ef4444;
+      --radius: 12px;
       --radius-sm: 8px;
-      --radius-md: 12px;
-      --radius-lg: 18px;
-      --radius-full: 9999px;
-      --transition: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
     }
+    html, body { height: 100%; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); font-size: 15px; }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    /* ── TOAST ── */
+    #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+    .toast { padding: 14px 20px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 500; color: #fff; animation: slideIn .3s ease; min-width: 260px; box-shadow: 0 8px 24px rgba(0,0,0,.4); display: flex; align-items: center; gap: 10px; }
+    .toast.success { background: var(--success); }
+    .toast.error { background: var(--error); }
+    .toast.info { background: var(--accent); }
+    @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg);
-      color: var(--text);
+    /* ── SPINNER ── */
+    .spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,.3); border-top-color: #fff; border-radius: 50%; animation: spin .6s linear infinite; display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── LOGIN SCREEN ── */
+    #login-screen {
       min-height: 100vh;
-      display: flex;
-      overflow: hidden;
-    }
-
-    /* ============================================================
-       LOGIN MODULE (JWT-based — botId + password)
-    ============================================================ */
-    #auth-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(8, 8, 8, 0.95);
-      backdrop-filter: blur(16px);
-      z-index: 99999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .auth-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 36px;
-      width: min(420px, 90vw);
-      text-align: center;
-      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
-    }
-
-    .auth-card h2 {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 1.6rem;
-      margin-bottom: 8px;
-    }
-
-    .auth-card p {
-      font-size: 14px;
-      color: var(--text-muted);
-      margin-bottom: 24px;
-    }
-
-    .auth-card input {
-      width: 100%;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 12px;
-      color: #fff;
-      font-size: 14px;
-      outline: none;
-      text-align: center;
-      margin-bottom: 16px;
-      transition: var(--transition);
-    }
-
-    .auth-card input:focus {
-      border-color: var(--accent);
-    }
-
-    .auth-btn {
-      width: 100%;
-      background: linear-gradient(135deg, var(--accent) 0%, #ff6235 100%);
-      color: #fff;
-      border: none;
-      border-radius: var(--radius-sm);
-      padding: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 15px;
-      transition: var(--transition);
-    }
-
-    .auth-btn:hover {
-      opacity: 0.9;
-      transform: translateY(-1px);
-    }
-
-    .auth-error {
-      color: var(--danger);
-      font-size: 13px;
-      margin-top: 12px;
-      display: none;
-    }
-
-    .auth-error.show {
-      display: block;
-    }
-
-    /* ============================================================
-       SIDEBAR & SHELL
-    ============================================================ */
-    .sidebar {
-      width: 260px;
-      background: var(--surface);
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      flex-shrink: 0;
-    }
-
-    .brand-logo {
-      padding: 24px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: var(--text);
-    }
-
-    .brand-logo span {
-      color: var(--accent);
-    }
-
-    .nav-list {
-      flex: 1;
-      padding: 20px 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
-      color: var(--text-muted);
-      text-decoration: none;
-      border-radius: var(--radius-sm);
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: var(--transition);
-      background: transparent;
-      border: none;
-      text-align: left;
-      width: 100%;
-    }
-
-    .nav-item:hover,
-    .nav-item.active {
-      color: #fff;
-      background: rgba(255, 255, 255, 0.04);
-    }
-
-    .nav-item.active {
-      border-left: 3px solid var(--accent);
-      background: rgba(232, 71, 28, 0.08);
-      color: #fff;
-    }
-
-    .nav-item svg {
-      width: 18px;
-      height: 18px;
-    }
-
-    .sidebar-footer {
-      padding: 20px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .avatar-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: var(--surface-2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-    }
-
-    .client-details {
-      flex: 1;
-      overflow: hidden;
-    }
-
-    .client-name {
-      font-size: 13px;
-      font-weight: 600;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .client-role {
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-
-    .logout-btn {
-      background: none;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      color: var(--text-muted);
-      cursor: pointer;
-      padding: 6px 10px;
-      font-size: 12px;
-      transition: var(--transition);
-    }
-
-    .logout-btn:hover {
-      border-color: var(--danger);
-      color: var(--danger);
-    }
-
-    /* ============================================================
-       MAIN CONTENT PANEL
-    ============================================================ */
-    .main-panel {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    .topbar {
-      height: 70px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 32px;
-      flex-shrink: 0;
-    }
-
-    .page-title {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 1.4rem;
-      font-weight: 700;
-    }
-
-    .topbar-actions {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(34, 197, 94, 0.12);
-      border: 1px solid rgba(34, 197, 94, 0.3);
-      border-radius: var(--radius-full);
-      padding: 6px 14px;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--success);
-    }
-
-    .badge-dot {
-      width: 7px;
-      height: 7px;
-      background: var(--success);
-      border-radius: 50%;
-    }
-
-    .content-area {
-      flex: 1;
-      overflow-y: auto;
-      padding: 32px;
-    }
-
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    /* ============================================================
-       CARDS & GRID LAYOUTS
-    ============================================================ */
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-      margin-bottom: 32px;
-    }
-
-    .stat-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .stat-lbl {
-      font-size: 13px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .stat-val {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 2.2rem;
-      font-weight: 700;
-      color: #fff;
-    }
-
-    .embed-card {
-      background: rgba(232, 71, 28, 0.05);
-      border: 1px dashed var(--accent);
-      border-radius: var(--radius-md);
-      padding: 24px;
-      margin-bottom: 32px;
-    }
-
-    .embed-card h3 {
-      font-family: 'Space Grotesk', sans-serif;
-      margin-bottom: 8px;
-      font-size: 1.15rem;
-    }
-
-    .embed-card p {
-      font-size: 13.5px;
-      color: var(--text-muted);
-      margin-bottom: 16px;
-      line-height: 1.5;
-    }
-
-    .snippet-box {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 16px;
-      font-family: 'Courier New', Courier, monospace;
-      font-size: 13px;
-      color: var(--text-muted);
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .copy-btn {
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 11px;
-      font-weight: 600;
-      transition: var(--transition);
-      flex-shrink: 0;
-    }
-
-    .copy-btn:hover {
-      opacity: 0.9;
-    }
-
-    /* ============================================================
-       FORM & CUSTOMIZATION STYLES
-    ============================================================ */
-    .form-section {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 28px;
-      margin-bottom: 24px;
-    }
-
-    .form-section h3 {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 1.2rem;
-      margin-bottom: 20px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .form-group label {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-muted);
-    }
-
-    .form-control {
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 12px 16px;
-      color: #fff;
-      font-size: 14px;
-      font-family: inherit;
-      outline: none;
-      transition: var(--transition);
-    }
-
-    .form-control:focus {
-      border-color: var(--accent);
-    }
-
-    textarea.form-control {
-      min-height: 120px;
-      resize: vertical;
-      line-height: 1.5;
-    }
-
-    .color-row {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .color-picker-input {
-      width: 50px;
-      height: 40px;
-      padding: 0;
-      border: none;
-      background: none;
-      cursor: pointer;
-      border-radius: 4px;
-    }
-
-    /* FAQ & Service Table builders */
-    .faq-builder-row,
-    .service-builder-row {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 12px;
-      align-items: flex-start;
-    }
-
-    .faq-builder-row input,
-    .service-builder-row input {
-      flex: 1;
-    }
-
-    .remove-row-btn {
-      background: rgba(239, 68, 68, 0.12);
-      color: var(--danger);
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      padding: 12px;
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .remove-row-btn:hover {
-      background: var(--danger);
-      color: #fff;
-    }
-
-    .add-row-btn {
-      background: rgba(255, 255, 255, 0.04);
-      color: #fff;
-      border: 1px dashed var(--border);
-      padding: 12px;
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      width: 100%;
-      font-weight: 600;
-      font-size: 13px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-
-    .add-row-btn:hover {
-      background: rgba(255, 255, 255, 0.08);
-      border-color: var(--text-muted);
-    }
-
-    .submit-bar {
-      margin-top: 32px;
-      display: flex;
-      justify-content: flex-end;
-    }
-
-    .save-btn {
-      background: linear-gradient(135deg, var(--accent) 0%, #ff6235 100%);
-      color: #fff;
-      border: none;
-      border-radius: var(--radius-sm);
-      padding: 14px 36px;
-      font-weight: 600;
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 15px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      transition: var(--transition);
-    }
-
-    .save-btn:hover {
-      transform: translateY(-1px);
-    }
-
-    .save-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    /* ============================================================
-       LEADS TABLE CRM STYLES
-    ============================================================ */
-    .leads-table-container {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      overflow: hidden;
-    }
-
-    .leads-table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-    }
-
-    .leads-table th,
-    .leads-table td {
-      padding: 16px 24px;
-      border-bottom: 1px solid var(--border);
-      font-size: 13.5px;
-    }
-
-    .leads-table th {
-      background: var(--surface-2);
-      font-weight: 600;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      font-size: 11px;
-      letter-spacing: 0.5px;
-    }
-
-    .leads-table tr:hover td {
-      background: rgba(255, 255, 255, 0.02);
-    }
-
-    .leads-table td span.crm-badge {
-      background: rgba(232, 71, 28, 0.12);
-      border: 1px solid rgba(232, 71, 28, 0.3);
-      color: var(--accent);
-      padding: 3px 8px;
-      border-radius: 4px;
-      font-size: 10.5px;
-      font-weight: 600;
-    }
-
-    /* ============================================================
-       ACCOUNT / PASSWORD CHANGE STYLES
-    ============================================================ */
-    .password-input-wrapper {
-      position: relative;
-    }
-
-    .password-input-wrapper input {
-      padding-right: 48px;
-    }
-
-    .toggle-pass-btn {
-      position: absolute;
-      right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      cursor: pointer;
-      font-size: 14px;
-      padding: 4px;
-      display: flex;
-      align-items: center;
-    }
-
-    .toggle-pass-btn:hover {
-      color: var(--text);
-    }
-
-    .pw-strength-bar {
-      height: 4px;
-      background: var(--surface-2);
-      border-radius: 2px;
-      margin-top: 8px;
-      overflow: hidden;
-    }
-
-    .pw-strength-fill {
-      height: 100%;
-      width: 0%;
-      border-radius: 2px;
-      transition: var(--transition);
-    }
-
-    .pw-strength-fill.weak {
-      background: var(--danger);
-      width: 33%;
-    }
-
-    .pw-strength-fill.medium {
-      background: var(--warning);
-      width: 66%;
-    }
-
-    .pw-strength-fill.strong {
-      background: var(--success);
-      width: 100%;
-    }
-
-    .pw-requirements {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-top: 6px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .pw-requirements li {
-      list-style: none;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .pw-requirements li.met {
-      color: var(--success);
-    }
-
-    .pw-requirements li .req-icon {
-      font-size: 10px;
-    }
-
-    /* ============================================================
-       KNOWLEDGE BASE / RAG STYLES
-    ============================================================ */
-    .kb-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-      margin-bottom: 32px;
-    }
-
-    .kb-upload-zone {
-      background: var(--surface);
-      border: 2px dashed var(--border);
-      border-radius: var(--radius-md);
-      padding: 32px;
-      text-align: center;
-      transition: var(--transition);
-      cursor: pointer;
-    }
-
-    .kb-upload-zone:hover,
-    .kb-upload-zone.dragover {
-      border-color: var(--accent);
-      background: rgba(232, 71, 28, 0.04);
-    }
-
-    .kb-upload-zone .upload-icon {
-      font-size: 48px;
-      margin-bottom: 16px;
-      opacity: 0.5;
-    }
-
-    .kb-upload-zone h4 {
-      font-family: 'Space Grotesk', sans-serif;
-      margin-bottom: 8px;
-    }
-
-    .kb-upload-zone p {
-      font-size: 13px;
-      color: var(--text-muted);
-      margin-bottom: 16px;
-    }
-
-    .kb-paste-zone {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .kb-paste-zone h4 {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 1rem;
-    }
-
-    .kb-paste-zone textarea {
-      min-height: 140px;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 12px 16px;
-      color: #fff;
-      font-size: 13px;
-      font-family: inherit;
-      outline: none;
-      resize: vertical;
-      transition: var(--transition);
-    }
-
-    .kb-paste-zone textarea:focus {
-      border-color: var(--accent);
-    }
-
-    .kb-upload-btn {
-      background: linear-gradient(135deg, var(--accent) 0%, #ff6235 100%);
-      color: #fff;
-      border: none;
-      border-radius: var(--radius-sm);
-      padding: 12px 24px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 14px;
-      transition: var(--transition);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-
-    .kb-upload-btn:hover {
-      opacity: 0.9;
-    }
-
-    .kb-upload-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    /* Extraction approval card */
-    .extraction-card {
-      background: rgba(34, 197, 94, 0.06);
-      border: 1px solid rgba(34, 197, 94, 0.3);
-      border-radius: var(--radius-md);
-      padding: 24px;
-      margin-bottom: 24px;
-      display: none;
-    }
-
-    .extraction-card.show {
-      display: block;
-    }
-
-    .extraction-card h4 {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 1rem;
-      margin-bottom: 8px;
-      color: var(--success);
-    }
-
-    .extraction-card p {
-      font-size: 13.5px;
-      color: var(--text-muted);
-      margin-bottom: 16px;
-      line-height: 1.5;
-    }
-
-    .extraction-actions {
-      display: flex;
-      gap: 12px;
-    }
-
-    .extraction-actions button {
-      padding: 10px 20px;
-      border-radius: var(--radius-sm);
-      font-weight: 600;
-      font-size: 13px;
-      cursor: pointer;
-      transition: var(--transition);
-      border: none;
-      font-family: 'Inter', sans-serif;
-    }
-
-    .btn-accept {
-      background: var(--success);
-      color: #fff;
-    }
-
-    .btn-accept:hover {
-      opacity: 0.9;
-    }
-
-    .btn-review {
-      background: var(--warning);
-      color: #000;
-    }
-
-    .btn-review:hover {
-      opacity: 0.9;
-    }
-
-    .btn-skip {
-      background: var(--surface-2);
-      color: var(--text-muted);
-      border: 1px solid var(--border) !important;
-    }
-
-    .btn-skip:hover {
-      color: #fff;
-      border-color: var(--text-muted) !important;
-    }
-
-    /* Document list */
-    .doc-list {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      overflow: hidden;
-    }
-
-    .doc-list-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 20px 24px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .doc-list-header h4 {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 1.05rem;
-    }
-
-    .doc-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px 24px;
-      border-bottom: 1px solid var(--border);
-      transition: var(--transition);
-    }
-
-    .doc-item:last-child {
-      border-bottom: none;
-    }
-
-    .doc-item:hover {
-      background: rgba(255, 255, 255, 0.02);
-    }
-
-    .doc-info {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      flex: 1;
-      min-width: 0;
-    }
-
-    .doc-icon {
-      font-size: 24px;
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--surface-2);
-      border-radius: var(--radius-sm);
-    }
-
-    .doc-meta {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .doc-name {
-      font-size: 14px;
-      font-weight: 600;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .doc-desc {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-top: 2px;
-    }
-
-    .doc-actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-shrink: 0;
-    }
-
-    .doc-action-btn {
-      background: none;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      color: var(--text-muted);
-      padding: 6px 10px;
-      font-size: 11px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: var(--transition);
-      font-family: inherit;
-      white-space: nowrap;
-    }
-
-    .doc-action-btn:hover {
-      border-color: var(--text);
-      color: #fff;
-    }
-
-    .doc-action-btn.danger:hover {
-      border-color: var(--danger);
-      color: var(--danger);
-    }
-
-    .doc-empty {
-      text-align: center;
-      padding: 48px 24px;
-      color: var(--text-muted);
-    }
-
-    .doc-empty .empty-icon {
-      font-size: 36px;
-      margin-bottom: 12px;
-      opacity: 0.4;
-    }
-
-    .doc-empty p {
-      font-size: 14px;
-    }
-
-    /* Toast */
-    .toast {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      background: var(--success);
-      color: #fff;
-      padding: 12px 24px;
-      border-radius: var(--radius-full);
-      font-size: 14px;
-      font-weight: 600;
-      z-index: 999999;
-      opacity: 0;
-      transition: var(--transition);
-      pointer-events: none;
-    }
-
-    .toast.show {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .toast-error {
-      background: var(--danger);
-    }
-
-    .spinner {
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin 0.6s linear infinite;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
+      display: flex; align-items: center; justify-content: center;
+      background: radial-gradient(ellipse at 30% 20%, rgba(99,102,241,.18) 0%, transparent 60%),
+                  radial-gradient(ellipse at 80% 80%, rgba(16,185,129,.1) 0%, transparent 50%), var(--bg);
+    }
+    .login-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 20px;
+      padding: 48px 40px; width: 400px; max-width: 94vw;
+      box-shadow: 0 24px 64px rgba(0,0,0,.6);
+    }
+    .login-logo { text-align: center; margin-bottom: 32px; }
+    .login-logo img { height: 38px; }
+    .login-logo .logo-text { font-size: 26px; font-weight: 800; background: linear-gradient(135deg, #6366f1, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .login-logo p { color: var(--text-muted); font-size: 14px; margin-top: 6px; }
+    .login-card h1 { font-size: 20px; font-weight: 700; margin-bottom: 28px; text-align: center; }
+    .form-group { margin-bottom: 18px; }
+    .form-group label { display: block; font-size: 13px; font-weight: 500; color: var(--text-muted); margin-bottom: 7px; text-transform: uppercase; letter-spacing: .04em; }
+    .form-group input { width: 100%; padding: 12px 16px; background: var(--bg); border: 1.5px solid var(--border); border-radius: var(--radius-sm); color: var(--text); font-family: inherit; font-size: 15px; outline: none; transition: border-color .2s; }
+    .form-group input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+    .btn { width: 100%; padding: 13px; border-radius: var(--radius-sm); border: none; cursor: pointer; font-family: inherit; font-size: 15px; font-weight: 600; transition: all .2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), #818cf8); color: #fff; }
+    .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(99,102,241,.4); }
+    .btn:disabled { opacity: .6; cursor: not-allowed; }
+    .login-error { color: var(--error); font-size: 13px; text-align: center; margin-top: 12px; min-height: 20px; }
+
+    /* ── DASHBOARD ── */
+    #dashboard { display: none; min-height: 100vh; }
+
+    /* Header */
+    .header {
+      background: var(--card); border-bottom: 1px solid var(--border);
+      padding: 0 28px; height: 64px; display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .header-left { display: flex; align-items: center; gap: 14px; }
+    .header-logo { font-size: 20px; font-weight: 800; background: linear-gradient(135deg, #6366f1, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .header-bot-name { color: var(--text); font-size: 15px; font-weight: 600; opacity: .9; }
+    .header-right { display: flex; align-items: center; gap: 12px; }
+    .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; letter-spacing: .03em; text-transform: uppercase; }
+    .status-active { background: rgba(16,185,129,.15); color: var(--success); border: 1px solid rgba(16,185,129,.3); }
+    .status-trial { background: rgba(245,158,11,.15); color: var(--warning); border: 1px solid rgba(245,158,11,.3); }
+    .status-suspended { background: rgba(239,68,68,.15); color: var(--error); border: 1px solid rgba(239,68,68,.3); }
+    .btn-logout { padding: 8px 18px; background: transparent; border: 1.5px solid var(--border); border-radius: var(--radius-sm); color: var(--text-muted); font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer; transition: all .2s; }
+    .btn-logout:hover { border-color: var(--error); color: var(--error); }
+
+    /* Tabs */
+    .tabs-bar { background: var(--card); border-bottom: 1px solid var(--border); display: flex; padding: 0 28px; overflow-x: auto; }
+    .tab-btn { padding: 16px 22px; font-family: inherit; font-size: 14px; font-weight: 500; color: var(--text-muted); background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; transition: all .2s; white-space: nowrap; display: flex; align-items: center; gap: 7px; }
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab-btn .tab-icon { font-size: 16px; }
+
+    /* Content */
+    .tab-content { display: none; padding: 32px 28px; max-width: 1000px; margin: 0 auto; animation: fadeUp .25s ease; }
+    .tab-content.active { display: block; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Cards */
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 20px; }
+    .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .card-title { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    .count-badge { background: var(--accent-glow); color: var(--accent); border: 1px solid rgba(99,102,241,.25); border-radius: 20px; padding: 3px 10px; font-size: 12px; font-weight: 700; }
+
+    /* Table */
+    .table-wrap { overflow-x: auto; border-radius: var(--radius-sm); }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th { padding: 12px 16px; text-align: left; color: var(--text-muted); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; border-bottom: 1px solid var(--border); background: var(--bg); }
+    td { padding: 13px 16px; border-bottom: 1px solid var(--border); color: var(--text); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--accent-glow); }
+
+    /* Status pills */
+    .pill { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .03em; }
+    .pill-pending { background: rgba(245,158,11,.12); color: var(--warning); }
+    .pill-confirmed { background: rgba(16,185,129,.12); color: var(--success); }
+    .pill-cancelled { background: rgba(239,68,68,.12); color: var(--error); }
+
+    /* Empty state */
+    .empty-state { text-align: center; padding: 60px 20px; }
+    .empty-state .empty-icon { font-size: 48px; margin-bottom: 14px; opacity: .5; }
+    .empty-state p { color: var(--text-muted); font-size: 15px; }
+
+    /* Buttons (secondary) */
+    .btn-sm { padding: 8px 16px; border-radius: var(--radius-sm); border: 1.5px solid var(--border); background: transparent; color: var(--text); font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer; transition: all .2s; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-sm:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-sm.danger { border-color: rgba(239,68,68,.3); color: var(--error); }
+    .btn-sm.danger:hover { background: rgba(239,68,68,.08); }
+    .btn-sm.success { background: var(--success); border-color: var(--success); color: #fff; }
+    .btn-sm.accent { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .btn-sm.accent:hover { background: var(--accent-hover); }
+
+    /* Form */
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
+    @media(max-width: 640px) { .form-row { grid-template-columns: 1fr; } }
+    .input { width: 100%; padding: 11px 14px; background: var(--bg); border: 1.5px solid var(--border); border-radius: var(--radius-sm); color: var(--text); font-family: inherit; font-size: 14px; outline: none; transition: border-color .2s; }
+    .input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+    textarea.input { min-height: 120px; resize: vertical; }
+    label.field-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 7px; }
+
+    /* Color picker */
+    .color-row { display: flex; align-items: center; gap: 10px; }
+    input[type="color"] { width: 44px; height: 38px; border: none; border-radius: 8px; cursor: pointer; padding: 2px; background: var(--bg); }
+    .color-preview { height: 38px; border-radius: var(--radius-sm); flex: 1; border: 1.5px solid var(--border); transition: background .2s; }
+
+    /* Dynamic rows (FAQs, services) */
+    .dynamic-list { display: flex; flex-direction: column; gap: 10px; }
+    .dynamic-item { display: flex; gap: 10px; align-items: flex-start; }
+    .dynamic-item .input { flex: 1; }
+    .btn-icon { width: 36px; height: 36px; border-radius: var(--radius-sm); border: 1.5px solid var(--border); background: transparent; color: var(--text-muted); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s; flex-shrink: 0; margin-top: 2px; }
+    .btn-icon:hover { border-color: var(--error); color: var(--error); }
+    .btn-add { background: none; border: 1.5px dashed var(--border); border-radius: var(--radius-sm); color: var(--text-muted); padding: 10px; font-family: inherit; font-size: 13px; cursor: pointer; transition: all .2s; display: block; width: 100%; margin-top: 8px; }
+    .btn-add:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* Knowledge base */
+    .upload-area { border: 2px dashed var(--border); border-radius: var(--radius); padding: 40px; text-align: center; cursor: pointer; transition: all .2s; }
+    .upload-area:hover, .upload-area.drag-over { border-color: var(--accent); background: var(--accent-glow); }
+    .upload-icon { font-size: 40px; margin-bottom: 12px; opacity: .6; }
+    .upload-area p { color: var(--text-muted); font-size: 14px; }
+    .upload-area strong { color: var(--accent); }
+    .tab-switch { display: flex; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 4px; margin-bottom: 18px; width: fit-content; }
+    .tab-switch button { padding: 8px 18px; border-radius: 6px; border: none; background: transparent; color: var(--text-muted); font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer; transition: all .2s; }
+    .tab-switch button.active { background: var(--card); color: var(--text); }
+
+    /* Extraction result */
+    .extraction-banner { background: rgba(16,185,129,.08); border: 1px solid rgba(16,185,129,.25); border-radius: var(--radius-sm); padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+    .extraction-banner p { color: var(--text); font-size: 14px; }
+    .extraction-actions { display: flex; gap: 8px; }
+
+    /* Doc list */
+    .doc-item { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: var(--bg); border-radius: var(--radius-sm); border: 1px solid var(--border); }
+    .doc-meta { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+
+    /* Password strength */
+    .strength-bar { height: 4px; border-radius: 2px; background: var(--border); margin-top: 8px; overflow: hidden; }
+    .strength-fill { height: 100%; border-radius: 2px; transition: width .3s, background .3s; width: 0; }
+
+    /* Embed */
+    .code-block { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px; font-family: 'Courier New', monospace; font-size: 13px; color: #a78bfa; line-height: 1.6; word-break: break-all; white-space: pre-wrap; position: relative; }
+    .copy-overlay { position: absolute; top: 8px; right: 8px; }
+
+    /* QR */
+    #qr-canvas { border-radius: var(--radius-sm); border: 1px solid var(--border); display: block; margin: 0 auto; }
+
+    /* Progress */
+    .progress-bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin: 12px 0; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), #818cf8); border-radius: 3px; transition: width .4s; }
+
+    /* Info box */
+    .info-box { background: rgba(99,102,241,.08); border: 1px solid rgba(99,102,241,.2); border-radius: var(--radius-sm); padding: 14px 16px; font-size: 13px; color: var(--text-muted); margin-bottom: 18px; line-height: 1.6; }
+
+    /* Share buttons */
+    .share-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .share-btn { padding: 14px; border-radius: var(--radius-sm); border: 1.5px solid var(--border); background: transparent; color: var(--text); font-family: inherit; font-size: 14px; font-weight: 500; cursor: pointer; text-align: center; transition: all .2s; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
+    .share-btn.whatsapp { border-color: rgba(37,211,102,.3); color: #25d366; }
+    .share-btn.whatsapp:hover { background: rgba(37,211,102,.08); }
+
+    /* Crawl */
+    .crawl-row { display: flex; gap: 10px; }
+    .crawl-row .input { flex: 1; }
+
+    @media(max-width: 640px) {
+      .tab-content { padding: 20px 16px; }
+      .header { padding: 0 16px; }
+      .header-bot-name { display: none; }
+      .tabs-bar { padding: 0 4px; }
+      .tab-btn { padding: 14px 14px; font-size: 13px; }
+      .form-row { grid-template-columns: 1fr; }
+      .share-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
-
 <body>
 
-  <!-- ======================================================
-       JWT LOGIN GATE
-  ====================================================== -->
-  <div id="auth-overlay">
-    <div class="auth-card">
-      <h2>🔐 SmartBot Dashboard Login</h2>
-      <p>Enter your bot credentials to access settings and CRM lead data.</p>
-      <input type="text" id="login-botId" placeholder="Your Bot ID (e.g. clinic, restaurant)" autocomplete="username" />
-      <input type="password" id="login-pass" placeholder="Enter your password..." autocomplete="current-password" />
-      <button class="auth-btn" onclick="loginWithJWT()">Sign In to Dashboard</button>
-      <div class="auth-error" id="login-error">Invalid bot ID or password.</div>
+<div id="toast-container"></div>
+
+<!-- ═══════════════════════════════════════════
+     LOGIN SCREEN
+═══════════════════════════════════════════ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="logo-text">Overarc</div>
+      <p>SmartBot Client Portal</p>
+    </div>
+    <h1>Sign In to Your Dashboard</h1>
+    <div class="form-group">
+      <label>Business ID</label>
+      <input type="text" id="login-bot-id" placeholder="e.g. city-dental-clinic" autocomplete="username" />
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="login-password" placeholder="Your dashboard password" autocomplete="current-password" />
+    </div>
+    <button class="btn btn-primary" id="login-btn" onclick="doLogin()">Sign In</button>
+    <p class="login-error" id="login-error"></p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     DASHBOARD
+═══════════════════════════════════════════ -->
+<div id="dashboard">
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <div class="header-logo">Overarc</div>
+      <span id="header-bot-name" class="header-bot-name">Loading...</span>
+    </div>
+    <div class="header-right">
+      <span id="status-badge" class="status-badge status-active">Active</span>
+      <button class="btn-logout" onclick="doLogout()">Logout</button>
+    </div>
+  </header>
+
+  <!-- Tabs -->
+  <nav class="tabs-bar">
+    <button class="tab-btn active" id="tab-leads-btn" onclick="switchTab('leads')"><span class="tab-icon">👥</span>Leads</button>
+    <button class="tab-btn" id="tab-appointments-btn" onclick="switchTab('appointments')"><span class="tab-icon">📅</span>Appointments</button>
+    <button class="tab-btn" id="tab-knowledge-btn" onclick="switchTab('knowledge')"><span class="tab-icon">📚</span>Knowledge Base</button>
+    <button class="tab-btn" id="tab-settings-btn" onclick="switchTab('settings')"><span class="tab-icon">⚙️</span>Bot Settings</button>
+    <button class="tab-btn" id="tab-account-btn" onclick="switchTab('account')"><span class="tab-icon">🔐</span>Account</button>
+    <button class="tab-btn" id="tab-embed-btn" onclick="switchTab('embed')"><span class="tab-icon">🔗</span>Embed & Share</button>
+  </nav>
+
+  <!-- ── TAB 1: LEADS ── -->
+  <div class="tab-content active" id="tab-leads">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📋 Captured Leads <span class="count-badge" id="leads-count">0</span></div>
+        <button class="btn-sm accent" onclick="exportLeads()">⬇ Export CSV</button>
+      </div>
+      <div id="leads-loading" style="text-align:center;padding:40px"><div class="spinner"></div></div>
+      <div class="table-wrap" id="leads-table-wrap" style="display:none">
+        <table id="leads-table">
+          <thead><tr><th>Name</th><th>Phone</th><th>Topic</th><th>Date</th></tr></thead>
+          <tbody id="leads-tbody"></tbody>
+        </table>
+      </div>
+      <div class="empty-state" id="leads-empty" style="display:none">
+        <div class="empty-icon">💬</div>
+        <p>No leads captured yet.<br>Your bot will save customer contacts here.</p>
+      </div>
     </div>
   </div>
 
-  <!-- ======================================================
-       SIDEBAR NAV PANEL
-  ====================================================== -->
-  <div class="sidebar">
-    <div class="brand-logo"><i data-lucide="zap"></i> Smart<span>Bot</span></div>
-
-    <div class="nav-list">
-      <button class="nav-item active" onclick="switchTab('overview', this)">
-        <i data-lucide="layout-dashboard"></i> Overview
-      </button>
-      <button class="nav-item" onclick="switchTab('settings', this)">
-        <i data-lucide="sliders"></i> Customize Bot
-      </button>
-      <button class="nav-item" onclick="switchTab('knowledge', this)">
-        <i data-lucide="book-open"></i> Knowledge Base
-      </button>
-      <button class="nav-item" onclick="switchTab('crm', this)">
-        <i data-lucide="users"></i> Leads CRM
-      </button>
-      <button class="nav-item" onclick="switchTab('account', this)">
-        <i data-lucide="lock"></i> Account
-      </button>
-    </div>
-
-    <div class="sidebar-footer">
-      <div class="avatar-icon" id="foot-avatar">🏥</div>
-      <div class="client-details">
-        <div class="client-name" id="foot-name">Loading Profile...</div>
-        <div class="client-role">SaaS Client Portal</div>
+  <!-- ── TAB 2: APPOINTMENTS ── -->
+  <div class="tab-content" id="tab-appointments">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📅 Appointments <span class="count-badge" id="appts-count">0</span></div>
+        <button class="btn-sm accent" onclick="exportAppointments()">⬇ Export CSV</button>
       </div>
-      <button class="logout-btn" onclick="logout()">Logout</button>
+      <div id="appts-loading" style="text-align:center;padding:40px"><div class="spinner"></div></div>
+      <div class="table-wrap" id="appts-table-wrap" style="display:none">
+        <table id="appts-table">
+          <thead><tr><th>Customer</th><th>Phone</th><th>Service</th><th>Date</th><th>Time</th><th>Status</th></tr></thead>
+          <tbody id="appts-tbody"></tbody>
+        </table>
+      </div>
+      <div class="empty-state" id="appts-empty" style="display:none">
+        <div class="empty-icon">📆</div>
+        <p>No appointments booked yet.<br>Your bot will save reservations here.</p>
+      </div>
     </div>
   </div>
 
-  <!-- ======================================================
-       MAIN CONTENT VIEW
-  ====================================================== -->
-  <div class="main-panel">
-    <!-- Header -->
-    <div class="topbar">
-      <div class="page-title" id="page-head-title">SaaS Business Assistant Console</div>
-      <div class="topbar-actions">
-        <div class="badge">
-          <div class="badge-dot"></div> Live & Active
+  <!-- ── TAB 3: KNOWLEDGE BASE ── -->
+  <div class="tab-content" id="tab-knowledge">
+    <!-- Upload Section -->
+    <div class="card">
+      <div class="card-title" style="margin-bottom:18px">📤 Upload Knowledge</div>
+      <div class="tab-switch">
+        <button id="kb-tab-pdf" class="active" onclick="switchKbTab('pdf')">📄 Upload PDF</button>
+        <button id="kb-tab-text" onclick="switchKbTab('text')">✏️ Paste Text</button>
+        <button id="kb-tab-url" onclick="switchKbTab('url')">🌐 Crawl Website</button>
+      </div>
+
+      <!-- PDF Upload -->
+      <div id="kb-pdf">
+        <div class="upload-area" id="upload-drop-zone" onclick="document.getElementById('pdf-file-input').click()">
+          <div class="upload-icon">📂</div>
+          <p>Drag & drop a PDF or <strong>click to browse</strong></p>
+          <p style="font-size:12px;margin-top:6px">Max 50,000 characters after extraction</p>
+          <input type="file" id="pdf-file-input" accept=".pdf" style="display:none" onchange="handleFileSelect(event)" />
+        </div>
+      </div>
+
+      <!-- Text paste -->
+      <div id="kb-text" style="display:none">
+        <label class="field-label">Paste your business information below</label>
+        <textarea class="input" id="paste-text" placeholder="Paste your menu, services, FAQs, policies, hours..." rows="8"></textarea>
+        <button class="btn btn-primary" style="width:auto;padding:11px 24px;margin-top:12px" onclick="uploadText()">Process Text</button>
+      </div>
+
+      <!-- URL Crawl -->
+      <div id="kb-url" style="display:none">
+        <label class="field-label">Your website URL</label>
+        <div class="crawl-row">
+          <input class="input" id="crawl-url" type="url" placeholder="https://yourbusiness.com" />
+          <button class="btn-sm accent" onclick="crawlUrl()">🕷️ Crawl</button>
+        </div>
+        <p style="font-size:13px;color:var(--text-muted);margin-top:10px">We'll extract your services, FAQs, and business info from the page.</p>
+      </div>
+
+      <!-- Upload progress -->
+      <div id="upload-progress" style="display:none;margin-top:16px">
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:4px">Processing document...</p>
+        <div class="progress-bar"><div class="progress-fill" id="upload-progress-fill" style="width:60%"></div></div>
+      </div>
+
+      <!-- Extraction result banner -->
+      <div class="extraction-banner" id="extraction-banner" style="display:none;margin-top:16px">
+        <p id="extraction-summary-text"></p>
+        <div class="extraction-actions">
+          <button class="btn-sm success" onclick="applyExtraction('accept')">✅ Apply All</button>
+          <button class="btn-sm" onclick="reviewExtraction()">👁 Review</button>
+          <button class="btn-sm" onclick="skipExtraction()">Skip</button>
         </div>
       </div>
     </div>
 
-    <!-- Scrollable Space -->
-    <div class="content-area">
-
-      <!-- ==================================================
-           TAB: OVERVIEW
-      ================================================== -->
-      <div class="tab-content active" id="tab-overview">
-        <div class="dashboard-grid">
-          <div class="stat-card">
-            <div class="stat-lbl">Captured Customer Leads</div>
-            <div class="stat-val" id="stat-total-leads">0</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-lbl">Active Billing Plan</div>
-            <div class="stat-val" style="font-size: 1.8rem; line-height: 2.2rem; color:#22c55e;">Pro ($250)</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-lbl">Platform Maintenance</div>
-            <div class="stat-val" style="font-size: 1.8rem; line-height: 2.2rem; color:#f59e0b;">$30/mo</div>
-          </div>
-        </div>
-
-        <div class="embed-card">
-          <h3>🔌 Copy Embeddable Website Widget Script</h3>
-          <p>
-            Copy and paste this script tag right before the closing <code></body></code> tag of your website.
-            The floating AI chatbot widget will instantly mount and handle leads capture 24/7!
-          </p>
-          <div class="snippet-box">
-            <span id="embed-code-text"></span>
-            <button class="copy-btn" onclick="copyEmbed()">Copy Embed Code</button>
-          </div>
-        </div>
+    <!-- Documents list -->
+    <div class="card">
+      <div class="card-title" style="margin-bottom:16px">📑 Uploaded Documents</div>
+      <div id="docs-loading" style="text-align:center;padding:30px"><div class="spinner"></div></div>
+      <div id="docs-list"></div>
+      <div class="empty-state" id="docs-empty" style="display:none">
+        <div class="empty-icon">📂</div>
+        <p>No documents uploaded yet.</p>
       </div>
-
-      <!-- ==================================================
-           TAB: BOT SETTINGS
-      ================================================== -->
-      <div class="tab-content" id="tab-settings">
-        <div class="form-section">
-          <h3>🎨 Brand Styling & Core Customizations</h3>
-
-          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
-            <div class="form-group">
-              <label>Business Name (Displayed in Header)</label>
-              <input type="text" class="form-control" id="form-name" placeholder="e.g. City Dental Clinic" />
-            </div>
-            <div class="form-group">
-              <label>Avatar Character Emoji</label>
-              <input type="text" class="form-control" id="form-emoji" placeholder="e.g. 🏥"
-                style="text-align: center;" />
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>WhatsApp Escalation Contact Number</label>
-            <input type="text" class="form-control" id="form-whatsapp" placeholder="e.g. +923249116764" />
-          </div>
-
-          <div class="form-group">
-            <label>Chat Widget Greeting Message</label>
-            <input type="text" class="form-control" id="form-greeting" placeholder="Welcome message..." />
-          </div>
-
-          <div class="form-group">
-            <label>Brand Theme Color</label>
-            <div class="color-row">
-              <input type="color" class="color-picker-input" id="form-color-picker" oninput="syncColors(this.value)" />
-              <input type="text" class="form-control" id="form-color" placeholder="#10B981" style="width: 140px;"
-                oninput="syncPicker(this.value)" />
-              <span style="font-size: 12px; color: var(--text-muted);">This color theme will render on the embedded
-                chatbot bubbles and widgets dynamically!</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="form-section">
-          <h3>🧠 Train AI System Prompt context</h3>
-          <div class="form-group">
-            <label>System Instructions (Tells the AI how to act, location details, prices & guidelines)</label>
-            <textarea class="form-control" id="form-prompt"
-              placeholder="Write full AI context details here..."></textarea>
-          </div>
-        </div>
-
-        <div class="form-section">
-          <h3>❓ Business FAQs Builder</h3>
-          <div style="margin-bottom: 16px; font-size: 13px; color: var(--text-muted);">
-            Manage common question & answer pairs below. These are loaded dynamically so the AI knows exact facts:
-          </div>
-          <div id="faq-rows-container"></div>
-          <button class="add-row-btn" onclick="addFaqRow()"><i data-lucide="plus" class="w-4 h-4"></i> Add FAQ Question
-            Pair</button>
-        </div>
-
-        <div class="form-section">
-          <h3>🍽️ Menu Highlights & Services Builder</h3>
-          <div style="margin-bottom: 16px; font-size: 13px; color: var(--text-muted);">
-            Manage your active menu dishes or business services and prices below. These are dynamically injected into
-            the AI system context:
-          </div>
-          <div id="service-rows-container"></div>
-          <button class="add-row-btn" onclick="addServiceRow()"><i data-lucide="plus" class="w-4 h-4"></i> Add Menu /
-            Service Item</button>
-        </div>
-
-        <div class="submit-bar">
-          <button class="save-btn" id="save-settings-btn" onclick="saveSettings()">
-            <i data-lucide="save"></i> Save Customizations
-          </button>
-        </div>
-      </div>
-
-      <!-- ==================================================
-           TAB: KNOWLEDGE BASE (RAG)
-      ================================================== -->
-      <div class="tab-content" id="tab-knowledge">
-        <!-- Extraction approval card (hidden by default) -->
-        <div class="extraction-card" id="extraction-card">
-          <h4>🧠 AI Extraction Complete</h4>
-          <p id="extraction-summary-text">We found services, FAQs, and policies in your document. Apply to bot config?
-          </p>
-          <div class="extraction-actions">
-            <button class="btn-accept" onclick="acceptExtraction()">✅ Accept All</button>
-            <button class="btn-review" onclick="reviewExtraction()">📝 Review</button>
-            <button class="btn-skip" onclick="skipExtraction()">✋ Skip</button>
-          </div>
-        </div>
-
-        <!-- Upload grid: PDF drag-drop + text paste -->
-        <div class="kb-grid">
-          <!-- PDF Upload Zone -->
-          <div class="kb-upload-zone" id="pdf-drop-zone"
-            ondragover="event.preventDefault(); this.classList.add('dragover')"
-            ondragleave="this.classList.remove('dragover')" ondrop="handleFileDrop(event)"
-            onclick="document.getElementById('pdf-file-input').click()">
-            <div class="upload-icon">📄</div>
-            <h4>Upload PDF Document</h4>
-            <p>Drag & drop a PDF here, or click to browse.<br>Your bot will learn from it automatically.</p>
-            <input type="file" id="pdf-file-input" accept=".pdf" style="display:none"
-              onchange="handleFileSelect(event)" />
-          </div>
-
-          <!-- Paste Text Zone -->
-          <div class="kb-paste-zone">
-            <h4>📝 Paste Business Information</h4>
-            <textarea id="kb-paste-text"
-              placeholder="Paste your menu, services list, policies, FAQs, or any business information here...&#10;&#10;The AI will automatically extract structured data from it."></textarea>
-            <button class="kb-upload-btn" onclick="uploadText()">
-              <i data-lucide="upload"></i> Process & Analyze Text
-            </button>
-          </div>
-        </div>
-
-        <!-- Document List -->
-        <div class="doc-list">
-          <div class="doc-list-header">
-            <h4>📚 Uploaded Documents</h4>
-            <span id="doc-count" style="font-size: 13px; color: var(--text-muted);">0 documents</span>
-          </div>
-          <div id="doc-list-body">
-            <div class="doc-empty">
-              <div class="empty-icon">📂</div>
-              <p>No documents uploaded yet. Upload a PDF or paste text to build your knowledge base.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ==================================================
-           TAB: LEADS CRM TABLE
-      ================================================== -->
-      <div class="tab-content" id="tab-crm">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-          <div style="font-size: 14px; color: var(--text-muted);">Manage and view captured clients leads generated in
-            real time:</div>
-          <button class="copy-btn" onclick="exportCSV()"><i data-lucide="download"
-              style="width:12px; height:12px; display:inline; margin-right:4px;"></i> Export Leads CSV</button>
-        </div>
-
-        <div class="leads-table-container">
-          <table class="leads-table">
-            <thead>
-              <tr>
-                <th>Customer Name</th>
-                <th>Phone Number</th>
-                <th>Inquiry Context</th>
-                <th>Date Registered</th>
-                <th>Badge Status</th>
-              </tr>
-            </thead>
-            <tbody id="crm-table-body">
-              <!-- Dynamically populated rows -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- ==================================================
-           TAB: ACCOUNT / PASSWORD CHANGE
-      ================================================== -->
-      <div class="tab-content" id="tab-account">
-        <div class="form-section">
-          <h3>🔑 Change Your Password</h3>
-          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
-            Update your login password. You'll receive a new session token after a successful change.
-          </p>
-
-          <div class="form-group">
-            <label>Current Password</label>
-            <div class="password-input-wrapper">
-              <input type="password" class="form-control" id="acc-current-pass"
-                placeholder="Enter current password..." />
-              <button class="toggle-pass-btn" onclick="togglePassword('acc-current-pass', this)"
-                type="button">👁</button>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>New Password</label>
-            <div class="password-input-wrapper">
-              <input type="password" class="form-control" id="acc-new-pass"
-                placeholder="At least 8 characters with a number..." oninput="updatePasswordStrength(this.value)" />
-              <button class="toggle-pass-btn" onclick="togglePassword('acc-new-pass', this)" type="button">👁</button>
-            </div>
-            <div class="pw-strength-bar">
-              <div class="pw-strength-fill" id="pw-strength-fill"></div>
-            </div>
-            <ul class="pw-requirements" id="pw-requirements">
-              <li id="req-length"><span class="req-icon">❌</span> At least 8 characters</li>
-              <li id="req-number"><span class="req-icon">❌</span> At least one number (0-9)</li>
-              <li id="req-common"><span class="req-icon">❌</span> Not a common password</li>
-            </ul>
-          </div>
-
-          <div class="form-group">
-            <label>Confirm New Password</label>
-            <div class="password-input-wrapper">
-              <input type="password" class="form-control" id="acc-confirm-pass"
-                placeholder="Re-enter new password..." />
-              <button class="toggle-pass-btn" onclick="togglePassword('acc-confirm-pass', this)"
-                type="button">👁</button>
-            </div>
-          </div>
-
-          <div class="submit-bar">
-            <button class="save-btn" id="change-pass-btn" onclick="changePassword()">
-              <i data-lucide="lock"></i> Update Password
-            </button>
-          </div>
-        </div>
-      </div>
-
     </div>
   </div>
 
-  <!-- Toast notification -->
-  <div class="toast" id="toast">Settings saved successfully!</div>
+  <!-- ── TAB 4: SETTINGS ── -->
+  <div class="tab-content" id="tab-settings">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">⚙️ Bot Configuration</div>
+        <button class="btn-sm accent" id="save-settings-btn" onclick="saveSettings()">💾 Save Changes</button>
+      </div>
 
-  <script>
-    // =========================================================================
-    // STATE
-    // =========================================================================
-    const urlParts = window.location.pathname.split('/');
-    const botId = urlParts[urlParts.length - 1] || "clinic";
-    const baseUrl = window.location.origin;
-    const TOKEN_KEY = 'sb_jwt_' + botId;
+      <div class="form-row">
+        <div>
+          <label class="field-label">Bot Name</label>
+          <input class="input" id="s-name" type="text" placeholder="Your Business Name" />
+        </div>
+        <div>
+          <label class="field-label">WhatsApp Number</label>
+          <input class="input" id="s-whatsapp" type="text" placeholder="+923001234567" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div>
+          <label class="field-label">Working Hours</label>
+          <input class="input" id="s-hours" type="text" placeholder="Mon-Sat 9AM-8PM" />
+        </div>
+        <div>
+          <label class="field-label">Location</label>
+          <input class="input" id="s-location" type="text" placeholder="Mingora, Swat" />
+        </div>
+      </div>
 
-    const state = {
-      profile: null,
-      leads: [],
-      token: null,
-      documents: [],
-      lastExtraction: null  // stores the last upload's extraction data
-    };
+      <div style="margin-bottom:18px">
+        <label class="field-label">Brand Color</label>
+        <div class="color-row">
+          <input type="color" id="s-color" value="#6366f1" oninput="updateColorPreview()" />
+          <div class="color-preview" id="color-preview-box" style="background:#6366f1"></div>
+          <input class="input" id="s-color-hex" type="text" value="#6366f1" placeholder="#6366f1" style="max-width:120px" oninput="syncColorFromHex()" />
+        </div>
+      </div>
 
-    // =========================================================================
-    // JWT AUTHENTICATION
-    // =========================================================================
-    function getToken() {
-      return localStorage.getItem(TOKEN_KEY);
-    }
+      <div style="margin-bottom:18px">
+        <label class="field-label">Greeting Message</label>
+        <textarea class="input" id="s-greeting" placeholder="Hello! Welcome to our business. How can I help?" rows="2"></textarea>
+      </div>
 
-    function setToken(token) {
-      localStorage.setItem(TOKEN_KEY, token);
-      state.token = token;
-    }
+      <div style="margin-bottom:24px">
+        <label class="field-label">AI System Prompt</label>
+        <textarea class="input" id="s-prompt" placeholder="You are a helpful assistant for..." rows="6"></textarea>
+      </div>
 
-    function clearToken() {
-      localStorage.removeItem(TOKEN_KEY);
-      state.token = null;
-    }
+      <!-- FAQs -->
+      <div style="margin-bottom:24px">
+        <label class="field-label" style="margin-bottom:12px">Frequently Asked Questions</label>
+        <div class="dynamic-list" id="faqs-list"></div>
+        <button class="btn-add" onclick="addFaqRow()">+ Add FAQ</button>
+      </div>
 
-    function isLoggedIn() {
-      return !!getToken();
-    }
+      <!-- Services -->
+      <div style="margin-bottom:24px">
+        <label class="field-label" style="margin-bottom:12px">Services / Products</label>
+        <div class="dynamic-list" id="services-list"></div>
+        <button class="btn-add" onclick="addServiceRow()">+ Add Service</button>
+      </div>
 
-    function loginWithJWT() {
-      const botIdInput = document.getElementById("login-botId").value.trim();
-      const password = document.getElementById("login-pass").value;
-      const errorEl = document.getElementById("login-error");
+      <button class="btn btn-primary" id="save-settings-btn2" onclick="saveSettings()" style="width:auto;padding:12px 32px">💾 Save All Settings</button>
+    </div>
+  </div>
 
-      if (!botIdInput || !password) {
-        errorEl.textContent = "Please enter both Bot ID and password.";
-        errorEl.classList.add("show");
-        return;
-      }
+  <!-- ── TAB 5: ACCOUNT ── -->
+  <div class="tab-content" id="tab-account">
+    <div class="card" style="max-width:480px">
+      <div class="card-title" style="margin-bottom:24px">🔐 Change Password</div>
+      <div style="margin-bottom:16px">
+        <label class="field-label">Current Password</label>
+        <input class="input" id="cp-current" type="password" autocomplete="current-password" />
+      </div>
+      <div style="margin-bottom:16px">
+        <label class="field-label">New Password</label>
+        <input class="input" id="cp-new" type="password" autocomplete="new-password" oninput="checkPasswordStrength(this.value)" />
+        <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
+        <p style="font-size:12px;color:var(--text-muted);margin-top:4px" id="strength-label">Min. 8 characters with at least 1 number</p>
+      </div>
+      <div style="margin-bottom:20px">
+        <label class="field-label">Confirm New Password</label>
+        <input class="input" id="cp-confirm" type="password" autocomplete="new-password" />
+      </div>
+      <button class="btn btn-primary" onclick="changePassword()" style="width:auto;padding:12px 32px">Change Password</button>
+      <p style="font-size:12px;color:var(--text-muted);margin-top:12px">You will be logged out after a successful password change.</p>
+    </div>
+  </div>
 
-      fetch(`${baseUrl}/api/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ botId: botIdInput, password: password })
-      })
-        .then(res => res.json())
-        .then(data => {
-          if (data.token) {
-            setToken(data.token);
-            state.token = data.token;
-            document.getElementById("auth-overlay").style.display = "none";
-            loadDashboardData();
-            showToast("✅ Logged in successfully!");
-          } else {
-            errorEl.textContent = "Invalid bot ID or password.";
-            errorEl.classList.add("show");
-          }
-        })
-        .catch(() => {
-          errorEl.textContent = "Could not reach the server. Make sure the backend is running.";
-          errorEl.classList.add("show");
-        });
-    }
+  <!-- ── TAB 6: EMBED & SHARE ── -->
+  <div class="tab-content" id="tab-embed">
+    <div class="card">
+      <div class="card-title" style="margin-bottom:18px">🔗 Chat Link</div>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:10px">Share this link on WhatsApp, Instagram bio, or anywhere. Works on all devices.</p>
+      <div style="display:flex;gap:10px;align-items:center">
+        <div class="code-block" id="chat-link-display" style="flex:1;padding:12px 16px;font-size:14px;color:var(--text)"></div>
+        <button class="btn-sm accent" onclick="copyToClipboard('chat-link-val', this)">📋 Copy</button>
+      </div>
+      <input type="hidden" id="chat-link-val" />
+    </div>
 
-    document.getElementById("login-botId").addEventListener("keydown", function (e) {
-      if (e.key === "Enter") document.getElementById("login-pass").focus();
+    <div class="card">
+      <div class="card-title" style="margin-bottom:18px">💻 Website Embed Code</div>
+      <div class="info-box">Paste this snippet just before the <code>&lt;/body&gt;</code> tag on your website. A floating chat bubble will appear.</div>
+      <div class="code-block" id="embed-code-display" style="position:relative">
+        <span id="embed-code-text"></span>
+        <div class="copy-overlay"><button class="btn-sm accent" onclick="copyToClipboard('embed-code-val', this)">📋 Copy</button></div>
+      </div>
+      <input type="hidden" id="embed-code-val" />
+    </div>
+
+    <div class="card">
+      <div class="card-title" style="margin-bottom:16px">📱 QR Code</div>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">Print or share this QR code. Scanning it opens your chat directly.</p>
+      <canvas id="qr-canvas" width="200" height="200"></canvas>
+    </div>
+
+    <div class="card">
+      <div class="card-title" style="margin-bottom:16px">📨 Share</div>
+      <div class="share-grid">
+        <a id="wa-share-btn" href="#" class="share-btn whatsapp" target="_blank" rel="noopener">
+          💬 Share on WhatsApp
+        </a>
+        <button class="share-btn" onclick="copyToClipboard('chat-link-val', this)">🔗 Copy Link</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- QR Code library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════════
+let BOT_ID = '';
+let TOKEN = '';
+let lastExtractionData = null;
+let settings = {};
+
+// ═══════════════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════════════
+function showToast(msg, type = 'info', duration = 3500) {
+  const c = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+  t.innerHTML = `<span>${icons[type] || 'ℹ️'}</span><span>${msg}</span>`;
+  c.appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(120%)'; t.style.transition = 'all .3s'; setTimeout(() => t.remove(), 350); }, duration);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════════════════════════
+async function doLogin() {
+  const botId = document.getElementById('login-bot-id').value.trim().toLowerCase();
+  const password = document.getElementById('login-password').value;
+  const btn = document.getElementById('login-btn');
+  const errEl = document.getElementById('login-error');
+  errEl.textContent = '';
+  if (!botId || !password) { errEl.textContent = 'Please enter your Business ID and password.'; return; }
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Signing in...';
+  try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ botId, password })
     });
-    document.getElementById("login-pass").addEventListener("keydown", function (e) {
-      if (e.key === "Enter") loginWithJWT();
+    const data = await res.json();
+    if (!res.ok) { errEl.textContent = data.error || 'Login failed.'; return; }
+    TOKEN = data.token;
+    BOT_ID = data.bot_id;
+    sessionStorage.setItem('overarc_token', TOKEN);
+    sessionStorage.setItem('overarc_bot_id', BOT_ID);
+    showDashboard();
+  } catch (e) { errEl.textContent = 'Connection error. Is the server running?'; }
+  finally { btn.disabled = false; btn.innerHTML = 'Sign In'; }
+}
+
+function doLogout() {
+  sessionStorage.removeItem('overarc_token');
+  sessionStorage.removeItem('overarc_bot_id');
+  TOKEN = ''; BOT_ID = '';
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+}
+
+async function showDashboard() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  await loadSettings();
+  await loadLeads();
+  loadAppointments();
+  loadDocuments();
+  setupEmbedTab();
+}
+
+// Auto-login from session
+window.addEventListener('DOMContentLoaded', () => {
+  TOKEN = sessionStorage.getItem('overarc_token') || '';
+  BOT_ID = sessionStorage.getItem('overarc_bot_id') || '';
+  if (TOKEN && BOT_ID) { showDashboard(); }
+
+  // Enter key support on login
+  ['login-bot-id', 'login-password'].forEach(id =>
+    document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); })
+  );
+
+  // Drag & drop
+  const dz = document.getElementById('upload-drop-zone');
+  if (dz) {
+    dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+    dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+    dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('drag-over'); const f = e.dataTransfer.files[0]; if (f) uploadFile(f); });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════════
+// TAB NAVIGATION
+// ═══════════════════════════════════════════════════════════════════
+function switchTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById(`tab-${tab}`).classList.add('active');
+  document.getElementById(`tab-${tab}-btn`).classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// AUTH HELPER
+// ═══════════════════════════════════════════════════════════════════
+function authHeaders() {
+  return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${TOKEN}` };
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════════════════════════════
+async function loadSettings() {
+  try {
+    const res = await fetch(`/api/settings?botId=${BOT_ID}`, { headers: authHeaders() });
+    if (res.status === 401) { doLogout(); return; }
+    settings = await res.json();
+    // Header
+    document.getElementById('header-bot-name').textContent = settings.name || BOT_ID;
+    const statusBadge = document.getElementById('status-badge');
+    const st = settings.status || 'active';
+    statusBadge.textContent = st.charAt(0).toUpperCase() + st.slice(1);
+    statusBadge.className = `status-badge status-${st}`;
+    // Populate settings form
+    document.getElementById('s-name').value = settings.name || '';
+    document.getElementById('s-whatsapp').value = settings.whatsapp || '';
+    document.getElementById('s-hours').value = settings.working_hours || '';
+    document.getElementById('s-location').value = settings.location || '';
+    document.getElementById('s-greeting').value = settings.greeting || '';
+    document.getElementById('s-prompt').value = settings.system_prompt || '';
+    const color = settings.color || '#6366f1';
+    document.getElementById('s-color').value = color;
+    document.getElementById('s-color-hex').value = color;
+    document.getElementById('color-preview-box').style.background = color;
+    // FAQs
+    const faqList = document.getElementById('faqs-list');
+    faqList.innerHTML = '';
+    (settings.faqs || []).forEach(f => addFaqRow(f.q, f.a));
+    // Services
+    const svcList = document.getElementById('services-list');
+    svcList.innerHTML = '';
+    (settings.services || []).forEach(s => addServiceRow(s.name, s.price));
+  } catch (e) { showToast('Failed to load settings.', 'error'); }
+}
+
+async function saveSettings() {
+  const btn = document.getElementById('save-settings-btn');
+  btn.disabled = true; btn.innerHTML = '<div class="spinner"></div> Saving...';
+  const faqs = [];
+  document.querySelectorAll('#faqs-list .faq-row').forEach(row => {
+    const q = row.querySelector('.faq-q').value.trim();
+    const a = row.querySelector('.faq-a').value.trim();
+    if (q && a) faqs.push({ q, a });
+  });
+  const services = [];
+  document.querySelectorAll('#services-list .svc-row').forEach(row => {
+    const name = row.querySelector('.svc-name').value.trim();
+    const price = row.querySelector('.svc-price').value.trim();
+    if (name) services.push({ name, price });
+  });
+  const payload = {
+    id: BOT_ID,
+    name: document.getElementById('s-name').value.trim(),
+    whatsapp: document.getElementById('s-whatsapp').value.trim(),
+    working_hours: document.getElementById('s-hours').value.trim(),
+    location: document.getElementById('s-location').value.trim(),
+    greeting: document.getElementById('s-greeting').value.trim(),
+    system_prompt: document.getElementById('s-prompt').value.trim(),
+    color: document.getElementById('s-color-hex').value.trim() || document.getElementById('s-color').value,
+    faqs, services
+  };
+  try {
+    const res = await fetch('/api/settings', { method: 'POST', headers: authHeaders(), body: JSON.stringify(payload) });
+    const data = await res.json();
+    if (res.ok) { showToast('Settings saved!', 'success'); document.getElementById('header-bot-name').textContent = payload.name; }
+    else { showToast(data.error || 'Save failed.', 'error'); }
+  } catch (e) { showToast('Connection error.', 'error'); }
+  finally { btn.disabled = false; btn.innerHTML = '💾 Save Changes'; }
+}
+
+function addFaqRow(q = '', a = '') {
+  const row = document.createElement('div');
+  row.className = 'dynamic-item faq-row';
+  row.innerHTML = `<input class="input faq-q" placeholder="Question" value="${escHtml(q)}" />
+    <input class="input faq-a" placeholder="Answer" value="${escHtml(a)}" />
+    <button class="btn-icon" onclick="this.parentElement.remove()" title="Remove">✕</button>`;
+  document.getElementById('faqs-list').appendChild(row);
+}
+
+function addServiceRow(name = '', price = '') {
+  const row = document.createElement('div');
+  row.className = 'dynamic-item svc-row';
+  row.innerHTML = `<input class="input svc-name" placeholder="Service name" value="${escHtml(name)}" />
+    <input class="input svc-price" placeholder="Price" style="max-width:140px" value="${escHtml(price)}" />
+    <button class="btn-icon" onclick="this.parentElement.remove()" title="Remove">✕</button>`;
+  document.getElementById('services-list').appendChild(row);
+}
+
+function updateColorPreview() {
+  const v = document.getElementById('s-color').value;
+  document.getElementById('color-preview-box').style.background = v;
+  document.getElementById('s-color-hex').value = v;
+}
+function syncColorFromHex() {
+  const v = document.getElementById('s-color-hex').value.trim();
+  if (/^#[0-9a-fA-F]{6}$/.test(v)) {
+    document.getElementById('s-color').value = v;
+    document.getElementById('color-preview-box').style.background = v;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// LEADS
+// ═══════════════════════════════════════════════════════════════════
+async function loadLeads() {
+  try {
+    const res = await fetch(`/api/leads?botId=${BOT_ID}`, { headers: authHeaders() });
+    if (res.status === 401) { doLogout(); return; }
+    const leads = await res.json();
+    document.getElementById('leads-loading').style.display = 'none';
+    document.getElementById('leads-count').textContent = leads.length;
+    if (!leads.length) { document.getElementById('leads-empty').style.display = 'block'; return; }
+    document.getElementById('leads-table-wrap').style.display = 'block';
+    const tbody = document.getElementById('leads-tbody');
+    tbody.innerHTML = '';
+    leads.reverse().forEach(l => {
+      const ts = l.timestamp || l.created_at || '';
+      const date = ts ? new Date(ts).toLocaleDateString() : '—';
+      tbody.insertAdjacentHTML('beforeend', `<tr>
+        <td><strong>${escHtml(l.name || '—')}</strong></td>
+        <td>${escHtml(l.phone || '—')}</td>
+        <td>${escHtml(l.topic || l.message || '—')}</td>
+        <td>${date}</td>
+      </tr>`);
     });
+  } catch (e) { document.getElementById('leads-loading').innerHTML = `<p style="color:var(--error)">Failed to load leads.</p>`; }
+}
 
-    if (isLoggedIn()) {
-      document.getElementById("auth-overlay").style.display = "none";
-      state.token = getToken();
-      loadDashboardData();
-    }
+function exportLeads() {
+  window.open(`/api/leads/export?botId=${BOT_ID}`, '_blank');
+}
 
-    function logout() {
-      clearToken();
-      state.token = null;
-      state.profile = null;
-      state.leads = [];
-      state.documents = [];
-      document.getElementById("auth-overlay").style.display = "flex";
-      document.getElementById("login-botId").value = "";
-      document.getElementById("login-pass").value = "";
-      document.getElementById("login-error").classList.remove("show");
-      showToast("🔒 Logged out.");
-    }
+// ═══════════════════════════════════════════════════════════════════
+// APPOINTMENTS
+// ═══════════════════════════════════════════════════════════════════
+async function loadAppointments() {
+  try {
+    const res = await fetch(`/api/appointments?botId=${BOT_ID}`, { headers: authHeaders() });
+    if (res.status === 401) { doLogout(); return; }
+    const appts = await res.json();
+    document.getElementById('appts-loading').style.display = 'none';
+    document.getElementById('appts-count').textContent = appts.length;
+    if (!appts.length) { document.getElementById('appts-empty').style.display = 'block'; return; }
+    document.getElementById('appts-table-wrap').style.display = 'block';
+    const tbody = document.getElementById('appts-tbody');
+    tbody.innerHTML = '';
+    appts.reverse().forEach(a => {
+      const status = a.status || 'pending';
+      const pillClass = status === 'confirmed' ? 'pill-confirmed' : status === 'cancelled' ? 'pill-cancelled' : 'pill-pending';
+      tbody.insertAdjacentHTML('beforeend', `<tr>
+        <td><strong>${escHtml(a.customer_name || '—')}</strong></td>
+        <td>${escHtml(a.customer_phone || '—')}</td>
+        <td>${escHtml(a.service || '—')}</td>
+        <td>${escHtml(a.preferred_date || '—')}</td>
+        <td>${escHtml(a.preferred_time || '—')}</td>
+        <td><span class="pill ${pillClass}">${status}</span></td>
+      </tr>`);
+    });
+  } catch (e) { document.getElementById('appts-loading').innerHTML = `<p style="color:var(--error)">Failed to load appointments.</p>`; }
+}
 
-    // =========================================================================
-    // AUTHENTICATED FETCH HELPER
-    // =========================================================================
-    function authFetch(url, options = {}) {
-      const headers = options.headers || {};
-      headers['Authorization'] = 'Bearer ' + getToken();
-      if (!headers['Content-Type'] && !(options.body instanceof FormData)) {
-        headers['Content-Type'] = 'application/json';
+function exportAppointments() {
+  window.open(`/api/appointments/export?botId=${BOT_ID}`, '_blank');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// KNOWLEDGE BASE
+// ═══════════════════════════════════════════════════════════════════
+function switchKbTab(tab) {
+  ['pdf', 'text', 'url'].forEach(t => {
+    document.getElementById(`kb-${t}`).style.display = t === tab ? 'block' : 'none';
+    document.getElementById(`kb-tab-${t}`).classList.toggle('active', t === tab);
+  });
+}
+
+function handleFileSelect(event) {
+  const file = event.target.files[0];
+  if (file) uploadFile(file);
+}
+
+async function uploadFile(file) {
+  if (!file.name.endsWith('.pdf')) { showToast('Only PDF files are supported.', 'error'); return; }
+  showUploadProgress(true);
+  const formData = new FormData();
+  formData.append('file', file);
+  try {
+    const res = await fetch('/api/documents/upload', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${TOKEN}` },
+      body: formData
+    });
+    const data = await res.json();
+    showUploadProgress(false);
+    if (res.ok && data.success) {
+      if (data.pending_approval && data.extraction) {
+        lastExtractionData = data.extraction;
+        showExtractionBanner(data.summary_text);
+      } else {
+        showToast('Document processed!', 'success');
       }
-      return fetch(url, { ...options, headers })
-        .then(res => {
-          if (res.status === 401) {
-            clearToken();
-            document.getElementById("auth-overlay").style.display = "flex";
-            document.getElementById("login-error").textContent = "Session expired. Please login again.";
-            document.getElementById("login-error").classList.add("show");
-            throw new Error("Unauthorized");
-          }
-          return res;
-        });
-    }
-
-    // =========================================================================
-    // RENDER & INITIAL LOAD DATA
-    // =========================================================================
-    function loadDashboardData() {
-      // 1. Load active settings profile
-      authFetch(`${baseUrl}/api/settings?botId=${botId}`)
-        .then(res => res.json())
-        .then(data => {
-          state.profile = data;
-          populateSettingsForm();
-          updateHeaderProfile();
-        })
-        .catch(err => console.error("Error loading settings:", err));
-
-      // 2. Load CRM captured leads
-      authFetch(`${baseUrl}/api/leads?botId=${botId}`)
-        .then(res => res.json())
-        .then(leads => {
-          state.leads = leads;
-          populateLeadsCRM();
-        })
-        .catch(err => console.error("Error loading leads:", err));
-
-      // 3. Load documents
       loadDocuments();
+    } else { showToast(data.error || 'Upload failed.', 'error'); }
+  } catch (e) { showUploadProgress(false); showToast('Upload failed.', 'error'); }
+}
 
-      // 4. Set snippet text
-      const snippet = `<script src="${baseUrl}/widget.js?botId=${botId}"><\/script>`;
-      document.getElementById("embed-code-text").textContent = snippet;
-    }
+async function uploadText() {
+  const text = document.getElementById('paste-text').value.trim();
+  if (!text) { showToast('Please paste some text first.', 'error'); return; }
+  showUploadProgress(true);
+  const formData = new FormData();
+  formData.append('text', text);
+  try {
+    const res = await fetch('/api/documents/upload', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${TOKEN}` },
+      body: formData
+    });
+    const data = await res.json();
+    showUploadProgress(false);
+    if (res.ok && data.success) {
+      document.getElementById('paste-text').value = '';
+      if (data.pending_approval && data.extraction) {
+        lastExtractionData = data.extraction;
+        showExtractionBanner(data.summary_text);
+      } else { showToast('Text processed!', 'success'); }
+      loadDocuments();
+    } else { showToast(data.error || 'Processing failed.', 'error'); }
+  } catch (e) { showUploadProgress(false); showToast('Processing failed.', 'error'); }
+}
 
-    function populateSettingsForm() {
-      const biz = state.profile;
-      if (!biz) return;
-      document.getElementById("form-name").value = biz.name || '';
-      document.getElementById("form-emoji").value = biz.emoji || '';
-      document.getElementById("form-whatsapp").value = biz.whatsapp || '';
-      document.getElementById("form-greeting").value = biz.greeting || '';
-      document.getElementById("form-color").value = biz.color || '#10B981';
-      document.getElementById("form-color-picker").value = biz.color || '#10B981';
-      document.getElementById("form-prompt").value = biz.system_prompt || '';
+async function crawlUrl() {
+  const url = document.getElementById('crawl-url').value.trim();
+  if (!url) { showToast('Please enter a URL.', 'error'); return; }
+  showUploadProgress(true);
+  try {
+    const res = await fetch('/api/crawl', {
+      method: 'POST', headers: authHeaders(), body: JSON.stringify({ url })
+    });
+    const data = await res.json();
+    showUploadProgress(false);
+    if (res.ok && data.success) {
+      if (data.pending_approval && data.extraction) {
+        lastExtractionData = data.extraction;
+        showExtractionBanner(data.summary_text);
+      } else { showToast('Website crawled!', 'success'); }
+      loadDocuments();
+    } else { showToast(data.error || 'Crawl failed.', 'error'); }
+  } catch (e) { showUploadProgress(false); showToast('Crawl failed.', 'error'); }
+}
 
-      const faqs = biz.faqs || [];
-      const container = document.getElementById("faq-rows-container");
-      container.innerHTML = "";
-      faqs.forEach(faq => {
-        addFaqRow(faq.q, faq.a);
+function showUploadProgress(show) {
+  document.getElementById('upload-progress').style.display = show ? 'block' : 'none';
+}
+
+function showExtractionBanner(text) {
+  document.getElementById('extraction-banner').style.display = 'flex';
+  document.getElementById('extraction-summary-text').textContent = '✅ ' + text + ' — Apply to your bot?';
+}
+
+async function applyExtraction(action) {
+  if (!lastExtractionData) return;
+  try {
+    const res = await fetch('/api/documents/apply-extraction', {
+      method: 'POST', headers: authHeaders(),
+      body: JSON.stringify({ action, extraction: lastExtractionData })
+    });
+    const data = await res.json();
+    if (res.ok) { showToast(data.message || 'Applied!', 'success'); }
+    else { showToast(data.error || 'Failed.', 'error'); }
+  } catch (e) { showToast('Error applying extraction.', 'error'); }
+  document.getElementById('extraction-banner').style.display = 'none';
+  lastExtractionData = null;
+  await loadSettings();
+}
+
+function reviewExtraction() {
+  if (!lastExtractionData) return;
+  const s = lastExtractionData;
+  alert(`Services found: ${(s.extracted_services||[]).length}\nFAQs found: ${(s.extracted_faqs||[]).length}\nPolicies found: ${(s.extracted_policies||[]).length}\n\nSwitch to Bot Settings to manually review and edit.`);
+}
+function skipExtraction() {
+  document.getElementById('extraction-banner').style.display = 'none';
+  lastExtractionData = null;
+  showToast('Extraction skipped. No changes made.', 'info');
+}
+
+async function loadDocuments() {
+  document.getElementById('docs-loading').style.display = 'block';
+  document.getElementById('docs-list').innerHTML = '';
+  document.getElementById('docs-empty').style.display = 'none';
+  try {
+    const res = await fetch('/api/documents', { headers: authHeaders() });
+    const docs = await res.json();
+    document.getElementById('docs-loading').style.display = 'none';
+    if (!docs.length) { document.getElementById('docs-empty').style.display = 'block'; return; }
+    const list = document.getElementById('docs-list');
+    docs.forEach(doc => {
+      const d = document.createElement('div');
+      d.className = 'doc-item';
+      const date = doc.created_at ? new Date(doc.created_at).toLocaleDateString() : '—';
+      d.innerHTML = `<div>
+          <div style="font-size:14px;font-weight:600">${escHtml(doc.source_name || 'Unknown')}</div>
+          <div class="doc-meta">${doc.chunk_count || 0} chunks · ${doc.source_type || 'doc'} · ${date}</div>
+        </div>
+        <button class="btn-sm danger" onclick="deleteDocument('${doc.id}', this)">🗑 Delete</button>`;
+      list.appendChild(d);
+    });
+  } catch (e) { document.getElementById('docs-loading').style.display = 'none'; }
+}
+
+async function deleteDocument(docId, btn) {
+  if (!confirm('Delete this document and all its chunks?')) return;
+  btn.disabled = true; btn.textContent = '...';
+  try {
+    const res = await fetch(`/api/documents/${docId}`, { method: 'DELETE', headers: authHeaders() });
+    const data = await res.json();
+    if (res.ok) { showToast('Document deleted.', 'success'); loadDocuments(); }
+    else { showToast(data.error || 'Delete failed.', 'error'); btn.disabled = false; btn.textContent = '🗑 Delete'; }
+  } catch (e) { showToast('Error.', 'error'); btn.disabled = false; btn.textContent = '🗑 Delete'; }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// ACCOUNT — CHANGE PASSWORD
+// ═══════════════════════════════════════════════════════════════════
+function checkPasswordStrength(pw) {
+  const fill = document.getElementById('strength-fill');
+  const label = document.getElementById('strength-label');
+  let score = 0;
+  if (pw.length >= 8) score++;
+  if (/\d/.test(pw)) score++;
+  if (/[A-Z]/.test(pw)) score++;
+  if (pw.length >= 12) score++;
+  const widths = ['0%', '25%', '50%', '75%', '100%'];
+  const colors = ['#ef4444', '#f59e0b', '#f59e0b', '#10b981', '#10b981'];
+  const labels = ['Too short', 'Weak', 'Fair', 'Good', 'Strong'];
+  fill.style.width = widths[score];
+  fill.style.background = colors[score];
+  label.textContent = score === 0 ? 'Min. 8 characters with at least 1 number' : labels[score];
+}
+
+async function changePassword() {
+  const current = document.getElementById('cp-current').value;
+  const newPw = document.getElementById('cp-new').value;
+  const confirm = document.getElementById('cp-confirm').value;
+  if (!current || !newPw || !confirm) { showToast('All fields are required.', 'error'); return; }
+  if (newPw !== confirm) { showToast('New passwords do not match.', 'error'); return; }
+  if (newPw.length < 8) { showToast('Password must be at least 8 characters.', 'error'); return; }
+  if (!/\d/.test(newPw)) { showToast('Password must contain at least 1 number.', 'error'); return; }
+  try {
+    const res = await fetch('/api/client/change-password', {
+      method: 'POST', headers: authHeaders(),
+      body: JSON.stringify({ currentPassword: current, newPassword: newPw })
+    });
+    const data = await res.json();
+    if (res.ok) { showToast('Password changed! Logging you out...', 'success'); setTimeout(doLogout, 2000); }
+    else { showToast(data.error || 'Failed.', 'error'); }
+  } catch (e) { showToast('Connection error.', 'error'); }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// EMBED & SHARE
+// ═══════════════════════════════════════════════════════════════════
+function setupEmbedTab() {
+  const baseUrl = window.location.origin;
+  const chatUrl = `${baseUrl}/chat/${BOT_ID}`;
+  const embedCode = `<script src="${baseUrl}/widget.js?botId=${BOT_ID}"><\/script>`;
+
+  document.getElementById('chat-link-display').textContent = chatUrl;
+  document.getElementById('chat-link-val').value = chatUrl;
+  document.getElementById('embed-code-text').textContent = embedCode;
+  document.getElementById('embed-code-val').value = embedCode;
+
+  // WhatsApp share
+  const waText = encodeURIComponent(`Chat with our AI assistant: ${chatUrl}`);
+  document.getElementById('wa-share-btn').href = `https://wa.me/?text=${waText}`;
+
+  // QR code
+  if (window.QRCode) {
+    const canvas = document.getElementById('qr-canvas');
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#1a1d27';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    try {
+      new QRCode(document.createElement('div'), {
+        text: chatUrl, width: 200, height: 200,
+        correctLevel: QRCode.CorrectLevel.H
       });
-
-      const services = biz.services || [];
-      const sContainer = document.getElementById("service-rows-container");
-      sContainer.innerHTML = "";
-      services.forEach(s => {
-        addServiceRow(s.name, s.price);
-      });
-    }
-
-    function updateHeaderProfile() {
-      const biz = state.profile;
-      if (!biz) return;
-      document.getElementById("foot-avatar").textContent = biz.emoji || '🏥';
-      document.getElementById("foot-name").textContent = biz.name || 'Unnamed Business';
-      document.getElementById("page-head-title").textContent = `${biz.name || 'Business'} — Settings Panel`;
-    }
-
-    function populateLeadsCRM() {
-      const tableBody = document.getElementById("crm-table-body");
-      tableBody.innerHTML = "";
-      document.getElementById("stat-total-leads").textContent = state.leads.length;
-
-      if (!state.leads.length) {
-        tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:32px;">No leads captured yet. Keep the bot active!</td></tr>`;
-        return;
+    } catch (e) { /* QRCode lib handles canvas differently */ }
+    // Use QRCode with a temp container and copy to canvas
+    const tempDiv = document.createElement('div');
+    document.body.appendChild(tempDiv);
+    const qr = new QRCode(tempDiv, {
+      text: chatUrl, width: 180, height: 180,
+      colorDark: '#6366f1', colorLight: '#1a1d27',
+      correctLevel: QRCode.CorrectLevel.H
+    });
+    setTimeout(() => {
+      const img = tempDiv.querySelector('img');
+      if (img) {
+        ctx.fillStyle = '#1a1d27';
+        ctx.fillRect(0, 0, 200, 200);
+        ctx.drawImage(img, 10, 10, 180, 180);
       }
+      document.body.removeChild(tempDiv);
+    }, 300);
+  }
+}
 
-      state.leads.forEach(lead => {
-        const tr = document.createElement("tr");
-        const date = new Date(lead.timestamp).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-        tr.innerHTML = `
-          <td style="font-weight:600; color:#fff;">${lead.name}</td>
-          <td>${lead.phone}</td>
-          <td>${lead.topic || 'General Inquiry'}</td>
-          <td>${date}</td>
-          <td><span class="crm-badge">Active Lead</span></td>
-        `;
-        tableBody.appendChild(tr);
-      });
-    }
+function copyToClipboard(inputId, btn) {
+  const val = document.getElementById(inputId).value;
+  navigator.clipboard.writeText(val).then(() => {
+    const orig = btn.innerHTML;
+    btn.innerHTML = '✅ Copied!';
+    setTimeout(() => { btn.innerHTML = orig; }, 2000);
+  });
+}
 
-    // =========================================================================
-    // COLOR SYNCS
-    // =========================================================================
-    function syncColors(val) {
-      document.getElementById("form-color").value = val;
-    }
-    function syncPicker(val) {
-      if (val.startsWith('#') && val.length === 7) {
-        document.getElementById("form-color-picker").value = val;
-      }
-    }
-
-    // =========================================================================
-    // FAQ BUILDER DYNAMICS ROW ACTIONS
-    // =========================================================================
-    function addFaqRow(q = "", a = "") {
-      const container = document.getElementById("faq-rows-container");
-      const row = document.createElement("div");
-      row.className = "faq-builder-row";
-      row.innerHTML = `
-        <input type="text" class="form-control faq-q" placeholder="Common question..." value="${escapeHtml(q)}" />
-        <input type="text" class="form-control faq-a" placeholder="Answer text..." value="${escapeHtml(a)}" />
-        <button class="remove-row-btn" onclick="this.closest('.faq-builder-row').remove()"><i data-lucide="trash" class="w-4 h-4"></i></button>
-      `;
-      container.appendChild(row);
-      if (window.lucide) window.lucide.createIcons();
-    }
-
-    function addServiceRow(name = "", price = "") {
-      const container = document.getElementById("service-rows-container");
-      const row = document.createElement("div");
-      row.className = "service-builder-row";
-      row.innerHTML = `
-        <input type="text" class="form-control service-name" placeholder="Item/Service Name (e.g. Chapli Kebab)..." value="${escapeHtml(name)}" />
-        <input type="text" class="form-control service-price" placeholder="Price (e.g. PKR 350)..." value="${escapeHtml(price)}" />
-        <button class="remove-row-btn" onclick="this.closest('.service-builder-row').remove()"><i data-lucide="trash" class="w-4 h-4"></i></button>
-      `;
-      container.appendChild(row);
-      if (window.lucide) window.lucide.createIcons();
-    }
-
-    function escapeHtml(str) {
-      if (!str) return '';
-      return str.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>').replace(/"/g, '"').replace(/'/g, '&#039;');
-    }
-
-    // =========================================================================
-    // SAVE CONFIGURATION TRIGGERS
-    // =========================================================================
-    function saveSettings() {
-      const btn = document.getElementById("save-settings-btn");
-      btn.disabled = true;
-      btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Saving changes...`;
-      if (window.lucide) window.lucide.createIcons();
-
-      const color = document.getElementById("form-color").value.trim();
-      const darkColor = color;
-
-      const faqRows = document.querySelectorAll(".faq-builder-row");
-      const faqs = [];
-      faqRows.forEach(row => {
-        const q = row.querySelector(".faq-q").value.trim();
-        const a = row.querySelector(".faq-a").value.trim();
-        if (q && a) {
-          faqs.push({ q, a });
-        }
-      });
-
-      const serviceRows = document.querySelectorAll(".service-builder-row");
-      const services = [];
-      serviceRows.forEach(row => {
-        const name = row.querySelector(".service-name").value.trim();
-        const price = row.querySelector(".service-price").value.trim();
-        if (name && price) {
-          services.push({ name, price });
-        }
-      });
-
-      const updatedPayload = {
-        id: botId,
-        name: document.getElementById("form-name").value.trim(),
-        emoji: document.getElementById("form-emoji").value.trim(),
-        color: color,
-        dark_color: darkColor,
-        whatsapp: document.getElementById("form-whatsapp").value.trim(),
-        greeting: document.getElementById("form-greeting").value.trim(),
-        system_prompt: document.getElementById("form-prompt").value.trim(),
-        faqs: faqs,
-        services: services
-      };
-
-      authFetch(`${baseUrl}/api/settings`, {
-        method: 'POST',
-        body: JSON.stringify(updatedPayload)
-      })
-        .then(res => res.json())
-        .then(data => {
-          btn.disabled = false;
-          btn.innerHTML = `<i data-lucide="save"></i> Save Customizations`;
-          if (window.lucide) window.lucide.createIcons();
-          state.profile = updatedPayload;
-          updateHeaderProfile();
-          showToast("🎨 Settings updated successfully!");
-        })
-        .catch(err => {
-          btn.disabled = false;
-          btn.innerHTML = `<i data-lucide="save"></i> Save Customizations`;
-          if (window.lucide) window.lucide.createIcons();
-          console.error("Save error:", err);
-          showToast("❌ Failed to save settings.", true);
-        });
-    }
-
-    // =========================================================================
-    // PASSWORD CHANGE
-    // =========================================================================
-    function togglePassword(inputId, btn) {
-      const input = document.getElementById(inputId);
-      if (input.type === "password") {
-        input.type = "text";
-        btn.textContent = "🙈";
-      } else {
-        input.type = "password";
-        btn.textContent = "👁";
-      }
-    }
-
-    function updatePasswordStrength(password) {
-      const fill = document.getElementById("pw-strength-fill");
-      const reqLength = document.getElementById("req-length");
-      const reqNumber = document.getElementById("req-number");
-      const reqCommon = document.getElementById("req-common");
-
-      const hasLength = password.length >= 8;
-      const hasNumber = /\d/.test(password);
-      const commonPasswords = new Set([
-        "123456", "password", "12345678", "qwerty", "123456789",
-        "12345", "1234", "111111", "1234567", "sunshine",
-        "qwerty123", "0", "admin", "letmein", "123123",
-        "dragon", "baseball", "abc123", "monkey", "password123"
-      ]);
-      const notCommon = !commonPasswords.has(password.toLowerCase());
-
-      reqLength.className = hasLength ? "met" : "";
-      reqLength.innerHTML = `<span class="req-icon">${hasLength ? '✅' : '❌'}</span> At least 8 characters`;
-      reqNumber.className = hasNumber ? "met" : "";
-      reqNumber.innerHTML = `<span class="req-icon">${hasNumber ? '✅' : '❌'}</span> At least one number (0-9)`;
-      reqCommon.className = notCommon ? "met" : "";
-      reqCommon.innerHTML = `<span class="req-icon">${notCommon ? '✅' : '❌'}</span> Not a common password`;
-
-      fill.className = "pw-strength-fill";
-      if (!password) {
-        fill.style.width = "0%";
-      } else if (hasLength && hasNumber && notCommon) {
-        fill.classList.add("strong");
-      } else if ((hasLength && hasNumber) || (hasLength && notCommon) || (hasNumber && notCommon)) {
-        fill.classList.add("medium");
-      } else {
-        fill.classList.add("weak");
-      }
-    }
-
-    function changePassword() {
-      const currentPassword = document.getElementById("acc-current-pass").value;
-      const newPassword = document.getElementById("acc-new-pass").value;
-      const confirmPassword = document.getElementById("acc-confirm-pass").value;
-      const btn = document.getElementById("change-pass-btn");
-
-      if (!currentPassword) { showToast("❌ Please enter your current password.", true); return; }
-      if (!newPassword) { showToast("❌ Please enter a new password.", true); return; }
-      if (newPassword !== confirmPassword) { showToast("❌ New passwords do not match.", true); return; }
-      if (newPassword.length < 8) { showToast("❌ New password must be at least 8 characters.", true); return; }
-      if (!/\d/.test(newPassword)) { showToast("❌ New password must contain at least one number.", true); return; }
-
-      btn.disabled = true;
-      btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Updating...`;
-      if (window.lucide) window.lucide.createIcons();
-
-      authFetch(`${baseUrl}/api/client/change-password`, {
-        method: 'POST',
-        body: JSON.stringify({ currentPassword: currentPassword, newPassword: newPassword })
-      })
-        .then(res => res.json())
-        .then(data => {
-          btn.disabled = false;
-          btn.innerHTML = `<i data-lucide="lock"></i> Update Password`;
-          if (window.lucide) window.lucide.createIcons();
-          if (data.success) {
-            setToken(data.token);
-            showToast("✅ Password changed successfully!");
-            document.getElementById("acc-current-pass").value = "";
-            document.getElementById("acc-new-pass").value = "";
-            document.getElementById("acc-confirm-pass").value = "";
-            updatePasswordStrength("");
-          } else {
-            showToast("❌ " + (data.error || "Failed to change password."), true);
-          }
-        })
-        .catch(err => {
-          btn.disabled = false;
-          btn.innerHTML = `<i data-lucide="lock"></i> Update Password`;
-          if (window.lucide) window.lucide.createIcons();
-          console.error("Password change error:", err);
-          showToast("❌ Failed to change password.", true);
-        });
-    }
-
-    // =========================================================================
-    // KNOWLEDGE BASE / RAG FUNCTIONS
-    // =========================================================================
-
-    // -----------------------------------------------------------------------
-    // Load documents list
-    // -----------------------------------------------------------------------
-    function loadDocuments() {
-      authFetch(`${baseUrl}/api/documents`)
-        .then(res => res.json())
-        .then(docs => {
-          state.documents = docs || [];
-          renderDocumentList();
-        })
-        .catch(err => console.error("Error loading documents:", err));
-    }
-
-    // -----------------------------------------------------------------------
-    // Render the document list in the UI
-    // -----------------------------------------------------------------------
-    function renderDocumentList() {
-      const container = document.getElementById("doc-list-body");
-      const countEl = document.getElementById("doc-count");
-      countEl.textContent = `${state.documents.length} document${state.documents.length !== 1 ? 's' : ''}`;
-
-      if (!state.documents.length) {
-        container.innerHTML = `
-          <div class="doc-empty">
-            <div class="empty-icon">📂</div>
-            <p>No documents uploaded yet. Upload a PDF or paste text to build your knowledge base.</p>
-          </div>
-        `;
-        return;
-      }
-
-      container.innerHTML = "";
-      state.documents.forEach(doc => {
-        const ext = doc.extraction_summary || {};
-        const itemsFound = [];
-        if (ext.extracted_services && ext.extracted_services.length) itemsFound.push(`${ext.extracted_services.length} services`);
-        if (ext.extracted_faqs && ext.extracted_faqs.length) itemsFound.push(`${ext.extracted_faqs.length} FAQs`);
-        if (ext.extracted_policies && ext.extracted_policies.length) itemsFound.push(`${ext.extracted_policies.length} policies`);
-        if (ext.extracted_hours) itemsFound.push('hours');
-        const desc = itemsFound.length ? `Extracted: ${itemsFound.join(', ')}` : `${doc.chunk_count || 0} chunks stored`;
-
-        const date = new Date(doc.created_at).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
-        const icon = doc.source_type === 'pdf' ? '📄' : '📝';
-
-        const item = document.createElement("div");
-        item.className = "doc-item";
-        item.innerHTML = `
-          <div class="doc-info">
-            <div class="doc-icon">${icon}</div>
-            <div class="doc-meta">
-              <div class="doc-name">${escapeHtml(doc.source_name || 'Untitled')}</div>
-              <div class="doc-desc">${desc} • ${date}</div>
-            </div>
-          </div>
-          <div class="doc-actions">
-            <button class="doc-action-btn" onclick="previewDocument('${escapeHtml(doc.source_name || '')}')">👁 Preview</button>
-            <button class="doc-action-btn" onclick="reanalyzeDocument('${escapeHtml(doc.source_name || '')}')">🔄 Re-analyze</button>
-            <button class="doc-action-btn danger" onclick="deleteDocument('${doc.id}')">🗑 Delete</button>
-          </div>
-        `;
-        container.appendChild(item);
-      });
-    }
-
-    // -----------------------------------------------------------------------
-    // Handle PDF file selection via browse
-    // -----------------------------------------------------------------------
-    function handleFileSelect(event) {
-      const file = event.target.files[0];
-      if (file) uploadFile(file);
-    }
-
-    // -----------------------------------------------------------------------
-    // Handle PDF file drop
-    // -----------------------------------------------------------------------
-    function handleFileDrop(event) {
-      event.preventDefault();
-      document.getElementById('pdf-drop-zone').classList.remove('dragover');
-      const file = event.dataTransfer.files[0];
-      if (file) uploadFile(file);
-    }
-
-    // -----------------------------------------------------------------------
-    // Upload a PDF file
-    // -----------------------------------------------------------------------
-    function uploadFile(file) {
-      if (!file.name.toLowerCase().endsWith('.pdf')) {
-        showToast("❌ Please upload a PDF file.", true);
-        return;
-      }
-
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const btn = document.querySelector('.kb-upload-btn');
-      const originalText = btn.innerHTML;
-      btn.disabled = true;
-      btn.innerHTML = `<span class="spinner"></span> Uploading & analyzing...`;
-
-      authFetch(`${baseUrl}/api/documents/upload`, {
-        method: 'POST',
-        body: formData
-      })
-        .then(res => res.json())
-        .then(data => {
-          btn.disabled = false;
-          btn.innerHTML = originalText;
-          if (window.lucide) window.lucide.createIcons();
-
-          if (data.success) {
-            showToast(`✅ ${data.summary_text || 'Document processed!'}`);
-            state.lastExtraction = data;
-            loadDocuments();
-
-            // Show extraction approval card if there's data to approve
-            if (data.pending_approval) {
-              showExtractionCard(data);
-            }
-          } else {
-            showToast("❌ " + (data.error || "Upload failed."), true);
-          }
-        })
-        .catch(err => {
-          btn.disabled = false;
-          btn.innerHTML = originalText;
-          if (window.lucide) window.lucide.createIcons();
-          console.error("Upload error:", err);
-          showToast("❌ Upload failed. Check server connection.", true);
-        });
-    }
-
-    // -----------------------------------------------------------------------
-    // Upload pasted text
-    // -----------------------------------------------------------------------
-    function uploadText() {
-      const text = document.getElementById("kb-paste-text").value.trim();
-      if (!text) {
-        showToast("❌ Please paste some text first.", true);
-        return;
-      }
-      if (text.length < 20) {
-        showToast("❌ Please paste at least 20 characters.", true);
-        return;
-      }
-
-      const formData = new FormData();
-      formData.append('text', text);
-
-      const btn = document.querySelector('.kb-upload-btn');
-      const originalText = btn.innerHTML;
-      btn.disabled = true;
-      btn.innerHTML = `<span class="spinner"></span> Analyzing text...`;
-
-      authFetch(`${baseUrl}/api/documents/upload`, {
-        method: 'POST',
-        body: formData
-      })
-        .then(res => res.json())
-        .then(data => {
-          btn.disabled = false;
-          btn.innerHTML = originalText;
-          if (window.lucide) window.lucide.createIcons();
-
-          if (data.success) {
-            showToast(`✅ ${data.summary_text || 'Text processed!'}`);
-            document.getElementById("kb-paste-text").value = "";
-            state.lastExtraction = data;
-            loadDocuments();
-
-            if (data.pending_approval) {
-              showExtractionCard(data);
-            }
-          } else {
-            showToast("❌ " + (data.error || "Processing failed."), true);
-          }
-        })
-        .catch(err => {
-          btn.disabled = false;
-          btn.innerHTML = originalText;
-          if (window.lucide) window.lucide.createIcons();
-          console.error("Text upload error:", err);
-          showToast("❌ Processing failed. Check server connection.", true);
-        });
-    }
-
-    // -----------------------------------------------------------------------
-    // Preview document content
-    // -----------------------------------------------------------------------
-    function previewDocument(sourceName) {
-      authFetch(`${baseUrl}/api/documents/preview?source_name=${encodeURIComponent(sourceName)}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.preview) {
-            // Show preview in a simple modal-like alert
-            const previewLines = data.preview.split('\n').slice(0, 30).join('\n');
-            showToast(`📄 ${data.source_name}: ${data.total_characters} chars, ${data.total_chunks} chunks`);
-            alert(`📄 Document Preview: "${data.source_name}"\n\n${data.total_characters} characters in ${data.total_chunks} chunks\n\n--- Preview (first 3000 chars) ---\n\n${previewLines}\n\n${data.total_characters > 3000 ? '...(truncated)' : ''}`);
-          } else {
-            showToast("❌ Could not load preview.", true);
-          }
-        })
-        .catch(err => {
-          console.error("Preview error:", err);
-          showToast("❌ Failed to load preview.", true);
-        });
-    }
-
-    // -----------------------------------------------------------------------
-    // Re-analyze a document
-    // -----------------------------------------------------------------------
-    function reanalyzeDocument(sourceName) {
-      authFetch(`${baseUrl}/api/documents/analyze`, {
-        method: 'POST',
-        body: JSON.stringify({ source_name: sourceName })
-      })
-        .then(res => res.json())
-        .then(data => {
-          if (data.success && data.extraction) {
-            state.lastExtraction = { extraction: data.extraction, pending_approval: data.pending_approval };
-            if (data.pending_approval) {
-              showExtractionCard(state.lastExtraction);
-            }
-            showToast("🔄 Re-analysis complete! Extraction updated.");
-            loadDocuments();
-          } else {
-            showToast("❌ Re-analysis failed.", true);
-          }
-        })
-        .catch(err => {
-          console.error("Re-analyze error:", err);
-          showToast("❌ Re-analysis failed.", true);
-        });
-    }
-
-    // -----------------------------------------------------------------------
-    // Delete a document
-    // -----------------------------------------------------------------------
-    function deleteDocument(docId) {
-      if (!confirm("Delete this document and all its knowledge chunks? This cannot be undone.")) return;
-
-      authFetch(`${baseUrl}/api/documents/${docId}`, { method: 'DELETE' })
-        .then(res => res.json())
-        .then(data => {
-          if (data.success) {
-            showToast(`🗑 ${data.message}`);
-            loadDocuments();
-          } else {
-            showToast("❌ " + (data.error || "Delete failed."), true);
-          }
-        })
-        .catch(err => {
-          console.error("Delete error:", err);
-          showToast("❌ Delete failed.", true);
-        });
-    }
-
-    // -----------------------------------------------------------------------
-    // Show the extraction approval card
-    // -----------------------------------------------------------------------
-    function showExtractionCard(data) {
-      const card = document.getElementById("extraction-card");
-      const summaryEl = document.getElementById("extraction-summary-text");
-      const ext = data.extraction || {};
-
-      const services = (ext.extracted_services || []).length;
-      const faqs = (ext.extracted_faqs || []).length;
-      const policies = (ext.extracted_policies || []).length;
-      const hours = ext.extracted_hours ? '✓' : '✗';
-      const greeting = ext.suggested_greeting ? '✓' : '✗';
-      const type = ext.detected_type || 'general_info';
-      const confidence = Math.round((ext.confidence || 0) * 100);
-
-      summaryEl.innerHTML = `
-        <strong>Document Type:</strong> ${type.replace(/_/g, ' ')} (${confidence}% confidence)<br>
-        <strong>Detected:</strong> ${services} services, ${faqs} FAQs, ${policies} policies<br>
-        <strong>Hours:</strong> ${hours} &nbsp;|&nbsp; <strong>Greeting:</strong> ${greeting}
-      `;
-      card.classList.add("show");
-    }
-
-    // -----------------------------------------------------------------------
-    // Accept extraction
-    // -----------------------------------------------------------------------
-    function acceptExtraction() {
-      if (!state.lastExtraction) return;
-      const extraction = state.lastExtraction.extraction || state.lastExtraction;
-
-      authFetch(`${baseUrl}/api/documents/apply-extraction`, {
-        method: 'POST',
-        body: JSON.stringify({ action: 'accept', extraction: extraction })
-      })
-        .then(res => res.json())
-        .then(data => {
-          document.getElementById("extraction-card").classList.remove("show");
-          if (data.success) {
-            showToast(`✅ ${data.message || 'Extraction applied!'}`);
-            // Refresh settings to show new data
-            authFetch(`${baseUrl}/api/settings?botId=${botId}`)
-              .then(res => res.json())
-              .then(settings => {
-                state.profile = settings;
-                populateSettingsForm();
-              })
-              .catch(() => { });
-          } else {
-            showToast("❌ " + (data.error || "Failed to apply."), true);
-          }
-        })
-        .catch(err => {
-          console.error("Accept error:", err);
-          showToast("❌ Failed to apply extraction.", true);
-        });
-    }
-
-    // -----------------------------------------------------------------------
-    // Review extraction (switch to settings tab with data)
-    // -----------------------------------------------------------------------
-    function reviewExtraction() {
-      document.getElementById("extraction-card").classList.remove("show");
-      showToast("📝 Switch to the Customize Bot tab to manually edit the extracted data.");
-      // Switch to settings tab
-      const settingsBtn = document.querySelectorAll('.nav-item')[1];
-      if (settingsBtn) settingsBtn.click();
-    }
-
-    // -----------------------------------------------------------------------
-    // Skip extraction
-    // -----------------------------------------------------------------------
-    function skipExtraction() {
-      state.lastExtraction = null;
-      document.getElementById("extraction-card").classList.remove("show");
-      showToast("✋ Extraction skipped. No changes made.");
-    }
-
-    // =========================================================================
-    // GENERAL CORE UTILS (COPY & TABS & EXPORTS)
-    // =========================================================================
-    function switchTab(tabId, btn) {
-      document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
-      document.getElementById("tab-" + tabId).classList.add("active");
-
-      document.querySelectorAll(".nav-item").forEach(i => i.classList.remove("active"));
-      if (btn) btn.classList.add("active");
-
-      // Refresh knowledge base data when switching to that tab
-      if (tabId === 'knowledge') {
-        loadDocuments();
-      }
-    }
-
-    function copyEmbed() {
-      const code = document.getElementById("embed-code-text").textContent;
-      navigator.clipboard.writeText(code).then(() => {
-        showToast("📋 Code copied to clipboard!");
-      });
-    }
-
-    function exportCSV() {
-      if (!state.leads.length) {
-        showToast("❌ No leads available to export.", true);
-        return;
-      }
-
-      const headers = "Customer Name,Phone Number,Topic,Date Registered\n";
-      const rows = state.leads.map(l => {
-        const date = new Date(l.timestamp).toISOString();
-        return `"${l.name}","${l.phone}","${l.topic || 'General Inquiry'}","${date}"`;
-      }).join("\n");
-
-      const blob = new Blob([headers + rows], { type: "text/csv" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `leads-${botId}.csv`;
-      a.click();
-      showToast("💾 CSV Leads log exported!");
-    }
-
-    function showToast(msg, isError = false) {
-      const toast = document.getElementById("toast");
-      toast.textContent = msg;
-      toast.classList.remove("toast-error");
-      if (isError) toast.classList.add("toast-error");
-      toast.classList.add("show");
-      setTimeout(() => toast.classList.remove("show"), 3000);
-    }
-
-    // Init Icons
-    if (window.lucide) window.lucide.createIcons();
-  </script>
+// ═══════════════════════════════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════════════════════════════
+function escHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
 </body>
-
 </html>

@@ -14,6 +14,14 @@ from flask_limiter.util import get_remote_address
 from dotenv import load_dotenv
 import bcrypt
 import jwt
+import csv
+
+try:
+    from apscheduler.schedulers.background import BackgroundScheduler
+    APSCHEDULER_AVAILABLE = True
+except ImportError:
+    APSCHEDULER_AVAILABLE = False
+    print("[WARNING] APScheduler not installed. Keep-alive ping will be disabled.")
 
 # =============================================================================
 # RAG-specific imports
@@ -39,10 +47,7 @@ app = Flask(__name__, static_folder='public', static_url_path='')
 # =============================================================================
 # SECURITY FIX 2: Restrict CORS to specific origins only
 # =============================================================================
-CORS(app, origins=[
-    "https://overarc.co",
-    "http://localhost:5000"
-])
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # =============================================================================
 # SECURITY FIX 3: Rate Limiting for /api/chat
@@ -887,6 +892,28 @@ def chat():
     businesses = load_businesses()
     if bot_id in businesses:
         biz = businesses[bot_id]
+
+        # =================================================================
+        # SUBSCRIPTION STATUS CHECK
+        # =================================================================
+        status = biz.get('status', 'active')
+        if status == 'suspended':
+            return jsonify({"reply": "This service is currently unavailable. Please contact the business directly."})
+        elif status == 'trial':
+            # Trial period: 14 days from created_at
+            created_at_str = biz.get('created_at', '')
+            if created_at_str:
+                try:
+                    created_at = datetime.datetime.fromisoformat(created_at_str.replace('Z', '+00:00'))
+                    if created_at.tzinfo is None:
+                        created_at = created_at.replace(tzinfo=datetime.timezone.utc)
+                    now_utc = datetime.datetime.now(datetime.timezone.utc)
+                    trial_end = created_at + datetime.timedelta(days=14)
+                    if now_utc > trial_end:
+                        return jsonify({"reply": "This service is currently unavailable. Please contact the business directly."})
+                except Exception:
+                    pass  # If we can't parse date, allow it
+
         system_prompt = biz.get('system_prompt', '')
         
         services = biz.get('services', [])
@@ -900,14 +927,15 @@ def chat():
             system_prompt = system_prompt.replace("{FAQS_LIST}", faqs_text)
     else:
         system_prompt = """You are the AI Assistant for Overarc, a premium web development and AI automation agency. 
-Your goal is to confidently and professionally answer questions about our custom AI chatbots.
+Your goal is to confidently and professionally answer questions about our custom AI chatbots and services.
 Key information to know:
 - We build custom AI chatbots for businesses that answer FAQs, capture leads, and book appointments 24/7.
 - Our chatbots are delivered in 3 days.
-- Pricing starts at $150 one-time setup for the Starter package. Pro is $250. Premium is $400.
-- We offer an optional $30/month plan for hosting and maintenance.
+- Pricing is $150 for Starter, $250 for Pro, and $400 for Premium. (Prices are one-time setup).
+- We offer an optional $30/month plan for hosting, updates & priority support.
 - Keep responses short, punchy, and highly professional. Limit responses to 2-3 sentences.
-- If asked complex questions, direct the user to contact us on WhatsApp (+923249116764)."""
+- If asked complex questions, direct the user to contact us on WhatsApp (+923249116764) or email shabir@overarc.co.
+- IMPORTANT STRICT RULE: If the user asks ANY question that is NOT about Overarc, our chatbots, our services, or web development, politely decline to answer. Say something like: "I'm a specialized assistant for Overarc and can only answer questions related to our web development and AI chatbot services. How can I help you with those?" Never write code, solve math problems, or discuss general topics."""
 
     # =============================================================================
     # RAG RETRIEVAL: Embed the user's message and search for relevant chunks
@@ -1029,11 +1057,11 @@ def save_lead():
         return jsonify({"error": f"Phone number exceeds maximum length of {FIELD_LIMITS['phone']} characters."}), 400
     businesses = load_businesses()
     business_name = "Overarc Agency"
-    business_email = "hello@overarc.co"
+    business_email = "shabir@overarc.co"
     if bot in businesses:
         biz = businesses[bot]
         business_name = biz.get('name', 'Overarc Agency')
-        business_email = biz.get('email', 'hello@overarc.co')
+        business_email = biz.get('email', 'shabir@overarc.co')
     lead_data = {
         "bot": bot,
         "business": business_name,
@@ -1223,12 +1251,12 @@ def save_appointment():
     print(f"[APPOINTMENT] New booking for [{bot}]: {customer_name} - {service} on {preferred_date} at {preferred_time}")
     if RESEND_API_KEY:
         businesses = load_businesses()
-        business_email = "hello@overarc.co"
+        business_email = "shabir@overarc.co"
         business_name = "Overarc Agency"
         if bot in businesses:
             biz = businesses[bot]
             business_name = biz.get('name', 'Overarc Agency')
-            business_email = biz.get('email', 'hello@overarc.co')
+            business_email = biz.get('email', 'shabir@overarc.co')
         email_html = f"""
         <h3>📅 New Appointment Booking</h3>
         <p><strong>Business:</strong> {business_name}</p>
@@ -1399,7 +1427,7 @@ def admin_create_client():
         "dark_color": data.get('dark_color', '#059669'),
         "whatsapp": data.get('whatsapp', ''),
         "greeting": data.get('greeting', f'Hello! Welcome to {business_name}. How can I help you today?'),
-        "system_prompt": data.get('system_prompt', ''),
+        "system_prompt": data.get('system_prompt', f"You are a helpful assistant for {business_name}.\n\nYOUR JOB:\n1. Greet visitors warmly\n2. Answer questions about services, pricing, and availability\n3. Capture name + phone number of interested visitors\n4. Keep responses SHORT — max 3 sentences\n5. Respond in the same language the user writes in\n6. STRICT RULE: If the user asks ANY question not related to {business_name} or its services, politely decline to answer. Say something like: \"I'm a specialized assistant for {business_name}. I can only help with our services. How can I assist you today?\""),
         "working_hours": data.get('working_hours', ''),
         "location": data.get('location', ''),
         "faqs": data.get('faqs', []),
@@ -2057,16 +2085,267 @@ def delete_document(doc_id):
 
 
 # =============================================================================
+# Onboarding page route
+# =============================================================================
+@app.route('/onboarding')
+def serve_onboarding():
+    return send_from_directory('public', 'onboarding.html')
+
+
+# =============================================================================
+# POST /api/admin/set-status — Admin-only subscription management
+# =============================================================================
+@app.route('/api/admin/set-status', methods=['POST'])
+def admin_set_status():
+    """Set the subscription status for a bot.
+    Protected by X-Admin-Key header.
+    Body: { botId, status }  status ∈ { 'active', 'trial', 'suspended' }
+    """
+    admin_key = request.headers.get("X-Admin-Key", "").strip()
+    if not admin_key or admin_key != SUPER_ADMIN_KEY:
+        return jsonify({"error": "Unauthorized. Valid admin key required."}), 401
+    data = request.json or {}
+    bot_id = sanitize_bot_id(data.get('botId', '').strip().lower())
+    new_status = data.get('status', '').strip().lower()
+    if not bot_id:
+        return jsonify({"error": "botId is required."}), 400
+    if new_status not in ('active', 'trial', 'suspended'):
+        return jsonify({"error": "status must be 'active', 'trial', or 'suspended'."}), 400
+    businesses = load_businesses()
+    if bot_id not in businesses:
+        return jsonify({"error": f"Business '{bot_id}' not found."}), 404
+    success = update_single_business(bot_id, {"status": new_status})
+    if not success:
+        return jsonify({"error": "Failed to update status."}), 500
+    print(f"[ADMIN] Status updated for '{bot_id}': {new_status}")
+    return jsonify({"success": True, "botId": bot_id, "status": new_status}), 200
+
+
+# =============================================================================
+# GET /api/leads/export — CSV export for leads
+# =============================================================================
+@app.route('/api/leads/export', methods=['GET'])
+@jwt_required
+def export_leads():
+    """Export all leads for a bot as a CSV file download."""
+    from flask import Response
+    import io as _io
+    bot_id = sanitize_bot_id(request.args.get('botId', '').strip().lower())
+    if not bot_id:
+        return jsonify({"error": "botId is required"}), 400
+    token_bot_id = g.bot_id
+    if token_bot_id and token_bot_id != bot_id:
+        return jsonify({"error": "Access denied."}), 403
+
+    # Fetch leads
+    leads = []
+    if USE_SUPABASE:
+        try:
+            url = f"{SUPABASE_URL}/rest/v1/leads?bot=eq.{bot_id}"
+            headers = {"apikey": SUPABASE_KEY, "Authorization": f"Bearer {SUPABASE_KEY}"}
+            res = requests.get(url, headers=headers)
+            res.raise_for_status()
+            leads = res.json()
+        except Exception as e:
+            print(f"[WARNING] Supabase leads export failed: {e}")
+    if not leads and os.path.exists(LEADS_FILE):
+        try:
+            with open(LEADS_FILE, 'r', encoding='utf-8') as f:
+                all_leads = json.load(f)
+            leads = [l for l in all_leads if l.get('bot', '') == bot_id]
+        except Exception:
+            leads = []
+
+    output = _io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['Name', 'Phone', 'Topic', 'Date', 'Time'])
+    for lead in leads:
+        ts = lead.get('timestamp', '')
+        date_part, time_part = (ts.split('T') if 'T' in ts else [ts, ''])
+        writer.writerow([
+            lead.get('name', ''),
+            lead.get('phone', ''),
+            lead.get('topic', ''),
+            date_part,
+            time_part[:8] if time_part else ''
+        ])
+    today = datetime.date.today().strftime('%Y-%m-%d')
+    filename = f"leads_{bot_id}_{today}.csv"
+    return Response(
+        output.getvalue(),
+        mimetype='text/csv',
+        headers={'Content-Disposition': f'attachment; filename="{filename}"'}
+    )
+
+
+# =============================================================================
+# GET /api/appointments/export — CSV export for appointments
+# =============================================================================
+@app.route('/api/appointments/export', methods=['GET'])
+@jwt_required
+def export_appointments():
+    """Export all appointments for a bot as a CSV file download."""
+    from flask import Response
+    import io as _io
+    bot_id = sanitize_bot_id(request.args.get('botId', '').strip().lower())
+    if not bot_id:
+        return jsonify({"error": "botId is required"}), 400
+    token_bot_id = g.bot_id
+    if token_bot_id and token_bot_id != bot_id:
+        return jsonify({"error": "Access denied."}), 403
+
+    appts = []
+    if USE_SUPABASE:
+        try:
+            url = f"{SUPABASE_URL}/rest/v1/appointments?bot=eq.{bot_id}"
+            headers = {"apikey": SUPABASE_KEY, "Authorization": f"Bearer {SUPABASE_KEY}"}
+            res = requests.get(url, headers=headers)
+            res.raise_for_status()
+            appts = res.json()
+        except Exception as e:
+            print(f"[WARNING] Supabase appointments export failed: {e}")
+    if not appts and os.path.exists(APPOINTMENTS_FILE):
+        try:
+            with open(APPOINTMENTS_FILE, 'r', encoding='utf-8') as f:
+                all_appts = json.load(f)
+            appts = [a for a in all_appts if a.get('bot', '') == bot_id]
+        except Exception:
+            appts = []
+
+    output = _io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['Customer Name', 'Phone', 'Service', 'Date', 'Time', 'Status'])
+    for appt in appts:
+        writer.writerow([
+            appt.get('customer_name', ''),
+            appt.get('customer_phone', ''),
+            appt.get('service', ''),
+            appt.get('preferred_date', ''),
+            appt.get('preferred_time', ''),
+            appt.get('status', 'pending')
+        ])
+    today = datetime.date.today().strftime('%Y-%m-%d')
+    filename = f"appointments_{bot_id}_{today}.csv"
+    return Response(
+        output.getvalue(),
+        mimetype='text/csv',
+        headers={'Content-Disposition': f'attachment; filename="{filename}"'}
+    )
+
+
+# =============================================================================
+# POST /api/crawl — Website URL crawler for auto-configuration
+# =============================================================================
+@app.route('/api/crawl', methods=['POST'])
+@jwt_required
+def crawl_website():
+    """
+    Crawl a URL, extract page text, and run AI analysis.
+    Body: { url, bot_id (optional — defaults to JWT bot_id) }
+    Returns the same extraction summary as /api/documents/upload.
+    """
+    bot_id = g.bot_id
+    data = request.json or {}
+    url = data.get('url', '').strip()
+    if not url:
+        return jsonify({"error": "url is required."}), 400
+    if not url.startswith(('http://', 'https://')):
+        url = 'https://' + url
+
+    try:
+        resp = requests.get(url, timeout=15, headers={
+            'User-Agent': 'Mozilla/5.0 (compatible; OverarcBot/1.0)'
+        })
+        resp.raise_for_status()
+        html = resp.text
+    except Exception as e:
+        return jsonify({"error": f"Failed to fetch URL: {str(e)}"}), 400
+
+    # Strip HTML tags
+    clean = re.sub(r'<script[^>]*>.*?</script>', ' ', html, flags=re.DOTALL | re.IGNORECASE)
+    clean = re.sub(r'<style[^>]*>.*?</style>', ' ', clean, flags=re.DOTALL | re.IGNORECASE)
+    clean = re.sub(r'<[^>]+>', ' ', clean)
+    clean = re.sub(r'\s+', ' ', clean).strip()
+
+    if len(clean) > 50000:
+        clean = clean[:50000]
+
+    if not clean:
+        return jsonify({"error": "No text content found on the page."}), 400
+
+    # Chunk + embed + store
+    chunks = chunk_text(clean, chunk_size=500, overlap=50)
+    source_name = url[:100]
+    embeddings = []
+    for chunk in chunks[:50]:  # Limit to first 50 chunks for web pages
+        emb = get_embedding(chunk)
+        if emb:
+            embeddings.append(emb)
+    valid_chunks = chunks[:len(embeddings)]
+    stored_count = store_document_chunks(bot_id, valid_chunks, source_name, embeddings)
+
+    # AI analysis
+    analysis = analyze_document_with_ai(clean, bot_id)
+
+    # Store metadata
+    doc_record = store_document_metadata(
+        bot_id=bot_id,
+        source_name=source_name,
+        source_type='url',
+        chunk_count=stored_count,
+        extraction_summary=analysis
+    )
+
+    services_found = len(analysis.get('extracted_services', []))
+    faqs_found = len(analysis.get('extracted_faqs', []))
+    policies_found = len(analysis.get('extracted_policies', []))
+    summary_parts = []
+    if services_found: summary_parts.append(f"{services_found} service items")
+    if faqs_found: summary_parts.append(f"{faqs_found} FAQs")
+    if policies_found: summary_parts.append(f"{policies_found} business policies")
+    summary_text = f"Found {', '.join(summary_parts)} — all saved!" if summary_parts else "Page crawled. No structured data detected."
+
+    return jsonify({
+        "success": True,
+        "url": url,
+        "chunks_stored": stored_count,
+        "summary_text": summary_text,
+        "extraction": analysis,
+        "document": doc_record,
+        "pending_approval": bool(services_found or faqs_found or policies_found)
+    }), 200
+
+
+# =============================================================================
 # Application entry point
 # =============================================================================
+
+# Keep-alive scheduler (prevents Render free tier from sleeping)
+def _keep_alive():
+    """Ping /api/health every 14 minutes to prevent Render sleep."""
+    try:
+        requests.get("http://localhost:{}/api/health".format(
+            os.environ.get('PORT', 5000)
+        ), timeout=10)
+        print("[KEEP-ALIVE] Pinged /api/health")
+    except Exception:
+        pass  # Silently ignore failures
+
+if APSCHEDULER_AVAILABLE and os.environ.get('PORT'):  # PORT set = running in production
+    _scheduler = BackgroundScheduler(daemon=True)
+    _scheduler.add_job(_keep_alive, 'interval', minutes=14)
+    _scheduler.start()
+    print("[KEEP-ALIVE] Scheduler started — pinging every 14 minutes")
+
+
 if __name__ == '__main__':
-    print("Starting Overarc Python Backend on port 5000...")
-    print("Access the site at: http://localhost:5000")
+    port = int(os.environ.get('PORT', 5000))
+    print(f"Starting Overarc Python Backend on port {port}...")
+    print(f"Access the site at: http://localhost:{port}")
     print("[SECURITY] Debug mode: OFF")
     print("[SECURITY] CORS restricted to: https://overarc.co, http://localhost:5000")
     print(f"[SECURITY] Rate limit on /api/chat: 30 requests/minute/IP")
     print(f"[SECURITY] JWT tokens expire after: {JWT_EXPIRATION_HOURS} hours")
-    
     # RAG status
     if USE_SUPABASE:
         print(f"[RAG] Database: Supabase + pgvector enabled")
@@ -2074,5 +2353,4 @@ if __name__ == '__main__':
         print("[RAG] Database: Local JSON files (chunks stored per-bot)")
     print(f"[RAG] Embedding model: {EMBEDDING_MODEL} (via OpenRouter)")
     print(f"[RAG] PDF support: {'Yes (PyPDF2)' if PDF_SUPPORT else 'No (install pypdf2)'}")
-    
-    app.run(port=5000, debug=False)
+    app.run(host='0.0.0.0', port=port, debug=False)

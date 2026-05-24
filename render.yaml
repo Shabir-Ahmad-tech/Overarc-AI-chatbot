@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: overarc-smartbot
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn server:app --workers 2 --timeout 120 --bind 0.0.0.0:$PORT
+    envVars:
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: SUPER_ADMIN_KEY
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false

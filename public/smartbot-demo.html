@@ -1637,7 +1637,7 @@ YOUR JOB:
       state.conversationHistory = [];
 
       try {
-        const res = await fetch(`/api/settings?botId=${botId}`);
+        const res = await fetch(`/api/widget-config?botId=${botId}`);
         if (!res.ok) throw new Error("Failed to fetch settings");
         const bot = await res.json();
 

@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Overarc — New Client Onboarding</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0f1117; --card: #1a1d27; --border: #2d3142;
+      --accent: #6366f1; --accent-hover: #4f52d6; --accent-glow: rgba(99,102,241,.15);
+      --text: #e2e8f0; --text-muted: #8b94b3;
+      --success: #10b981; --error: #ef4444; --warning: #f59e0b;
+      --radius: 14px; --radius-sm: 8px;
+    }
+    html, body { min-height: 100vh; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); font-size: 15px; }
+    body {
+      background: radial-gradient(ellipse at 20% 10%, rgba(99,102,241,.2) 0%, transparent 55%),
+                  radial-gradient(ellipse at 85% 90%, rgba(16,185,129,.1) 0%, transparent 45%), var(--bg);
+    }
+
+    .page-header { text-align: center; padding: 48px 24px 32px; }
+    .logo-text { font-size: 28px; font-weight: 800; background: linear-gradient(135deg, #6366f1, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
+    .page-header h1 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+    .page-header p { color: var(--text-muted); font-size: 15px; }
+
+    .form-card { max-width: 760px; margin: 0 auto 60px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 40px 36px; box-shadow: 0 24px 64px rgba(0,0,0,.5); }
+    @media(max-width:640px) { .form-card { padding: 28px 18px; margin: 0 12px 40px; } }
+
+    .section-title { font-size: 14px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: .06em; margin: 28px 0 18px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+    .section-title:first-child { margin-top: 0; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
+    @media(max-width:640px) { .form-row { grid-template-columns: 1fr; } }
+    .form-group { margin-bottom: 18px; }
+    label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 7px; }
+    input, select, textarea { width: 100%; padding: 12px 14px; background: var(--bg); border: 1.5px solid var(--border); border-radius: var(--radius-sm); color: var(--text); font-family: inherit; font-size: 14px; outline: none; transition: border-color .2s; }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+    select option { background: var(--card); }
+    textarea { min-height: 90px; resize: vertical; }
+
+    .color-row { display: flex; align-items: center; gap: 10px; }
+    input[type="color"] { width: 48px; height: 42px; border: none; border-radius: 8px; cursor: pointer; padding: 2px; background: var(--bg); flex-shrink: 0; }
+    .color-hex { flex: 1; }
+    .color-preview-dot { width: 42px; height: 42px; border-radius: var(--radius-sm); border: 1.5px solid var(--border); flex-shrink: 0; transition: background .2s; }
+
+    /* Dynamic rows */
+    .dynamic-list { display: flex; flex-direction: column; gap: 10px; }
+    .dynamic-item { display: flex; gap: 8px; align-items: center; }
+    .dynamic-item input { flex: 1; margin-bottom: 0; }
+    .btn-icon { width: 38px; height: 38px; border-radius: var(--radius-sm); border: 1.5px solid var(--border); background: transparent; color: var(--text-muted); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .2s; }
+    .btn-icon:hover { border-color: var(--error); color: var(--error); }
+    .btn-add { background: none; border: 1.5px dashed var(--border); border-radius: var(--radius-sm); color: var(--text-muted); padding: 10px; font-family: inherit; font-size: 13px; cursor: pointer; transition: all .2s; display: block; width: 100%; margin-top: 8px; }
+    .btn-add:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* Password strength */
+    .strength-bar { height: 4px; border-radius: 2px; background: var(--border); margin-top: 7px; }
+    .strength-fill { height: 100%; border-radius: 2px; transition: width .3s, background .3s; }
+    .strength-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+    /* Submit button */
+    .btn-submit { width: 100%; padding: 15px; border-radius: var(--radius-sm); border: none; cursor: pointer; font-family: inherit; font-size: 16px; font-weight: 700; background: linear-gradient(135deg, var(--accent), #818cf8); color: #fff; transition: all .2s; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 28px; }
+    .btn-submit:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(99,102,241,.4); }
+    .btn-submit:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+    .spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,.3); border-top-color: #fff; border-radius: 50%; animation: spin .6s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Error */
+    .field-error { font-size: 12px; color: var(--error); margin-top: 4px; }
+    .form-error { background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.3); border-radius: var(--radius-sm); padding: 12px 16px; font-size: 13px; color: var(--error); margin-top: 16px; }
+
+    /* Bot ID preview */
+    .bot-id-preview { background: var(--bg); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 11px 14px; font-family: 'Courier New', monospace; font-size: 13px; color: #a78bfa; margin-top: 8px; }
+
+    /* Delivery card */
+    #delivery-card { display: none; max-width: 760px; margin: 0 auto 60px; }
+    .delivery-success { background: rgba(16,185,129,.08); border: 1px solid rgba(16,185,129,.3); border-radius: var(--radius); padding: 32px; text-align: center; margin-bottom: 20px; }
+    .delivery-success .check { font-size: 56px; margin-bottom: 14px; }
+    .delivery-success h2 { font-size: 22px; font-weight: 700; color: var(--success); margin-bottom: 8px; }
+    .delivery-success p { color: var(--text-muted); }
+    .delivery-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media(max-width:580px) { .delivery-grid { grid-template-columns: 1fr; } }
+    .delivery-item { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 20px; }
+    .delivery-item label { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); margin-bottom: 10px; }
+    .code-display { font-family: 'Courier New', monospace; font-size: 12px; color: #a78bfa; background: var(--bg); border-radius: 6px; padding: 10px; word-break: break-all; white-space: pre-wrap; margin-bottom: 10px; }
+    .btn-copy { width: 100%; padding: 9px; border-radius: 6px; border: 1.5px solid var(--border); background: transparent; color: var(--text); font-family: inherit; font-size: 13px; cursor: pointer; transition: all .2s; }
+    .btn-copy:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-copy.copied { background: var(--success); border-color: var(--success); color: #fff; }
+    #delivery-qr { margin: 0 auto; display: block; }
+  </style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="logo-text">Overarc</div>
+  <h1>New Client Setup</h1>
+  <p>Fill in the client's business information to deploy their AI chatbot in seconds.</p>
+</div>
+
+<!-- Onboarding Form -->
+<div class="form-card" id="onboarding-form-card">
+
+  <div class="section-title">Business Information</div>
+  <div class="form-row">
+    <div class="form-group">
+      <label>Business Name *</label>
+      <input type="text" id="f-business-name" placeholder="e.g. City Dental Clinic" oninput="generateBotId()" />
+    </div>
+    <div class="form-group">
+      <label>Industry *</label>
+      <select id="f-industry">
+        <option value="">Select industry</option>
+        <option value="clinic">🏥 Clinic / Medical</option>
+        <option value="restaurant">🍽️ Restaurant / Cafe</option>
+        <option value="realestate">🏠 Real Estate</option>
+        <option value="retail">🛍️ Retail / E-commerce</option>
+        <option value="lawfirm">⚖️ Law Firm</option>
+        <option value="gym">💪 Gym / Fitness</option>
+        <option value="other">🔧 Other</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>Auto-Generated Bot ID</label>
+    <div class="bot-id-preview" id="bot-id-preview">→ Will appear here</div>
+    <p style="font-size:12px;color:var(--text-muted);margin-top:5px">Generated from business name. You can share this with the client.</p>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label>WhatsApp Number</label>
+      <input type="text" id="f-whatsapp" placeholder="+923001234567" />
+    </div>
+    <div class="form-group">
+      <label>Lead Notification Email *</label>
+      <input type="email" id="f-email" placeholder="client@business.com" />
+    </div>
+  </div>
+
+  <div class="section-title">Customization</div>
+  <div class="form-row">
+    <div class="form-group">
+      <label>Working Hours</label>
+      <input type="text" id="f-hours" placeholder="Mon-Sat 9AM to 8PM" />
+    </div>
+    <div class="form-group">
+      <label>Location / Address</label>
+      <input type="text" id="f-location" placeholder="Mingora, Swat, KPK" />
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>Brand Color</label>
+    <div class="color-row">
+      <input type="color" id="f-color" value="#6366f1" oninput="syncColor()" />
+      <div class="color-preview-dot" id="f-color-dot" style="background:#6366f1"></div>
+      <input type="text" class="color-hex" id="f-color-hex" value="#6366f1" placeholder="#6366f1" oninput="syncColorFromHex()" />
+    </div>
+  </div>
+
+  <div class="section-title">Services (up to 10)</div>
+  <div class="dynamic-list" id="services-list"></div>
+  <button class="btn-add" id="add-service-btn" onclick="addService()">+ Add Service / Product</button>
+
+  <div class="section-title">FAQs (up to 10)</div>
+  <div class="dynamic-list" id="faqs-list"></div>
+  <button class="btn-add" id="add-faq-btn" onclick="addFaq()">+ Add FAQ</button>
+
+  <div class="section-title">Dashboard Access</div>
+  <div class="form-row">
+    <div class="form-group">
+      <label>Dashboard Password *</label>
+      <input type="password" id="f-password" placeholder="Min 8 chars, 1 number" oninput="checkStrength()" autocomplete="new-password" />
+      <div class="strength-bar"><div class="strength-fill" id="strength-fill" style="width:0;background:var(--error)"></div></div>
+      <p class="strength-label" id="strength-label">Min. 8 characters, at least 1 number</p>
+    </div>
+    <div class="form-group">
+      <label>Confirm Password *</label>
+      <input type="password" id="f-confirm-password" placeholder="Re-enter password" autocomplete="new-password" />
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>Admin Key (Your super-admin key) *</label>
+    <input type="password" id="f-admin-key" placeholder="Your SUPER_ADMIN_KEY from .env" autocomplete="off" />
+    <p style="font-size:12px;color:var(--text-muted);margin-top:4px">This is never sent to the client — only you need this.</p>
+  </div>
+
+  <div id="form-error" class="form-error" style="display:none"></div>
+
+  <button class="btn-submit" id="submit-btn" onclick="submitOnboarding()">
+    🚀 Create & Deploy Bot
+  </button>
+</div>
+
+<!-- Delivery Card (shown after success) -->
+<div id="delivery-card">
+  <div class="delivery-success">
+    <div class="check">🎉</div>
+    <h2>Bot Deployed Successfully!</h2>
+    <p id="delivery-client-name">Your client's AI chatbot is live and ready to use.</p>
+  </div>
+
+  <div class="delivery-grid">
+    <div class="delivery-item">
+      <label>💬 Chat Link</label>
+      <div class="code-display" id="d-chat-link"></div>
+      <button class="btn-copy" onclick="copyVal('d-chat-link', this)">📋 Copy Chat Link</button>
+    </div>
+    <div class="delivery-item">
+      <label>📊 Dashboard Link</label>
+      <div class="code-display" id="d-dashboard-link"></div>
+      <button class="btn-copy" onclick="copyVal('d-dashboard-link', this)">📋 Copy Dashboard Link</button>
+    </div>
+    <div class="delivery-item" style="grid-column: 1 / -1">
+      <label>💻 Website Embed Code</label>
+      <div class="code-display" id="d-embed-code"></div>
+      <button class="btn-copy" onclick="copyVal('d-embed-code', this)">📋 Copy Embed Code</button>
+    </div>
+  </div>
+
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:24px;margin-top:16px;text-align:center">
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">QR Code for Chat Link</p>
+    <div id="delivery-qr"></div>
+  </div>
+
+  <button class="btn-submit" onclick="location.reload()" style="margin-top:16px">➕ Add Another Client</button>
+</div>
+
+<script>
+let serviceCount = 0, faqCount = 0;
+
+function generateBotId() {
+  const name = document.getElementById('f-business-name').value;
+  const id = name.toLowerCase().trim()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .slice(0, 40);
+  document.getElementById('bot-id-preview').textContent = id || '→ Will appear here';
+}
+
+function syncColor() {
+  const v = document.getElementById('f-color').value;
+  document.getElementById('f-color-dot').style.background = v;
+  document.getElementById('f-color-hex').value = v;
+}
+function syncColorFromHex() {
+  const v = document.getElementById('f-color-hex').value.trim();
+  if (/^#[0-9a-fA-F]{6}$/.test(v)) {
+    document.getElementById('f-color').value = v;
+    document.getElementById('f-color-dot').style.background = v;
+  }
+}
+
+function addService() {
+  if (serviceCount >= 10) { alert('Maximum 10 services.'); return; }
+  serviceCount++;
+  const row = document.createElement('div');
+  row.className = 'dynamic-item svc-row';
+  row.innerHTML = `<input type="text" placeholder="Service name" class="svc-name" />
+    <input type="text" placeholder="Price (e.g. PKR 500)" class="svc-price" style="max-width:160px" />
+    <button class="btn-icon" onclick="this.parentElement.remove();serviceCount--">✕</button>`;
+  document.getElementById('services-list').appendChild(row);
+}
+
+function addFaq() {
+  if (faqCount >= 10) { alert('Maximum 10 FAQs.'); return; }
+  faqCount++;
+  const row = document.createElement('div');
+  row.className = 'dynamic-item faq-row';
+  row.innerHTML = `<input type="text" placeholder="Question" class="faq-q" style="flex:1.2" />
+    <input type="text" placeholder="Answer" class="faq-a" style="flex:2" />
+    <button class="btn-icon" onclick="this.parentElement.remove();faqCount--">✕</button>`;
+  document.getElementById('faqs-list').appendChild(row);
+}
+
+function checkStrength() {
+  const pw = document.getElementById('f-password').value;
+  const fill = document.getElementById('strength-fill');
+  const label = document.getElementById('strength-label');
+  let score = 0;
+  if (pw.length >= 8) score++;
+  if (/\d/.test(pw)) score++;
+  if (/[A-Z]/.test(pw)) score++;
+  if (pw.length >= 12) score++;
+  const widths = ['0%','25%','50%','75%','100%'];
+  const colors = ['#ef4444','#f59e0b','#f59e0b','#10b981','#10b981'];
+  const labels = ['Too short','Weak','Fair','Good','Strong'];
+  fill.style.width = widths[score];
+  fill.style.background = colors[score];
+  label.textContent = score === 0 ? 'Min. 8 characters, at least 1 number' : labels[score];
+}
+
+function showError(msg) {
+  const el = document.getElementById('form-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+function clearError() { document.getElementById('form-error').style.display = 'none'; }
+
+async function submitOnboarding() {
+  clearError();
+  const businessName = document.getElementById('f-business-name').value.trim();
+  const email = document.getElementById('f-email').value.trim();
+  const password = document.getElementById('f-password').value;
+  const confirm = document.getElementById('f-confirm-password').value;
+  const adminKey = document.getElementById('f-admin-key').value.trim();
+
+  if (!businessName) { showError('Business name is required.'); return; }
+  if (!email) { showError('Lead notification email is required.'); return; }
+  if (!password) { showError('Password is required.'); return; }
+  if (password.length < 8) { showError('Password must be at least 8 characters.'); return; }
+  if (!/\d/.test(password)) { showError('Password must contain at least one number.'); return; }
+  if (password !== confirm) { showError('Passwords do not match.'); return; }
+  if (!adminKey) { showError('Admin key is required.'); return; }
+
+  const botId = document.getElementById('bot-id-preview').textContent.replace('→ Will appear here','').trim();
+  if (!botId) { showError('Could not generate a Bot ID from the business name.'); return; }
+
+  // Collect services
+  const services = [];
+  document.querySelectorAll('#services-list .svc-row').forEach(row => {
+    const name = row.querySelector('.svc-name').value.trim();
+    const price = row.querySelector('.svc-price').value.trim();
+    if (name) services.push({ name, price });
+  });
+
+  // Collect FAQs
+  const faqs = [];
+  document.querySelectorAll('#faqs-list .faq-row').forEach(row => {
+    const q = row.querySelector('.faq-q').value.trim();
+    const a = row.querySelector('.faq-a').value.trim();
+    if (q && a) faqs.push({ q, a });
+  });
+
+  const color = document.getElementById('f-color-hex').value.trim() || document.getElementById('f-color').value;
+  const hours = document.getElementById('f-hours').value.trim();
+  const location = document.getElementById('f-location').value.trim();
+  const whatsapp = document.getElementById('f-whatsapp').value.trim();
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Creating bot...';
+
+  const payload = {
+    botId, businessName, password, email,
+    whatsapp, working_hours: hours, location,
+    color, emoji: '🤖',
+    services, faqs,
+    greeting: `Hello! Welcome to ${businessName}. How can I help you today?`,
+    system_prompt: `You are a helpful assistant for ${businessName}.\n\nWORKING HOURS: ${hours}\nLOCATION: ${location}\nCONTACT: ${whatsapp}\n\nSERVICES:\n{SERVICES_LIST}\n\nFAQs:\n{FAQS_LIST}\n\nYOUR JOB:\n1. Greet visitors warmly\n2. Answer questions about services, pricing, and availability\n3. Capture name + phone number of interested visitors\n4. Keep responses SHORT — max 3 sentences\n5. Respond in the same language the user writes in (Urdu or English)\n6. Never make up information not listed above\n7. STRICT RULE: If the user asks ANY question not related to ${businessName} or its services, politely decline to answer. Say something like: "I'm a specialized assistant for ${businessName}. I can only help with our services. How can I assist you today?"`
+  };
+
+  try {
+    const res = await fetch('/api/admin/create-client', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminKey },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (!res.ok) { showError(data.error || 'Failed to create client.'); return; }
+
+    // Show delivery card
+    const base = window.location.origin;
+    const chatUrl = `${base}/chat/${botId}`;
+    const dashUrl = `${base}/dashboard/${botId}`;
+    const embedCode = `<script src="${base}/widget.js?botId=${botId}"><\/script>`;
+
+    document.getElementById('onboarding-form-card').style.display = 'none';
+    const deliveryCard = document.getElementById('delivery-card');
+    deliveryCard.style.display = 'block';
+    document.getElementById('delivery-client-name').textContent = `${businessName}'s AI chatbot is live! Bot ID: ${botId}`;
+    document.getElementById('d-chat-link').textContent = chatUrl;
+    document.getElementById('d-dashboard-link').textContent = dashUrl;
+    document.getElementById('d-embed-code').textContent = embedCode;
+
+    // QR Code
+    const qrContainer = document.getElementById('delivery-qr');
+    qrContainer.innerHTML = '';
+    new QRCode(qrContainer, {
+      text: chatUrl, width: 180, height: 180,
+      colorDark: '#6366f1', colorLight: '#1a1d27',
+      correctLevel: QRCode.CorrectLevel.H
+    });
+
+    deliveryCard.scrollIntoView({ behavior: 'smooth' });
+  } catch (e) { showError('Connection error. Is the server running?'); }
+  finally { btn.disabled = false; btn.innerHTML = '🚀 Create & Deploy Bot'; }
+}
+
+function copyVal(id, btn) {
+  const text = document.getElementById(id).textContent.trim();
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✅ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// Add initial empty rows
+addService();
+addFaq();
+</script>
+</body>
+</html>

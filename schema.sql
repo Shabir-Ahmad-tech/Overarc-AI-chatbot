@@ -14,6 +14,9 @@ CREATE TABLE IF NOT EXISTS businesses (
   color VARCHAR(10) DEFAULT '#E8471C',
   dark_color VARCHAR(10) DEFAULT '#C2410C',
   whatsapp TEXT,
+  email TEXT,                 -- Lead notification email for business owner
+  password_hash TEXT,         -- bcrypt hash for per-client JWT login
+  status VARCHAR(20) DEFAULT 'active', -- 'active' | 'trial' | 'suspended'
   greeting TEXT,
   system_prompt TEXT NOT NULL,
   faqs JSONB DEFAULT '[]'::jsonb,
