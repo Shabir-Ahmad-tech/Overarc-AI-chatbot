@@ -1,0 +1,67 @@
+# =========================================================================
+# Overarc AI Chatbot - Professional Git Ignore Configuration
+# =========================================================================
+
+# --- Environment Configuration ---
+# Never commit sensitive credentials, API keys, or private environment files
+.env
+.env.local
+.env.*.local
+*.env
+
+# --- Python Virtual Environments ---
+# Ignore local virtual environment directories used for development
+venv/
+.venv/
+env/
+ENV/
+ActiveState.venv/
+
+# --- Python Compilation & Cache ---
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# --- Local Data & Databases ---
+# Ignore locally captured leads data and database instances
+leads.json
+*.db
+*.sqlite
+*.sqlite3
+
+# --- Web & Frontend Build Caches (for Next.js / Node.js migration) ---
+node_modules/
+.next/
+out/
+build/
+dist/
+.docusaurus/
+.cache/
+
+# --- Operating System & Editor Files ---
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editor and IDE configurations
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# --- Log Files ---
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*

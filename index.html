@@ -1,0 +1,1893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Overarc — AI Chatbots Built for Real Businesses</title>
+  <meta name="description" content="Overarc builds custom AI chatbots that answer questions 24/7, capture leads, and book appointments. Delivered in 3 days. Starting at $499."/>
+  <link rel="icon" type="image/png" href="Icons/Icon Transparent.png"/>
+  <link rel="canonical" href="https://overarc.co"/>
+
+  <!-- Fonts: Syne (headings) + Inter (body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Lucide Icons (modern, clean, consistent) -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+  <style>
+    /* ============================================================
+       DESIGN TOKENS
+    ============================================================ */
+    :root{
+      --bg:        #080808;
+      --s1:        #111;
+      --s2:        #181818;
+      --s3:        #222;
+      --b1:        rgba(255,255,255,.055);
+      --b2:        rgba(255,255,255,.11);
+      --b3:        rgba(255,255,255,.2);
+      --w:         #F4F4F4;
+      --m:         rgba(244,244,244,.5);
+      --d:         rgba(244,244,244,.22);
+      --o:         #E8471C;
+      --o2:        #FF6235;
+      --od:        rgba(232,71,28,.12);
+      --og:        rgba(232,71,28,.22);
+      --ok:        rgba(232,71,28,.06);
+      --g:         #22C55E;
+      --ease:      .22s cubic-bezier(.4,0,.2,1);
+      --spring:    .5s cubic-bezier(.34,1.56,.64,1);
+      --mw:        1140px;
+    }
+
+    /* ============================================================
+       BASE
+    ============================================================ */
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+    body{
+      font-family:'Inter',sans-serif;
+      background:var(--bg);
+      color:var(--w);
+      line-height:1.6;
+      overflow-x:hidden;
+    }
+    ::selection{background:var(--o);color:#fff}
+    a{color:inherit;text-decoration:none}
+    img{display:block;max-width:100%}
+
+    /* ============================================================
+       LAYOUT
+    ============================================================ */
+    .wrap{max-width:var(--mw);margin:0 auto;padding:0 28px}
+    .sec{padding:120px 0}
+    .sec-alt{background:var(--s1)}
+
+    /* ============================================================
+       TYPOGRAPHY
+    ============================================================ */
+    .display{
+      font-family:'Space Grotesk',sans-serif;
+      font-size:clamp(2.4rem,5.5vw,4.4rem);
+      font-weight:600;
+      line-height:1.08;
+      letter-spacing:-.035em;
+    }
+    .h2{
+      font-family:'Space Grotesk',sans-serif;
+      font-size:clamp(2rem,4vw,3.2rem);
+      font-weight:700;
+      letter-spacing:-.03em;
+      line-height:1.1;
+    }
+    .h3{font-family:'Space Grotesk',sans-serif;font-size:1.05rem;font-weight:700;letter-spacing:-.01em}
+    .label{
+      display:inline-flex;align-items:center;gap:10px;
+      font-size:11px;font-weight:600;letter-spacing:2.5px;
+      text-transform:uppercase;color:var(--o);margin-bottom:18px;
+    }
+    .label::after{content:'';width:28px;height:1px;background:var(--o);opacity:.6}
+    .body-l{font-size:1.05rem;line-height:1.78;color:var(--m)}
+    .body-s{font-size:.9rem;line-height:1.7;color:var(--m)}
+    .orange{color:var(--o)}
+
+    /* ============================================================
+       BUTTONS
+    ============================================================ */
+    .btn{
+      display:inline-flex;align-items:center;gap:8px;
+      font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;
+      padding:13px 26px;border-radius:9999px;border:none;cursor:pointer;
+      transition:var(--ease);white-space:nowrap;position:relative;overflow:hidden;
+    }
+    .btn-o{background:var(--o);color:#fff;box-shadow:0 6px 28px var(--og)}
+    .btn-o:hover{background:var(--o2);transform:translateY(-2px);box-shadow:0 14px 40px rgba(232,71,28,.4)}
+    .btn-g{background:transparent;border:1px solid var(--b2);color:var(--w)}
+    .btn-g:hover{border-color:var(--b3);background:rgba(255,255,255,.04);transform:translateY(-1px)}
+    .btn-sm{padding:9px 20px;font-size:13px}
+    .btn-demo{
+      display:inline-flex;align-items:center;gap:7px;
+      font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;color:var(--o);
+      padding:7px 16px;border-radius:9999px;border:1px solid rgba(232,71,28,.3);
+      transition:var(--ease);
+    }
+    .btn-demo:hover{background:var(--od);border-color:var(--o)}
+    .btn-demo svg{width:12px;height:12px}
+
+    /* ============================================================
+       CANVAS BACKGROUND (animated particles)
+    ============================================================ */
+    #bg-canvas{
+      position:fixed;inset:0;z-index:0;
+      pointer-events:none;opacity:.45;
+    }
+    @keyframes spin-slow {
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    /* ============================================================
+       NAVBAR
+    ============================================================ */
+    .nav{
+      position:fixed;top:0;left:0;right:0;z-index:100;height:70px;
+      display:flex;align-items:center;
+      transition:background .3s,border-color .3s;
+    }
+    .nav.lit{
+      background:rgba(8,8,8,.9);
+      backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+      border-bottom:1px solid var(--b1);
+    }
+    .nav-inner{display:flex;align-items:center;justify-content:space-between;width:100%}
+    .nav-logo img{height:44px;width:auto;display:block}
+    .nav-links{display:flex;align-items:center;gap:4px;list-style:none}
+    .nav-links a{
+      padding:7px 15px;border-radius:9999px;font-size:14px;font-weight:500;
+      color:var(--m);transition:var(--ease);
+    }
+    .nav-links a:hover{color:var(--w);background:rgba(255,255,255,.05)}
+    .nav-right{display:flex;align-items:center;gap:10px}
+    .nav-ham{display:none;background:none;border:none;color:var(--w);cursor:pointer;padding:4px}
+    .nav-ham svg{width:22px;height:22px}
+
+    /* ============================================================
+       HERO
+    ============================================================ */
+    .hero{
+      min-height:100vh;display:flex;align-items:center;
+      padding:130px 0 80px;position:relative;z-index:1;
+      overflow:hidden;
+    }
+
+    /* Large decorative rotating arc */
+    .hero-arc{
+      position:absolute;right:-180px;top:50%;transform:translateY(-50%);
+      width:700px;height:700px;
+      opacity:.06;
+      animation:spin-slow 40s linear infinite;
+      pointer-events:none;
+    }
+    @keyframes spin-slow{from{transform:translateY(-50%) rotate(0)}to{transform:translateY(-50%) rotate(360deg)}}
+
+    /* Orange radial glow */
+    .hero-glow{
+      position:absolute;right:-100px;top:30%;
+      width:600px;height:600px;
+      background:radial-gradient(circle,rgba(232,71,28,.1) 0%,transparent 65%);
+      pointer-events:none;
+    }
+
+    .hero-content{position:relative;z-index:2;max-width:860px}
+
+    /* Live badge */
+    .live-badge{
+      display:inline-flex;align-items:center;gap:10px;
+      background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);
+      border-radius:9999px;padding:6px 16px;margin-bottom:32px;
+    }
+    .live-dot{
+      width:7px;height:7px;border-radius:50%;background:var(--g);
+      animation:pulse 2.5s ease-in-out infinite;
+    }
+    @keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(34,197,94,.4)}50%{opacity:.5;box-shadow:0 0 0 6px rgba(34,197,94,0)}}
+    .live-text{font-size:12px;font-weight:600;color:var(--g);letter-spacing:.5px}
+
+    /* Headline word — orange underline */
+    .ul-word{
+      position:relative;color:var(--o);display:inline-block;
+    }
+    .ul-word::after{
+      content:'';position:absolute;bottom:-6px;left:0;right:0;
+      height:3px;background:var(--o);border-radius:2px;opacity:.45;
+      transform:scaleX(0);transform-origin:left;
+      animation:underline-in 1s .8s cubic-bezier(.4,0,.2,1) forwards;
+    }
+    @keyframes underline-in{to{transform:scaleX(1)}}
+
+    .hero p.sub{
+      font-size:1.15rem;line-height:1.82;color:var(--m);
+      max-width:540px;margin:24px 0 40px;
+    }
+    .hero-actions{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:72px}
+
+    /* Stats row */
+    .hero-stats{
+      display:flex;align-items:center;gap:0;
+      border-top:1px solid var(--b1);padding-top:36px;flex-wrap:wrap;gap:0;
+    }
+    .stat{
+      display:flex;flex-direction:column;padding:0 32px;
+      border-right:1px solid var(--b1);
+    }
+    .stat:first-child{padding-left:0}
+    .stat:last-child{border-right:none}
+    .stat-n{
+      font-family:'Space Grotesk',sans-serif;font-size:2rem;font-weight:800;
+      letter-spacing:-.04em;line-height:1;
+    }
+    .stat-n .u{color:var(--o)}
+    .stat-l{font-size:12px;color:var(--m);margin-top:4px}
+
+    /* ============================================================
+       MARQUEE
+    ============================================================ */
+    .marquee-strip{
+      border-top:1px solid var(--b1);border-bottom:1px solid var(--b1);
+      background:var(--s1);padding:16px 0;overflow:hidden;position:relative;z-index:1;
+    }
+    .marquee-track{display:flex;animation:marquee 30s linear infinite;width:max-content}
+    .marquee-track:hover{animation-play-state:paused}
+    @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+    .mi{
+      display:inline-flex;align-items:center;gap:9px;
+      padding:0 32px;font-size:13px;font-weight:600;color:var(--m);
+      white-space:nowrap;border-right:1px solid var(--b1);
+    }
+    .mi svg{width:15px;height:15px;color:var(--o)}
+
+    /* ============================================================
+       HOW IT WORKS
+    ============================================================ */
+    .how-grid{
+      display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;
+      margin-top:0;
+    }
+    .steps{display:flex;flex-direction:column;margin-top:48px}
+    .step{
+      display:flex;gap:24px;padding:28px 0;
+      border-bottom:1px solid var(--b1);cursor:default;
+      transition:var(--ease);
+    }
+    .step:first-child{border-top:1px solid var(--b1)}
+    .step-n{
+      font-family:'Space Grotesk',sans-serif;font-size:.9rem;font-weight:800;
+      color:var(--d);width:28px;flex-shrink:0;padding-top:3px;transition:var(--ease);
+    }
+    .step:hover .step-n{color:var(--o)}
+    .step-b h3{font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700;margin-bottom:7px}
+    .step-b p{font-size:.875rem;color:var(--m);line-height:1.7}
+
+    /* Right side cards */
+    .cards-stack{display:flex;flex-direction:column;gap:14px}
+    .card{
+      background:var(--s1);border:1px solid var(--b2);border-radius:18px;
+      padding:24px 26px;transition:var(--ease);
+    }
+    .card:hover{border-color:rgba(232,71,28,.3);transform:translateX(4px)}
+    .card-head{display:flex;align-items:center;gap:13px;margin-bottom:10px}
+    .card-ico{
+      width:40px;height:40px;border-radius:10px;background:var(--od);
+      color:var(--o);display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    }
+    .card-ico svg{width:18px;height:18px}
+    .card-title{font-family:'Space Grotesk',sans-serif;font-size:.95rem;font-weight:700}
+    .card p{font-size:.85rem;color:var(--m);line-height:1.65}
+
+    /* ============================================================
+       FEATURES
+    ============================================================ */
+    .feat-intro{
+      display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:end;margin-bottom:60px;
+    }
+    .feat-grid{
+      display:grid;grid-template-columns:repeat(3,1fr);
+      gap:1px;background:var(--b1);border:1px solid var(--b1);border-radius:20px;overflow:hidden;
+    }
+    .feat{
+      background:var(--s1);padding:32px 28px;transition:var(--ease);position:relative;overflow:hidden;
+    }
+    .feat::after{
+      content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
+      background:var(--o);transform:scaleX(0);transform-origin:left;transition:.35s ease;
+    }
+    .feat:hover{background:var(--s2)}
+    .feat:hover::after{transform:scaleX(1)}
+    .feat-ico{
+      width:44px;height:44px;border-radius:12px;
+      display:flex;align-items:center;justify-content:center;margin-bottom:20px;
+    }
+    .feat-ico svg{width:20px;height:20px}
+    .feat h3{font-family:'Space Grotesk',sans-serif;font-size:.97rem;font-weight:700;margin-bottom:9px}
+    .feat p{font-size:.84rem;color:var(--m);line-height:1.65}
+
+    /* ============================================================
+       DEMO SECTION
+    ============================================================ */
+    .demo-outer{text-align:center}
+    .demo-card{
+      background:var(--s1);border:1px solid var(--b2);border-radius:24px;
+      padding:52px 44px;max-width:800px;margin:60px auto 0;
+      position:relative;overflow:hidden;
+    }
+    .demo-card::before{
+      content:'';position:absolute;top:0;left:10%;right:10%;height:1px;
+      background:linear-gradient(90deg,transparent,var(--o),transparent);
+    }
+    /* Browser chrome */
+    .browser{background:var(--s2);border:1px solid var(--b2);border-radius:14px;overflow:hidden;text-align:left}
+    .browser-bar{
+      display:flex;align-items:center;gap:8px;
+      padding:11px 16px;border-bottom:1px solid var(--b1);background:var(--s3);
+    }
+    .bd{width:10px;height:10px;border-radius:50%}
+    .browser-url{
+      flex:1;background:var(--s1);border:1px solid var(--b1);border-radius:9999px;
+      padding:5px 14px;font-size:11.5px;color:var(--m);
+      display:flex;align-items:center;gap:6px;margin:0 8px;
+    }
+    .browser-url svg{width:11px;height:11px;color:var(--g)}
+    .browser-body{padding:28px;display:flex;flex-direction:column;gap:14px}
+    /* Chat bubbles */
+    .msg{display:flex;gap:10px;opacity:0}
+    .msg.usr{justify-content:flex-end}
+    .msg.vis{animation:msg-in .45s ease forwards}
+    @keyframes msg-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    .bubble{
+      max-width:76%;padding:10px 15px;border-radius:16px;
+      font-size:13px;line-height:1.55;
+    }
+    .msg.bot .bubble{background:var(--s3);color:var(--w);border-bottom-left-radius:4px}
+    .msg.usr .bubble{background:var(--o);color:#fff;border-bottom-right-radius:4px}
+    .av{
+      width:30px;height:30px;border-radius:50%;background:var(--od);
+      color:var(--o);display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    }
+    .av svg{width:14px;height:14px}
+    /* Typing indicator */
+    .typing{display:flex;gap:4px;align-items:center;padding:10px 15px;
+      background:var(--s3);border-radius:16px;border-bottom-left-radius:4px;width:fit-content}
+    .typing span{width:6px;height:6px;border-radius:50%;background:var(--m);animation:bounce-dot .9s ease infinite}
+    .typing span:nth-child(2){animation-delay:.15s}
+    .typing span:nth-child(3){animation-delay:.3s}
+    @keyframes bounce-dot{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+    .demo-cta{margin-top:28px;display:flex;justify-content:center;gap:14px;flex-wrap:wrap}
+    .demo-note{font-size:12px;color:var(--m);margin-top:14px;text-align:center}
+
+    /* ============================================================
+       PRICING
+    ============================================================ */
+    .price-header{
+      display:flex;justify-content:space-between;align-items:flex-end;
+      margin-bottom:52px;gap:28px;flex-wrap:wrap;
+    }
+    .price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;align-items:start}
+    .pc{
+      background:var(--s2);border:1px solid var(--b1);border-radius:20px;
+      padding:36px 30px;transition:var(--ease);position:relative;
+    }
+    .pc:hover{border-color:var(--b3);transform:translateY(-5px)}
+    .pc.hot{
+      background:var(--bg);border-color:var(--o);
+      box-shadow:0 0 48px rgba(232,71,28,.12),inset 0 0 48px rgba(232,71,28,.03);
+    }
+    .pc.hot:hover{transform:translateY(-5px)}
+    .hot-tag{
+      position:absolute;top:-12px;left:28px;
+      background:var(--o);color:#fff;font-size:11px;font-weight:700;
+      font-family:'Space Grotesk',sans-serif;letter-spacing:1.5px;text-transform:uppercase;
+      padding:4px 14px;border-radius:9999px;
+    }
+    .tier{font-size:12px;font-weight:600;color:var(--m);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+    .amount{
+      font-family:'Space Grotesk',sans-serif;font-size:3.2rem;font-weight:800;
+      letter-spacing:-.04em;line-height:1;margin-bottom:4px;
+    }
+    .pkr{font-size:12.5px;color:var(--m);margin-bottom:26px}
+    .pline{height:1px;background:var(--b1);margin-bottom:26px}
+    .pfs{list-style:none;display:flex;flex-direction:column;gap:11px;margin-bottom:30px}
+    .pf{display:flex;align-items:flex-start;gap:10px;font-size:13.5px;color:var(--m)}
+    .pf svg{width:14px;height:14px;flex-shrink:0;margin-top:2px}
+    .pf.y svg{color:var(--g)}
+    .pf.n{color:var(--d)}
+    .pf.n svg{color:var(--d)}
+    .pbtn{
+      width:100%;padding:14px;border-radius:12px;
+      font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;
+      cursor:pointer;border:none;transition:var(--ease);
+    }
+    .pbtn.solid{background:var(--o);color:#fff}
+    .pbtn.solid:hover{background:var(--o2);transform:translateY(-1px)}
+    .pbtn.out{background:transparent;border:1px solid var(--b2);color:var(--w)}
+    .pbtn.out:hover{border-color:var(--b3);background:rgba(255,255,255,.04)}
+    .price-note{text-align:center;margin-top:28px;font-size:13px;color:var(--m)}
+    .price-note strong{color:var(--o)}
+
+    /* ============================================================
+       TESTIMONIALS
+    ============================================================ */
+    .testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:60px}
+    .tc{
+      background:var(--s1);border:1px solid var(--b1);border-radius:20px;
+      padding:30px;display:flex;flex-direction:column;transition:var(--ease);
+    }
+    .tc:hover{border-color:var(--b2)}
+    .stars{display:flex;gap:3px;margin-bottom:16px}
+    .stars svg{width:14px;height:14px;color:#F59E0B;fill:#F59E0B}
+    .tq{font-size:13.5px;line-height:1.8;color:var(--m);font-style:italic;flex:1;margin-bottom:22px}
+    .ta{display:flex;align-items:center;gap:12px}
+    .av2{
+      width:40px;height:40px;border-radius:50%;font-family:'Space Grotesk',sans-serif;
+      font-weight:700;font-size:14px;color:#fff;
+      display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    }
+    .tn{font-size:13.5px;font-weight:600}
+    .tb{font-size:12px;color:var(--m)}
+
+    /* ============================================================
+       FAQ
+    ============================================================ */
+    .faq-layout{display:grid;grid-template-columns:1fr 1.6fr;gap:80px;align-items:start}
+    .faq-sticky{position:sticky;top:100px}
+    .faq-list{display:flex;flex-direction:column;gap:10px}
+    .fi{
+      border:1px solid var(--b1);border-radius:12px;background:var(--s2);
+      overflow:hidden;transition:border-color var(--ease);
+    }
+    .fi.open{border-color:rgba(232,71,28,.35)}
+    .fq{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:18px 22px;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;
+      cursor:pointer;gap:16px;user-select:none;
+    }
+    .fq svg{width:16px;height:16px;color:var(--m);transition:transform .3s ease,color .2s;flex-shrink:0}
+    .fi.open .fq svg{transform:rotate(45deg);color:var(--o)}
+    .fa{max-height:0;overflow:hidden;transition:max-height .35s cubic-bezier(.4,0,.2,1)}
+    .fi.open .fa{max-height:220px}
+    .fa-inner{padding:0 22px 18px;font-size:13.5px;color:var(--m);line-height:1.75}
+
+    /* ============================================================
+       CTA SECTION
+    ============================================================ */
+    .cta-sec{text-align:center;padding:120px 0}
+    .cta-inner{max-width:760px;margin:0 auto}
+    .cta-arc-wrap{display:flex;justify-content:center;margin-bottom:28px}
+    .cta-arc-svg{opacity:.12;animation:spin-slow 50s linear infinite}
+    .cta-inner .h2{margin-bottom:18px}
+    .cta-inner p{font-size:1.05rem;color:var(--m);line-height:1.78;margin-bottom:38px;max-width:560px;margin-left:auto;margin-right:auto}
+    .cta-btns{display:flex;justify-content:center;gap:14px;flex-wrap:wrap}
+
+    /* ============================================================
+       FOOTER
+    ============================================================ */
+    footer{background:var(--s1);border-top:1px solid var(--b1);padding:56px 0 32px}
+    .ft{display:flex;justify-content:space-between;align-items:flex-start;gap:40px;flex-wrap:wrap;margin-bottom:48px}
+    .f-logo img{height:48px}
+    .f-tagline{font-size:13px;color:var(--m);margin-top:10px;max-width:200px;line-height:1.55}
+    .f-cols{display:flex;gap:52px;flex-wrap:wrap}
+    .f-col{display:flex;flex-direction:column;gap:13px}
+    .f-col-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.8px;color:var(--d);margin-bottom:2px}
+    .f-col a{font-size:13px;color:var(--m);transition:var(--ease)}
+    .f-col a:hover{color:var(--w)}
+    .fb{
+      border-top:1px solid var(--b1);padding-top:26px;
+      display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;
+    }
+    .fb p{font-size:12px;color:var(--d)}
+    .fb a{color:var(--o)}
+
+    /* WhatsApp bubble */
+    .wa{
+      position:fixed;bottom:28px;right:28px;z-index:200;
+      width:54px;height:54px;border-radius:50%;background:#25D366;
+      color:#fff;display:flex;align-items:center;justify-content:center;
+      box-shadow:0 8px 24px rgba(37,211,102,.4);transition:var(--spring);
+    }
+    .wa:hover{transform:scale(1.12);box-shadow:0 12px 36px rgba(37,211,102,.55)}
+    .wa svg{width:26px;height:26px}
+
+    /* ============================================================
+       SCROLL REVEAL
+    ============================================================ */
+    .sr{opacity:0;transform:translateY(32px);transition:opacity .7s ease,transform .7s ease}
+    .sr.vis{opacity:1;transform:translateY(0)}
+    .d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}.d4{transition-delay:.4s}
+
+    /* ============================================================
+       COUNTER ANIMATION
+    ============================================================ */
+    .count{display:inline}
+
+    /* ============================================================
+       MOBILE NAV DRAWER
+    ============================================================ */
+    .mobile-nav{
+      display:none;flex-direction:column;gap:4px;
+      position:fixed;top:70px;left:0;right:0;z-index:99;
+      background:rgba(8,8,8,.97);backdrop-filter:blur(24px);
+      border-bottom:1px solid var(--b1);
+      padding:16px 20px 20px;
+      transform:translateY(-10px);opacity:0;
+      transition:.25s cubic-bezier(.4,0,.2,1);
+      pointer-events:none;
+    }
+    .mobile-nav.open{
+      display:flex;transform:translateY(0);opacity:1;pointer-events:all;
+    }
+    .mobile-nav a{
+      padding:12px 16px;border-radius:10px;font-size:15px;font-weight:500;
+      color:var(--m);transition:var(--ease);border:1px solid transparent;
+    }
+    .mobile-nav a:hover{color:var(--w);background:rgba(255,255,255,.04)}
+    .mobile-nav .mob-cta{
+      display:flex;gap:10px;margin-top:8px;
+      padding-top:16px;border-top:1px solid var(--b1);
+      flex-wrap:wrap;
+    }
+    .mobile-nav .mob-cta a{flex:1;text-align:center;justify-content:center}
+
+    /* ============================================================
+       RESPONSIVE
+    ============================================================ */
+    @media(max-width:1024px){
+      .how-grid{grid-template-columns:1fr;gap:48px}
+      .faq-layout{grid-template-columns:1fr}
+      .faq-sticky{position:static}
+    }
+    @media(max-width:860px){
+      .feat-intro{grid-template-columns:1fr;gap:32px}
+      .feat-grid{grid-template-columns:1fr 1fr}
+      .price-grid{grid-template-columns:1fr}
+      .testi-grid{grid-template-columns:1fr}
+      .price-header{flex-direction:column;align-items:flex-start}
+    }
+    @media(max-width:640px){
+      .nav-links,.nav-right .btn-g,.nav-right .btn-demo{display:none}
+      .nav-ham{display:block}
+      .wrap{padding:0 18px}
+      .sec{padding:72px 0}
+      .hero{padding:100px 0 60px}
+      .feat-grid{grid-template-columns:1fr}
+      .demo-card{padding:24px 16px}
+      .stat{padding:0 16px}
+      .hero-stats{flex-wrap:wrap;gap:0;row-gap:20px}
+      .hero-stats .stat{flex:1;min-width:45%;border-right:none !important;padding:0 12px !important}
+      .hero-stats .stat:nth-child(1),.hero-stats .stat:nth-child(2){border-bottom:1px solid var(--b1);padding-bottom:20px !important}
+      .hero-actions{gap:10px}
+      .hero-actions .btn{width:100%;justify-content:center}
+      .ft{flex-direction:column}
+      .f-cols{gap:32px}
+      .price-grid .pc.hot{margin:0}
+      .cards-stack .card:hover{transform:none}
+      .testi-grid{gap:12px}
+      .browser-url{display:none}
+      .demo-cta .btn{width:100%;justify-content:center}
+      .cta-btns .btn{width:100%;justify-content:center}
+      .how-grid{gap:32px}
+    }
+  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { corePlugins: { preflight: false } }
+  </script>
+</head>
+<body>
+
+<!-- ================================================================
+     HERO SECTION
+================================================================ -->
+<section class="relative w-full min-h-screen sm:h-screen overflow-hidden" style="margin-bottom: 80px;">
+  
+  <!-- Full-width background image with overlay -->
+  <div class="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat" style="background-image: url('Icons/Hero.png');">
+    <!-- Gradient overlay to ensure text readability on the left side -->
+    <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-transparent"></div>
+    <div class="absolute inset-0 bg-[#080808]/20"></div>
+  </div>
+
+  <!-- PARTICLE CANVAS BACKGROUND (Subtle on top of image) -->
+  <canvas id="bg-canvas" class="absolute inset-0 z-0 w-full h-full mix-blend-screen opacity-50"></canvas>
+  
+  <nav class="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-4 sm:px-6 md:px-10 py-4 sm:py-6">
+    <a href="#" class="flex items-center gap-2">
+      <img src="Icons/Transparent.png" alt="Overarc Logo" class="h-8 sm:h-10 w-auto object-contain">
+    </a>
+
+    <div class="hidden lg:flex items-center gap-1 bg-black/70 backdrop-blur-md rounded-full pl-6 pr-1 py-1 shadow-sm border border-white/10">
+      <a href="#how" class="text-sm px-3 py-2 transition-colors font-medium text-white/60 hover:text-[#E8471C]">How it Works</a>
+      <a href="#features" class="text-sm px-3 py-2 transition-colors font-medium text-white/60 hover:text-[#E8471C]">Features</a>
+      <a href="#pricing" class="text-sm px-3 py-2 transition-colors font-medium text-white/60 hover:text-[#E8471C]">Pricing</a>
+      <a href="smartbot-demo.html" class="ml-2 bg-[#E8471C] hover:bg-[#C2410C] text-white text-sm font-medium px-5 py-2.5 rounded-full transition-colors border-0 cursor-pointer">
+        Try Live Demo
+      </a>
+    </div>
+
+    <div class="flex items-center gap-3 sm:gap-6 text-white">
+      <a href="smartbot-demo.html" target="_blank" class="hidden sm:flex items-center gap-2 text-sm font-medium hover:opacity-80 transition-opacity">
+        <i data-lucide="play" style="width:16px;height:16px;"></i>
+        Try Live Demo
+      </a>
+      <button id="tw-menu-btn" class="lg:hidden relative flex items-center justify-center w-10 h-10 rounded-full bg-black/70 backdrop-blur-md border border-white/10 text-[#E8471C] transition-all duration-300 hover:bg-black/90 cursor-pointer" aria-label="Open menu">
+        <i data-lucide="menu" id="tw-menu-icon" class="absolute transition-all duration-300 opacity-100 rotate-0 scale-100" style="width:20px;height:20px;"></i>
+        <i data-lucide="x" id="tw-x-icon" class="absolute transition-all duration-300 opacity-0 -rotate-90 scale-50" style="width:20px;height:20px;"></i>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile menu overlay -->
+  <div id="tw-mobile-menu" class="lg:hidden fixed inset-0 z-20 transition-opacity duration-300 opacity-0 pointer-events-none">
+    <div class="absolute inset-0 bg-[#E8471C]/40 backdrop-blur-sm"></div>
+  </div>
+
+  <!-- Mobile menu drawer -->
+  <div id="tw-mobile-drawer" class="lg:hidden fixed top-0 right-0 bottom-0 z-20 w-[85%] max-w-sm bg-[#111]/95 backdrop-blur-xl shadow-2xl transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] translate-x-full border-l border-white/10">
+    <div class="flex flex-col h-full pt-24 px-8 pb-8">
+      <div class="flex flex-col gap-1">
+        <a href="#how" class="tw-nav-link text-2xl font-semibold text-[#E8471C] py-4 border-b border-white/10 transition-all duration-500 translate-x-8 opacity-0" style="transition-delay:150ms;">How it Works</a>
+        <a href="#features" class="tw-nav-link text-2xl font-semibold text-[#E8471C] py-4 border-b border-white/10 transition-all duration-500 translate-x-8 opacity-0" style="transition-delay:220ms;">Features</a>
+        <a href="#pricing" class="tw-nav-link text-2xl font-semibold text-[#E8471C] py-4 border-b border-white/10 transition-all duration-500 translate-x-8 opacity-0" style="transition-delay:290ms;">Pricing</a>
+      </div>
+
+      <div id="tw-cta-group" class="mt-8 flex flex-col gap-4 transition-all duration-500 translate-x-8 opacity-0" style="transition-delay:400ms;">
+        <a href="https://wa.me/923249116764?text=Hi%20Overarc,%20I'm%20interested%20in%20an%20AI%20Chatbot%20for%20my%20business!" target="_blank" class="flex items-center gap-2 text-sm font-medium text-white">
+          <i data-lucide="message-circle" style="width:16px;height:16px;"></i>
+          Contact on WhatsApp
+        </a>
+        <a href="smartbot-demo.html" class="mt-2 bg-[#E8471C] hover:bg-[#C2410C] text-white text-sm font-semibold px-5 py-3 rounded-full transition-colors border-0 cursor-pointer text-center">
+          Try Live Demo
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hero copy -->
+  <div class="relative z-10 flex flex-col items-start justify-center pt-28 sm:pt-32 md:pt-40 px-4 sm:px-6 md:px-12 w-full max-w-[1400px] mx-auto h-full pointer-events-none">
+    
+    <!-- Text on the left -->
+    <div class="flex flex-col items-start text-left lg:w-[50%] pointer-events-auto z-20 mt-10">
+      <h1 class="font-normal leading-[1.05] text-white text-[2.5rem] sm:text-5xl md:text-6xl lg:text-[4.5rem] xl:text-[5rem]" style="font-family:'Space Grotesk', sans-serif; letter-spacing:-0.035em; text-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+        Stop losing <br />
+        <span class="text-[#E8471C]">
+          customers at 3 AM.
+        </span>
+      </h1>
+      <p class="mt-6 sm:mt-8 text-white/90 text-sm sm:text-base md:text-lg leading-relaxed max-w-md font-medium" style="font-family:'Inter', sans-serif; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
+        Overarc builds custom AI chatbots that answer questions, capture leads, and book appointments 24/7.
+      </p>
+      
+      <!-- CTA Buttons -->
+      <div class="mt-10 flex items-center gap-4 flex-wrap">
+        <a href="smartbot-demo.html" target="_blank" class="bg-[#E8471C] hover:bg-[#C2410C] text-white text-sm font-semibold px-6 py-3.5 rounded-full transition-colors shadow-[0_10px_30px_rgba(232,71,28,0.4)] cursor-pointer">
+          Try Live Demo
+        </a>
+        <a href="#how" class="text-white text-sm font-semibold hover:text-[#E8471C] transition-colors cursor-pointer flex items-center gap-2 drop-shadow-md">
+          How it Works <i data-lucide="arrow-right" style="width:16px;height:16px;"></i>
+        </a>
+      </div>
+
+      <!-- SmartBot feature text -->
+      <div class="mt-16 flex flex-col gap-2 p-5 bg-black/30 backdrop-blur-md rounded-2xl border border-white/10 max-w-sm shadow-2xl">
+         <div class="flex items-center gap-2 text-white/95">
+           <i data-lucide="sparkles" style="width:16px;height:16px;color:#E8471C;"></i>
+           <span class="text-sm font-medium">SmartBot<sup class="text-[10px]">TM</sup></span>
+         </div>
+         <p class="text-white/80 text-xs leading-relaxed">
+           Intelligently handles customer queries, turning late-night visitors into booked appointments and qualified leads.
+         </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom-right indicator -->
+  <div class="hidden sm:flex absolute right-6 md:right-10 bottom-8 md:bottom-10 z-10 items-center gap-2 text-white/90 text-sm bg-black/40 backdrop-blur-md px-4 py-2 rounded-full border border-white/10 shadow-lg">
+    <div class="w-2 h-2 rounded-full bg-[#22C55E] animate-pulse"></div>
+    <span class="font-medium">All systems operational</span>
+  </div>
+</section>
+
+<!-- ================================================================
+     MARQUEE STRIP
+================================================================ -->
+<div class="marquee-strip">
+  <div class="marquee-track">
+    <span class="mi"><i data-lucide="stethoscope"></i>Dental Clinics</span>
+    <span class="mi"><i data-lucide="home"></i>Real Estate</span>
+    <span class="mi"><i data-lucide="utensils"></i>Restaurants</span>
+    <span class="mi"><i data-lucide="shopping-bag"></i>Retail Shops</span>
+    <span class="mi"><i data-lucide="scale"></i>Law Firms</span>
+    <span class="mi"><i data-lucide="dumbbell"></i>Gyms &amp; Coaches</span>
+    <span class="mi"><i data-lucide="car"></i>Auto Showrooms</span>
+    <span class="mi"><i data-lucide="graduation-cap"></i>Academies</span>
+    <span class="mi"><i data-lucide="sparkles"></i>Salons &amp; Spas</span>
+    <span class="mi"><i data-lucide="building-2"></i>Clinics</span>
+    <!-- duplicate for seamless loop -->
+    <span class="mi"><i data-lucide="stethoscope"></i>Dental Clinics</span>
+    <span class="mi"><i data-lucide="home"></i>Real Estate</span>
+    <span class="mi"><i data-lucide="utensils"></i>Restaurants</span>
+    <span class="mi"><i data-lucide="shopping-bag"></i>Retail Shops</span>
+    <span class="mi"><i data-lucide="scale"></i>Law Firms</span>
+    <span class="mi"><i data-lucide="dumbbell"></i>Gyms &amp; Coaches</span>
+    <span class="mi"><i data-lucide="car"></i>Auto Showrooms</span>
+    <span class="mi"><i data-lucide="graduation-cap"></i>Academies</span>
+    <span class="mi"><i data-lucide="sparkles"></i>Salons &amp; Spas</span>
+    <span class="mi"><i data-lucide="building-2"></i>Clinics</span>
+  </div>
+</div>
+
+<!-- ================================================================
+     HOW IT WORKS
+================================================================ -->
+<section class="sec" id="how">
+  <div class="wrap">
+    <div class="how-grid">
+      <!-- Left -->
+      <div class="sr">
+        <div class="label">The Process</div>
+        <h2 class="h2">From order to live<br/>in <span class="orange">3 days flat.</span></h2>
+        <p class="body-l" style="margin-top:16px;max-width:420px">
+          No technical meetings. No developer jargon. You share your business info,
+          we do everything else, and deliver a working bot.
+        </p>
+
+        <div class="steps">
+          <div class="step">
+            <div class="step-n">01</div>
+            <div class="step-b">
+              <h3>You fill a 15-minute form</h3>
+              <p>Services, prices, working hours, FAQs, and logo — on your phone or laptop. Simple Google Form.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-n">02</div>
+            <div class="step-b">
+              <h3>We build &amp; train your bot</h3>
+              <p>We configure the AI with your exact data, match your branding, and test every conversation flow end to end.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-n">03</div>
+            <div class="step-b">
+              <h3>You go live everywhere</h3>
+              <p>Shareable chat link, website embed code, and a private admin dashboard — all delivered with a walkthrough video.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right -->
+      <div class="cards-stack sr d2">
+        <div class="card">
+          <div class="card-head">
+            <div class="card-ico"><i data-lucide="brain-circuit"></i></div>
+            <div class="card-title">AI That Knows Your Business</div>
+          </div>
+          <p>Trained on your exact services and FAQs — not generic responses. It feels like a real team member, not a chatbot.</p>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <div class="card-ico"><i data-lucide="link-2"></i></div>
+            <div class="card-title">No Website? No Problem.</div>
+          </div>
+          <p>You get a standalone link shareable on WhatsApp, Instagram bio, or anywhere. Website embed code included if you have one.</p>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <div class="card-ico"><i data-lucide="languages"></i></div>
+            <div class="card-title">Urdu &amp; English, Automatically</div>
+          </div>
+          <p>Detects the language your customer uses and responds in the same language. Full Urdu, Roman Urdu, English — no config needed.</p>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <div class="card-ico"><i data-lucide="layout-dashboard"></i></div>
+            <div class="card-title">Your Data, Your Dashboard</div>
+          </div>
+          <p>Every lead, booking, and chat log is stored in your private admin dashboard. Export to CSV, update info yourself, no code needed.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     FEATURES
+================================================================ -->
+<section class="sec sec-alt" id="features">
+  <div class="wrap">
+    <div class="feat-intro sr">
+      <div>
+        <div class="label">Features</div>
+        <h2 class="h2">Everything your<br/>business needs.</h2>
+      </div>
+      <div>
+        <p class="body-l">
+          This isn't a rule-based bot that breaks the second someone asks something unexpected.
+          Real AI. Tested end-to-end. Delivered as a complete system you can actually use.
+        </p>
+        <a href="smartbot-demo.html" target="_blank" class="btn btn-g" style="margin-top:24px">
+          <i data-lucide="external-link"></i>
+          Try the live demo
+        </a>
+      </div>
+    </div>
+
+    <div class="feat-grid sr d1">
+      <div class="feat">
+        <div class="feat-ico" style="background:var(--od);color:var(--o)"><i data-lucide="bot"></i></div>
+        <h3>Real AI — Not Buttons</h3>
+        <p>Powered by GPT-4o-mini. Understands natural conversation. Handles questions it was never explicitly trained on.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-ico" style="background:rgba(34,197,94,.1);color:#22C55E"><i data-lucide="user-plus"></i></div>
+        <h3>Auto Lead Capture</h3>
+        <p>After a few messages, it asks for name and phone number, saves them to your dashboard, and emails you instantly.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-ico" style="background:rgba(168,85,247,.1);color:#A855F7"><i data-lucide="calendar-check-2"></i></div>
+        <h3>Appointment Booking</h3>
+        <p>Customers pick service, date, and time through conversation. It records everything and sends you a notification.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-ico" style="background:rgba(245,158,11,.1);color:#F59E0B"><i data-lucide="gauge"></i></div>
+        <h3>Admin Dashboard</h3>
+        <p>Password-protected. See all leads, bookings, and chat logs. Update services and FAQs without any code.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-ico" style="background:rgba(6,182,212,.1);color:#06B6D4"><i data-lucide="code-2"></i></div>
+        <h3>One-Line Embed</h3>
+        <p>Paste a single script tag before &lt;/body&gt; and the chat bubble appears on any website. That's the whole integration.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-ico" style="background:rgba(239,68,68,.1);color:#EF4444"><i data-lucide="paintbrush-2"></i></div>
+        <h3>Fully Custom Branded</h3>
+        <p>Your logo, colors, and business name. Visitors never know it's AI. Feels like talking to a real team member.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     LIVE DEMO
+================================================================ -->
+<section class="sec demo-outer" id="demo">
+  <div class="wrap">
+    <div class="label" style="justify-content:center">Live Demo</div>
+    <h2 class="h2 sr">See it. Don't just<br/>read about it.</h2>
+    <p class="body-l sr d1" style="max-width:480px;margin:12px auto 0">
+      The conversation below is the actual product — not a recording, not a screenshot.
+      The real bot. Try asking it something.
+    </p>
+
+    <div class="demo-card sr d2">
+      <!-- Browser mockup -->
+      <div class="browser">
+        <div class="browser-bar">
+          <div class="bd" style="background:#EF4444"></div>
+          <div class="bd" style="background:#F59E0B"></div>
+          <div class="bd" style="background:#22C55E"></div>
+          <div class="browser-url">
+            <i data-lucide="lock" style="width:11px;height:11px;color:var(--g)"></i>
+            overarc.co/demo/city-dental-clinic
+          </div>
+        </div>
+        <div class="browser-body" id="chat-demo">
+          <!-- Messages injected by JS -->
+        </div>
+      </div>
+
+      <div class="demo-cta">
+        <a href="smartbot-demo.html" target="_blank" class="btn btn-o">
+          <i data-lucide="external-link"></i>
+          Open Full Demo — Try It Yourself
+        </a>
+      </div>
+      <p class="demo-note">Switch between Dental Clinic, Real Estate &amp; Restaurant inside. No login needed.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     PRICING
+================================================================ -->
+<section class="sec sec-alt" id="pricing">
+  <div class="wrap">
+    <div class="price-header sr">
+      <div>
+        <div class="label">Pricing</div>
+        <h2 class="h2">Honest pricing.<br/>No surprises.</h2>
+      </div>
+      <p class="body-l" style="max-width:360px">
+        One-time setup fee. We build it, test it, and deliver it.
+        You own it forever. Optional monthly plan if you want us to maintain it.
+      </p>
+    </div>
+
+    <div class="price-grid sr d1">
+      <!-- Starter -->
+      <div class="pc">
+        <div class="tier">Starter</div>
+        <div class="amount">$150</div>
+        <div class="pkr">one-time setup</div>
+        <div class="pline"></div>
+        <ul class="pfs">
+          <li class="pf y"><i data-lucide="check-circle-2"></i>AI chatbot setup &amp; training</li>
+          <li class="pf y"><i data-lucide="check-circle-2"></i>Unlimited FAQ answering</li>
+          <li class="pf y"><i data-lucide="check-circle-2"></i>Lead capture system</li>
+          <li class="pf y"><i data-lucide="check-circle-2"></i>Admin dashboard</li>
+          <li class="pf y"><i data-lucide="check-circle-2"></i>Standalone chat link</li>
+          <li class="pf y"><i data-lucide="check-circle-2"></i>1 month support</li>
+          <li class="pf n"><i data-lucide="minus-circle"></i>Appointment booking</li>
+          <li class="pf n"><i data-lucide="minus-circle"></i>Website embed code</li>
+        </ul>
+        <button class="pbtn out" onclick="window.open('https://wa.me/923249116764?text=Hi%20Overarc,%20I\'m%20interested%20in%20the%20Starter%20Package!','_blank')">Get Started</button>
+      </div>
+
+      <!-- Pro -->
+      <div class="pc hot">
+        <div class="hot-tag">Most Popular</div>
+        <div class="tier">Pro</div>
+        <div class="amount"><span class="orange">$250</span></div>
+        <div class="pkr">one-time setup</div>
+        <div class="pline" style="background:rgba(255,255,255,.1)"></div>
+        <ul class="pfs">
+          <li class="pf y"><i data-lucide="check-circle-2"></i>Everything in Starter</li>
+          <li class="pf y"><i data-lucide="check-circle-2"></i>Appointment booking flow</li>
+          <li class="pf y"><i data-lucide="check-circle-2"></i>Website embed code</li>
+          <li class="pf y"><i data-lucide="check-circle-2"></i>Urdu + English support</li>
+          <li class="pf y"><i data-lucide="check-circle-2"></i>Email lead notifications</li>
+          <li class="pf y"><i data-lucide="check-circle-2"></i>3 months support</li>
+          <li class="pf n"><i data-lucide="minus-circle"></i>Monthly PDF report</li>
+        </ul>
+        <button class="pbtn solid" onclick="window.open('https://wa.me/923249116764?text=Hi%20Overarc,%20I\'m%20interested%20in%20the%20Pro%20Package!','_blank')">
+          <i data-lucide="zap" style="width:15px;height:15px"></i>
+          Get This Package
+        </button>
+      </div>
+
+      <!-- Premium -->
+      <div class="pc">
+        <div class="tier">Premium</div>
+        <div class="amount">$400</div>
+        <div class="pkr">one-time setup</div>
+        <div class="pline"></div>
+        <ul class="pfs">
+          <li class="pf y"><i data-lucide="check-circle-2"></i>Everything in Pro</li>
+          <li class="pf y"><i data-lucide="check-circle-2"></i>Full custom branding</li>
+          <li class="pf y"><i data-lucide="check-circle-2"></i>Monthly PDF leads report</li>
+          <li class="pf y"><i data-lucide="check-circle-2"></i>Priority support</li>
+          <li class="pf y"><i data-lucide="check-circle-2"></i>6 months free support</li>
+          <li class="pf y"><i data-lucide="check-circle-2"></i>Free tweaks anytime</li>
+        </ul>
+        <button class="pbtn out" onclick="window.open('https://wa.me/923249116764?text=Hi%20Overarc,%20I\'m%20interested%20in%20the%20Premium%20Package!','_blank')">Get Started</button>
+      </div>
+    </div>
+
+    <div class="price-note sr d2">
+      Need ongoing peace of mind? Add <strong>$30/month</strong> for hosting, updates &amp; priority support.
+      &nbsp;·&nbsp; 50% upfront, 50% on delivery.
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     TESTIMONIALS
+================================================================ -->
+<section class="sec" id="testimonials">
+  <div class="wrap">
+    <div class="label">Real Clients</div>
+    <h2 class="h2 sr">What businesses say<br/>after going live.</h2>
+
+    <div class="testi-grid">
+      <div class="tc sr">
+        <div class="stars">
+          <i data-lucide="star"></i><i data-lucide="star"></i><i data-lucide="star"></i>
+          <i data-lucide="star"></i><i data-lucide="star"></i>
+        </div>
+        <p class="tq">
+          "Our receptionist was answering the same questions 50 times a day.
+          Now the bot handles it — and we're booking 12 extra appointments every week
+          from people who used to just leave without asking."
+        </p>
+        <div class="ta">
+          <div class="av2" style="background:linear-gradient(135deg,#22C55E,#15803D)">AK</div>
+          <div>
+            <div class="tn">Dr. Ahmad Khan</div>
+            <div class="tb">City Dental Clinic, Mingora</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tc sr d1">
+        <div class="stars">
+          <i data-lucide="star"></i><i data-lucide="star"></i><i data-lucide="star"></i>
+          <i data-lucide="star"></i><i data-lucide="star"></i>
+        </div>
+        <p class="tq">
+          "Customers were asking about property prices at 11 PM.
+          I was missing all of it. Now I wake up to fresh leads —
+          names and numbers already saved. Best investment I've made this year."
+        </p>
+        <div class="ta">
+          <div class="av2" style="background:linear-gradient(135deg,#F59E0B,#D97706)">BR</div>
+          <div>
+            <div class="tn">Bilal Rehman</div>
+            <div class="tb">Al-Noor Real Estate, Swat</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tc sr d2">
+        <div class="stars">
+          <i data-lucide="star"></i><i data-lucide="star"></i><i data-lucide="star"></i>
+          <i data-lucide="star"></i><i data-lucide="star"></i>
+        </div>
+        <p class="tq">
+          "It responds in Urdu. My customers love it. Table reservations doubled in one month.
+          Overarc delivered in 2 days, not 3 — and sent me a full walkthrough video on delivery."
+        </p>
+        <div class="ta">
+          <div class="av2" style="background:linear-gradient(135deg,#E8471C,#C2410C)">FM</div>
+          <div>
+            <div class="tn">Faisal Mehmood</div>
+            <div class="tb">Taste of Swat Restaurant</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     FAQ
+================================================================ -->
+<section class="sec sec-alt" id="faq">
+  <div class="wrap">
+    <div class="faq-layout">
+      <!-- Sticky left -->
+      <div class="faq-sticky sr">
+        <div class="label">FAQ</div>
+        <h2 class="h2">Questions<br/>we get a lot.</h2>
+        <p class="body-l" style="margin-top:14px">
+          Can't find your answer? Message us on WhatsApp — we usually reply within the hour.
+        </p>
+        <a href="https://wa.me/923249116764?text=Hi%20Overarc,%20I'm%20interested%20in%20an%20AI%20Chatbot%20for%20my%20business!" target="_blank" class="btn btn-g" style="margin-top:28px">
+          <i data-lucide="message-circle"></i>
+          Ask on WhatsApp
+        </a>
+      </div>
+
+      <!-- Accordion -->
+      <div class="faq-list sr d1">
+        <div class="fi">
+          <div class="fq" onclick="faq(this)">
+            Do I need a website to use this?
+            <i data-lucide="plus"></i>
+          </div>
+          <div class="fa"><div class="fa-inner">
+            No. You get a standalone chat link you can share on WhatsApp, Instagram bio, Google Business, or anywhere. If you do have a website, we include a one-line embed code.
+          </div></div>
+        </div>
+
+        <div class="fi">
+          <div class="fq" onclick="faq(this)">
+            How long does delivery actually take?
+            <i data-lucide="plus"></i>
+          </div>
+          <div class="fa"><div class="fa-inner">
+            3 business days after you send your form. Day 1: we configure. Day 2: we build and test. Day 3: we deliver with a Loom walkthrough video. Some clients go live on Day 2.
+          </div></div>
+        </div>
+
+        <div class="fi">
+          <div class="fq" onclick="faq(this)">
+            Does it really understand Urdu?
+            <i data-lucide="plus"></i>
+          </div>
+          <div class="fa"><div class="fa-inner">
+            Yes — full Urdu, Roman Urdu, and English. The AI detects whichever language the customer types in and responds in that same language automatically. No extra configuration.
+          </div></div>
+        </div>
+
+        <div class="fi">
+          <div class="fq" onclick="faq(this)">
+            Can I update the bot after delivery?
+            <i data-lucide="plus"></i>
+          </div>
+          <div class="fa"><div class="fa-inner">
+            Yes. Your admin dashboard lets you edit services, prices, and FAQs yourself — no coding. Or message us and we'll update it for you free during your support period.
+          </div></div>
+        </div>
+
+        <div class="fi">
+          <div class="fq" onclick="faq(this)">
+            Is it real AI or just a scripted button bot?
+            <i data-lucide="plus"></i>
+          </div>
+          <div class="fa"><div class="fa-inner">
+            Real AI — GPT-4o-mini via OpenRouter. It understands natural conversation and handles questions it was never explicitly trained on. Not click-and-button menus.
+          </div></div>
+        </div>
+
+        <div class="fi">
+          <div class="fq" onclick="faq(this)">
+            What's the payment structure?
+            <i data-lucide="plus"></i>
+          </div>
+          <div class="fa"><div class="fa-inner">
+            50% upfront to start, 50% when you approve the final version. No hidden fees. The optional $30/month plan covers hosting, updates, and priority support.
+          </div></div>
+        </div>
+
+        <div class="fi">
+          <div class="fq" onclick="faq(this)">
+            Can medium or larger businesses use this?
+            <i data-lucide="plus"></i>
+          </div>
+          <div class="fa"><div class="fa-inner">
+            The current product is best for businesses handling up to ~200 daily conversations. For enterprise or high-volume operations, we build a custom solution on proper backend infrastructure — contact us to discuss.
+          </div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     CTA
+================================================================ -->
+<section class="cta-sec" id="contact">
+  <div class="wrap">
+    <div class="cta-inner sr">
+      <div class="cta-arc-wrap">
+        <svg class="cta-arc-svg" width="140" height="72" viewBox="0 0 140 72" fill="none">
+          <path d="M4 68 A66 66 0 0 1 90 4" stroke="white" stroke-width="3" stroke-linecap="round" fill="none"/>
+          <path d="M90 4 A66 66 0 0 1 136 68" stroke="#E8471C" stroke-width="3" stroke-linecap="round" fill="none"/>
+        </svg>
+      </div>
+
+      <h2 class="h2">
+        Your customers are<br/>asking right now.<br/>
+        <span class="orange">Who's answering?</span>
+      </h2>
+
+      <p>
+        Every unanswered message is a lost sale. Let Overarc handle it 24/7 while you
+        focus on running your business. Get your custom AI chatbot live in 3 days.
+      </p>
+
+      <div class="cta-btns">
+        <a href="https://wa.me/923249116764?text=Hi%20Overarc,%20I'd%20like%20to%20get%20started!" target="_blank" class="btn btn-o">
+          <i data-lucide="message-circle"></i>
+          Start on WhatsApp
+        </a>
+        <a href="smartbot-demo.html" target="_blank" class="btn btn-g">
+          See Demo First
+          <i data-lucide="arrow-right"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     FOOTER
+================================================================ -->
+<footer>
+  <div class="wrap">
+    <div class="ft">
+      <div>
+        <div class="f-logo">
+          <img src="Icons/Transparent.png" alt="Overarc" />
+        </div>
+        <div class="f-tagline">AI chatbots for real businesses. Built by hand. Delivered in 3 days.</div>
+      </div>
+
+      <div class="f-cols">
+        <div class="f-col">
+          <div class="f-col-lbl">Product</div>
+          <a href="#how">How It Works</a>
+          <a href="#features">Features</a>
+          <a href="#pricing">Pricing</a>
+          <a href="smartbot-demo.html" target="_blank">Live Demo</a>
+        </div>
+        <div class="f-col">
+          <div class="f-col-lbl">Contact</div>
+          <a href="https://wa.me/923249116764?text=Hi%20Overarc,%20I'm%20interested%20in%20an%20AI%20Chatbot!" target="_blank">WhatsApp</a>
+          <a href="mailto:hello@overarc.co">hello@overarc.co</a>
+          <a href="#faq">FAQ</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="fb">
+      <p>© 2026 <a href="https://overarc.co">Overarc</a> &middot; AI-powered customer engagement &middot; overarc.co</p>
+      <p>Made by <a href="https://s-designs.netlify.app/" target="_blank" style="color:var(--o);font-weight:600;">S Designs</a></p>
+    </div>
+  </div>
+</footer>
+
+<!-- ================================================================
+     SCRIPTS
+================================================================ -->
+<script>
+  // --- Init Lucide icons ---
+  lucide.createIcons();
+
+  // ============================================================
+  // PARTICLE CANVAS
+  // ============================================================
+  (function(){
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let W, H, particles = [];
+
+    function resize(){
+      W = canvas.width  = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    const COUNT = 55;
+    for(let i = 0; i < COUNT; i++){
+      particles.push({
+        x: Math.random() * 2000,
+        y: Math.random() * 1200,
+        vx: (Math.random() - .5) * .25,
+        vy: (Math.random() - .5) * .25,
+        r: Math.random() * 1.5 + .4,
+        a: Math.random() * .5 + .1,
+        orange: Math.random() > .75,
+      });
+    }
+
+    function draw(){
+      ctx.clearRect(0, 0, W, H);
+
+      // Draw connections
+      for(let i = 0; i < particles.length; i++){
+        for(let j = i+1; j < particles.length; j++){
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx*dx + dy*dy);
+          if(dist < 160){
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(255,255,255,${(1 - dist/160) * 0.04})`;
+            ctx.lineWidth = .6;
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Draw dots
+      particles.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = p.orange
+          ? `rgba(232,71,28,${p.a})`
+          : `rgba(255,255,255,${p.a * .6})`;
+        ctx.fill();
+        p.x += p.vx;
+        p.y += p.vy;
+        if(p.x < 0 || p.x > W) p.vx *= -1;
+        if(p.y < 0 || p.y > H) p.vy *= -1;
+      });
+
+      requestAnimationFrame(draw);
+    }
+    draw();
+  })();
+  // NAVBAR SCROLL & MOBILE MENU
+  // ============================================================
+  
+  // ============================================================
+  // TAILWIND MOBILE MENU
+  // ============================================================
+  const menuBtn = document.getElementById('tw-menu-btn');
+  const mobileMenu = document.getElementById('tw-mobile-menu');
+  const mobileDrawer = document.getElementById('tw-mobile-drawer');
+  const menuIcon = document.getElementById('tw-menu-icon');
+  const xIcon = document.getElementById('tw-x-icon');
+  const twNavLinks = document.querySelectorAll('.tw-nav-link');
+  const ctaGroup = document.getElementById('tw-cta-group');
+
+  if(menuBtn) {
+    let menuOpen = false;
+    const toggleMenu = (open) => {
+      menuOpen = open;
+      document.body.style.overflow = menuOpen ? 'hidden' : '';
+      if(menuOpen) {
+        menuIcon.classList.replace('opacity-100', 'opacity-0');
+        menuIcon.classList.replace('rotate-0', 'rotate-90');
+        menuIcon.classList.replace('scale-100', 'scale-50');
+        xIcon.classList.replace('opacity-0', 'opacity-100');
+        xIcon.classList.replace('-rotate-90', 'rotate-0');
+        xIcon.classList.replace('scale-50', 'scale-100');
+        mobileMenu.classList.replace('opacity-0', 'opacity-100');
+        mobileMenu.classList.replace('pointer-events-none', 'pointer-events-auto');
+        mobileDrawer.classList.replace('translate-x-full', 'translate-x-0');
+        twNavLinks.forEach((l) => {
+          l.classList.replace('translate-x-8', 'translate-x-0');
+          l.classList.replace('opacity-0', 'opacity-100');
+        });
+        ctaGroup.classList.replace('translate-x-8', 'translate-x-0');
+        ctaGroup.classList.replace('opacity-0', 'opacity-100');
+      } else {
+        menuIcon.classList.replace('opacity-0', 'opacity-100');
+        menuIcon.classList.replace('rotate-90', 'rotate-0');
+        menuIcon.classList.replace('scale-50', 'scale-100');
+        xIcon.classList.replace('opacity-100', 'opacity-0');
+        xIcon.classList.replace('rotate-0', '-rotate-90');
+        xIcon.classList.replace('scale-100', 'scale-50');
+        mobileMenu.classList.replace('opacity-100', 'opacity-0');
+        mobileMenu.classList.replace('pointer-events-auto', 'pointer-events-none');
+        mobileDrawer.classList.replace('translate-x-0', 'translate-x-full');
+        twNavLinks.forEach((l) => {
+          l.classList.replace('translate-x-0', 'translate-x-8');
+          l.classList.replace('opacity-100', 'opacity-0');
+        });
+        ctaGroup.classList.replace('translate-x-0', 'translate-x-8');
+        ctaGroup.classList.replace('opacity-100', 'opacity-0');
+      }
+    };
+    menuBtn.addEventListener('click', () => toggleMenu(!menuOpen));
+    mobileMenu.addEventListener('click', () => toggleMenu(false));
+    twNavLinks.forEach(l => l.addEventListener('click', () => toggleMenu(false)));
+  }
+
+  // ============================================================
+  // BACKGROUND PARTICLES
+  // ============================================================
+  const c = document.getElementById('bg-canvas');
+  if (c) {
+    const cx = c.getContext('2d');
+    let cw, ch;
+    const pts = [];
+    function r(n){ return Math.random()*n; }
+    function rz(){
+      cw = c.width = window.innerWidth;
+      ch = c.height = window.innerHeight;
+    }
+    rz();
+    window.addEventListener('resize', rz);
+
+    const nPts = Math.min(window.innerWidth / 15, 80);
+    for(let i=0; i<nPts; i++){
+      pts.push({ x:r(cw), y:r(ch), vx:(r(1)-.5)*.8, vy:(r(1)-.5)*.8, sz:r(1.5)+.5 });
+    }
+
+    function draw(){
+      cx.clearRect(0,0,cw,ch);
+      cx.fillStyle = '#E8471C';
+      pts.forEach(p => {
+        p.x += p.vx; p.y += p.vy;
+        if(p.x<0||p.x>cw) p.vx*=-1;
+        if(p.y<0||p.y>ch) p.vy*=-1;
+        cx.beginPath();
+        cx.arc(p.x, p.y, p.sz, 0, Math.PI*2);
+        cx.fill();
+      });
+      requestAnimationFrame(draw);
+    }
+    draw();
+  }
+
+  // Remove the old canvas animation
+  const oldCanvasScript = 'const c = document.getElementById("bg-canvas");';
+
+  // Old Nav logic suppressed
+  // const nav = document.getElementById('nav');
+  const mobileNav = document.getElementById('mobile-nav');
+  const hamIcon = document.getElementById('ham-icon');
+
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('lit', window.scrollY > 30);
+  }, {passive: true});
+
+  window.toggleMobileNav = function() {
+    const isOpen = mobileNav.classList.contains('open');
+    if(isOpen) {
+      closeMobileNav();
+    } else {
+      mobileNav.classList.add('open');
+      lucide.createIcons({
+        name: 'x',
+        attrs: {
+          class: 'lucide lucide-x'
+        },
+        nameAttr: 'data-lucide'
+      });
+      hamIcon.setAttribute('data-lucide', 'x');
+      lucide.createIcons({nodes: [hamIcon]});
+    }
+  };
+
+  window.closeMobileNav = function() {
+    mobileNav.classList.remove('open');
+    hamIcon.setAttribute('data-lucide', 'menu');
+    lucide.createIcons({nodes: [hamIcon]});
+  };
+
+  // ============================================================
+  // SCROLL REVEAL
+  // ============================================================
+  const ro = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if(e.isIntersecting){ e.target.classList.add('vis'); ro.unobserve(e.target); }
+    });
+  }, {threshold: 0.08});
+  document.querySelectorAll('.sr').forEach(el => ro.observe(el));
+
+  // ============================================================
+  // COUNTER ANIMATION
+  // ============================================================
+  function animateCount(el, target, duration = 1600){
+    let start = 0, startTime = null;
+    function step(time){
+      if(!startTime) startTime = time;
+      const progress = Math.min((time - startTime) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = Math.floor(eased * target);
+      if(progress < 1) requestAnimationFrame(step);
+      else el.textContent = target;
+    }
+    requestAnimationFrame(step);
+  }
+
+  const counterObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if(e.isIntersecting){
+        document.querySelectorAll('.count').forEach(el => {
+          animateCount(el, parseInt(el.dataset.target));
+        });
+        counterObs.disconnect();
+      }
+    });
+  }, {threshold: 0.5});
+  const statsSection = document.querySelector('.hero-stats');
+  if(statsSection) counterObs.observe(statsSection);
+
+  // ============================================================
+  // DEMO CHAT ANIMATION
+  // ============================================================
+  const convo = [
+    { role:'bot',  text:'Hello! 👋 Welcome to <strong>City Dental Clinic</strong>. I\'m here 24/7 — how can I help you today?' },
+    { role:'user', text:'How much is teeth whitening?' },
+    { role:'bot',  text:'Teeth whitening is <strong>PKR 5,000</strong> per session and takes about 1 hour. Want to book a slot? 😊' },
+    { role:'user', text:'Yes please, Saturday morning?' },
+    { role:'bot',  text:'Perfect! I\'ll get that booked. May I have your <strong>name and phone number</strong> to confirm? ✅' },
+  ];
+
+  const chatEl = document.getElementById('chat-demo');
+  let chatDone = false;
+
+  function buildChat(){
+    chatEl.innerHTML = '';
+    convo.forEach((m, i) => {
+      const isBot = m.role === 'bot';
+      const wrap  = document.createElement('div');
+      wrap.className = `msg ${isBot ? 'bot' : 'usr'}`;
+
+      if(isBot){
+        wrap.innerHTML = `
+          <div class="av"><i data-lucide="bot"></i></div>
+          <div class="bubble">${m.text}</div>`;
+      } else {
+        wrap.innerHTML = `<div class="bubble">${m.text}</div>`;
+      }
+
+      chatEl.appendChild(wrap);
+      setTimeout(() => {
+        wrap.classList.add('vis');
+        lucide.createIcons({ nodes: [wrap] });
+      }, i * 800);
+    });
+  }
+
+  const chatObs = new IntersectionObserver((entries) => {
+    if(entries[0].isIntersecting && !chatDone){
+      chatDone = true;
+      buildChat();
+    }
+  }, {threshold: 0.3});
+  if(chatEl) chatObs.observe(chatEl);
+
+  // ============================================================
+  // FAQ ACCORDION
+  // ============================================================
+  function faq(el){
+    const item   = el.closest('.fi');
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.fi').forEach(f => f.classList.remove('open'));
+    if(!isOpen) item.classList.add('open');
+  }
+</script>
+<!-- ================================================================
+     FLOATING CHATBOT WIDGET
+================================================================ -->
+<div id="overarc-chatbot" class="fixed bottom-6 right-6 z-50 flex flex-col items-end pointer-events-auto">
+  
+  <!-- Chat Window -->
+  <div id="ob-window" class="hidden flex-col w-[350px] max-w-[calc(100vw-32px)] h-[500px] max-h-[calc(100vh-100px)] bg-[#111] border border-white/10 rounded-2xl shadow-2xl mb-4 overflow-hidden transition-all duration-300 opacity-0 translate-y-4 font-sans">
+    
+    <!-- Header -->
+    <div class="flex items-center justify-between px-4 py-3 bg-[#181818] border-b border-white/10">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-full bg-[#E8471C] flex items-center justify-center">
+          <i data-lucide="bot" class="text-white w-5 h-5"></i>
+        </div>
+        <div>
+          <div class="text-sm font-semibold text-white">Overarc Assistant</div>
+          <div class="text-xs text-[#22C55E] flex items-center gap-1 font-medium">
+            <span class="w-1.5 h-1.5 bg-[#22C55E] rounded-full inline-block animate-pulse"></span> Online
+          </div>
+        </div>
+      </div>
+      <button id="ob-close" class="text-white/60 hover:text-white hover:bg-white/10 rounded-full transition-all cursor-pointer p-1.5 flex items-center justify-center">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+
+    <!-- Chat Area -->
+    <div id="ob-chat-area" class="flex-1 p-4 overflow-y-auto flex flex-col gap-3">
+      <!-- Initial Message -->
+      <div class="flex items-start gap-2 max-w-[85%]">
+        <div class="w-6 h-6 rounded-full bg-[#E8471C] flex items-center justify-center shrink-0 mt-1">
+          <i data-lucide="bot" class="text-white w-3 h-3"></i>
+        </div>
+        <div class="bg-[#222] text-white/90 text-sm px-3 py-2.5 rounded-2xl rounded-tl-sm shadow-sm leading-relaxed">
+          Hi! 👋 Welcome to Overarc. I'm your AI assistant. How can I help you today?
+        </div>
+      </div>
+    </div>
+
+    <!-- Input Area (Mocked for demo) -->
+    <div class="p-3 bg-[#181818] border-t border-white/10">
+      <div class="flex flex-wrap gap-2 mb-3" id="ob-options">
+        <button class="ob-opt text-xs bg-[#222] hover:bg-[#333] border border-white/10 text-white px-3 py-2 rounded-full transition-colors font-medium" data-reply="I want to see a live demo">See Demo</button>
+        <button class="ob-opt text-xs bg-[#222] hover:bg-[#333] border border-white/10 text-white px-3 py-2 rounded-full transition-colors font-medium" data-reply="How much does it cost?">Pricing</button>
+        <button class="ob-opt text-xs bg-[#222] hover:bg-[#333] border border-white/10 text-white px-3 py-2 rounded-full transition-colors font-medium" data-reply="How do I get started?">Get Started</button>
+      </div>
+      <div class="relative flex items-center">
+        <input type="text" id="ob-input" placeholder="Type a message..." disabled class="w-full bg-[#222] border border-white/10 rounded-full pl-4 pr-10 py-2.5 text-sm text-white focus:outline-none focus:border-[#E8471C]/50 cursor-not-allowed opacity-50 transition-colors">
+        <button id="ob-send" disabled class="absolute right-1 w-8 h-8 rounded-full bg-[#E8471C] hover:bg-[#C2410C] flex items-center justify-center opacity-50 cursor-not-allowed transition-colors">
+          <i data-lucide="send" class="w-4 h-4 text-white ml-0.5"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Toggle Button -->
+  <button id="ob-toggle" class="w-16 h-16 rounded-full bg-gradient-to-tr from-[#E8471C] to-[#FF6235] hover:scale-105 text-white shadow-[0_4px_25px_rgba(232,71,28,0.5)] flex items-center justify-center transition-all duration-300 cursor-pointer z-50 overflow-hidden relative">
+    <i data-lucide="bot" id="ob-icon-msg" class="w-7 h-7 absolute transition-all duration-300 pointer-events-none drop-shadow-md"></i>
+    <i data-lucide="chevron-down" id="ob-icon-close" class="w-8 h-8 absolute transition-all duration-300 opacity-0 scale-50 -rotate-90 pointer-events-none"></i>
+  </button>
+</div>
+
+<script>
+  // Floating Chatbot Widget Logic
+  document.addEventListener('DOMContentLoaded', () => {
+    if (window.lucide) window.lucide.createIcons();
+
+    const obToggle = document.getElementById('ob-toggle');
+    const obClose = document.getElementById('ob-close');
+    const obWindow = document.getElementById('ob-window');
+    const obIconMsg = document.getElementById('ob-icon-msg');
+    const obIconClose = document.getElementById('ob-icon-close');
+    const obChatArea = document.getElementById('ob-chat-area');
+    const obOptions = document.querySelectorAll('.ob-opt');
+
+    let isOpen = false;
+
+    const toggleChat = () => {
+      isOpen = !isOpen;
+      if(isOpen) {
+        obWindow.classList.remove('hidden');
+        obWindow.style.display = 'flex';
+        // small delay for transition
+        setTimeout(() => {
+          obWindow.classList.remove('opacity-0', 'translate-y-4');
+        }, 10);
+        obIconMsg.classList.add('opacity-0', 'scale-50', 'rotate-90');
+        obIconClose.classList.remove('opacity-0', 'scale-50', '-rotate-90');
+      } else {
+        obWindow.classList.add('opacity-0', 'translate-y-4');
+        setTimeout(() => {
+          obWindow.classList.add('hidden');
+          obWindow.style.display = 'none';
+        }, 300);
+        obIconMsg.classList.remove('opacity-0', 'scale-50', 'rotate-90');
+        obIconClose.classList.add('opacity-0', 'scale-50', '-rotate-90');
+      }
+    };
+
+    obToggle.addEventListener('click', toggleChat);
+    obClose.addEventListener('click', toggleChat);
+
+    const appendUserMsg = (text) => {
+      const div = document.createElement('div');
+      div.className = 'flex items-start justify-end gap-2 max-w-[85%] self-end mt-2';
+      div.innerHTML = `<div class="bg-[#E8471C] text-white text-sm px-3 py-2.5 rounded-2xl rounded-tr-sm shadow-sm leading-relaxed">${text}</div>`;
+      obChatArea.appendChild(div);
+      obChatArea.scrollTop = obChatArea.scrollHeight;
+    };
+
+    const appendBotMsg = (text) => {
+      const div = document.createElement('div');
+      div.className = 'flex items-start gap-2 max-w-[85%] mt-2 opacity-0 translate-y-2 transition-all duration-300';
+      div.innerHTML = `
+        <div class="w-6 h-6 rounded-full bg-[#E8471C] flex items-center justify-center shrink-0 mt-1">
+          <i data-lucide="bot" class="text-white w-3 h-3"></i>
+        </div>
+        <div class="bg-[#222] text-white/90 text-sm px-3 py-2.5 rounded-2xl rounded-tl-sm shadow-sm leading-relaxed">${text}</div>
+      `;
+      obChatArea.appendChild(div);
+      setTimeout(() => {
+        div.classList.remove('opacity-0', 'translate-y-2');
+        obChatArea.scrollTop = obChatArea.scrollHeight;
+        if(window.lucide) window.lucide.createIcons();
+      }, 50);
+    };
+
+    const showTyping = () => {
+      const id = 'typing-' + Date.now();
+      const div = document.createElement('div');
+      div.id = id;
+      div.className = 'flex items-start gap-2 max-w-[85%] mt-2';
+      div.innerHTML = `
+        <div class="w-6 h-6 rounded-full bg-[#E8471C] flex items-center justify-center shrink-0 mt-1">
+          <i data-lucide="bot" class="text-white w-3 h-3"></i>
+        </div>
+        <div class="bg-[#222] text-white/50 text-sm px-4 py-3 rounded-2xl rounded-tl-sm shadow-sm flex items-center gap-1.5">
+          <span class="w-1.5 h-1.5 bg-white/40 rounded-full animate-bounce" style="animation-delay: 0ms"></span>
+          <span class="w-1.5 h-1.5 bg-white/40 rounded-full animate-bounce" style="animation-delay: 150ms"></span>
+          <span class="w-1.5 h-1.5 bg-white/40 rounded-full animate-bounce" style="animation-delay: 300ms"></span>
+        </div>
+      `;
+      obChatArea.appendChild(div);
+      obChatArea.scrollTop = obChatArea.scrollHeight;
+      if(window.lucide) window.lucide.createIcons();
+      return id;
+    };
+
+    // ==========================================
+    // REAL AI LOGIC (Python Backend)
+    // ==========================================
+    // State management
+    let chatHistory = [];
+    let messageCount = 0;
+    let leadCaptured = false;
+    let leadFormShown = false;
+    let lastUserMessage = "";
+
+    const chatInput = document.getElementById('ob-input');
+    const chatSend = document.getElementById('ob-send');
+
+    // Enable input since backend handles the API key
+    chatInput.disabled = false;
+    chatInput.classList.remove('cursor-not-allowed', 'opacity-50');
+    chatSend.disabled = false;
+    chatSend.classList.remove('cursor-not-allowed', 'opacity-50');
+
+    const showLeadForm = () => {
+      // Bot asks for details first
+      appendBotMsg("By the way — can I get your **name and phone number** so our team can follow up with you directly? 😊");
+
+      setTimeout(() => {
+        const formDiv = document.createElement('div');
+        formDiv.className = 'flex items-start gap-2 max-w-[85%] mt-2 ob-form-container';
+        formDiv.innerHTML = `
+          <div class="w-6 h-6 rounded-full bg-[#E8471C] flex items-center justify-center shrink-0 mt-1">
+            <i data-lucide="bot" class="text-white w-3 h-3"></i>
+          </div>
+          <div class="bg-[#222] border border-white/10 rounded-2xl rounded-tl-sm p-4 w-full text-white">
+            <p class="text-xs text-white/70 mb-3 leading-relaxed">Leave your details and we'll reach out shortly:</p>
+            <input type="text" id="ob-lead-name" placeholder="Your full name" class="w-full bg-[#111] border border-white/10 rounded-lg px-3 py-2 text-xs text-white mb-2 focus:outline-none focus:border-[#E8471C]" />
+            <input type="tel" id="ob-lead-phone" placeholder="Phone number (e.g. 0300-1234567)" class="w-full bg-[#111] border border-white/10 rounded-lg px-3 py-2 text-xs text-white mb-3 focus:outline-none focus:border-[#E8471C]" />
+            <button id="ob-lead-submit" class="w-full bg-gradient-to-tr from-[#E8471C] to-[#FF6235] text-white text-xs font-semibold py-2.5 rounded-lg hover:opacity-90 transition-opacity cursor-pointer">
+              Send Details
+            </button>
+          </div>
+        `;
+        obChatArea.appendChild(formDiv);
+        obChatArea.scrollTop = obChatArea.scrollHeight;
+        if(window.lucide) window.lucide.createIcons();
+
+        // Bind form submit button
+        document.getElementById('ob-lead-submit').addEventListener('click', submitLead);
+      }, 800);
+    };
+
+    const submitLead = async () => {
+      const name = document.getElementById('ob-lead-name').value.trim();
+      const phone = document.getElementById('ob-lead-phone').value.trim();
+
+      if (!name || !phone) {
+        alert('Please enter both name and phone number');
+        return;
+      }
+
+      // Hide the form
+      const formContainer = obChatArea.querySelector('.ob-form-container');
+      if (formContainer) formContainer.remove();
+
+      // Show typing indicator
+      const typingId = showTyping();
+
+      try {
+        // Send lead to local Python backend
+        const response = await fetch("http://localhost:5000/api/leads", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            name: name,
+            phone: phone,
+            message: lastUserMessage,
+            timestamp: new Date().toISOString()
+          })
+        });
+
+        document.getElementById(typingId).remove();
+
+        if (response.ok) {
+          leadCaptured = true;
+          // Save to local storage for local persistence (so smartbot-admin can read it if they open it on the same domain!)
+          const localLeads = JSON.parse(localStorage.getItem('sb_leads') || '[]');
+          localLeads.push({
+            id: Date.now(),
+            bot: "clinic", // map to clinic tab in dashboard or save under overarc
+            business: "Overarc Agency",
+            name: name,
+            phone: phone,
+            timestamp: new Date().toISOString(),
+            topic: lastUserMessage || "General Inquiry"
+          });
+          localStorage.setItem('sb_leads', JSON.stringify(localLeads));
+
+          appendBotMsg(`Thank you, **${name}**! ✅ I've saved your details. Our team will contact you at **${phone}** shortly. Is there anything else I can help you with?`);
+        } else {
+          appendBotMsg(`Thanks, **${name}**! I've noted down your details and our team will get in touch soon.`);
+        }
+      } catch (err) {
+        console.error("Error saving lead:", err);
+        document.getElementById(typingId).remove();
+        // Fallback save locally if backend fails
+        leadCaptured = true;
+        const localLeads = JSON.parse(localStorage.getItem('sb_leads') || '[]');
+        localLeads.push({
+          id: Date.now(),
+          bot: "clinic",
+          business: "Overarc Agency",
+          name: name,
+          phone: phone,
+          timestamp: new Date().toISOString(),
+          topic: lastUserMessage || "General Inquiry"
+        });
+        localStorage.setItem('sb_leads', JSON.stringify(localLeads));
+        appendBotMsg(`Thank you, **${name}**! ✅ I've saved your details locally. Our team will reach out at **${phone}** soon.`);
+      }
+    };
+
+    const lockInput = () => {
+      chatInput.disabled = true;
+      chatSend.disabled = true;
+      chatInput.classList.add('cursor-not-allowed', 'opacity-50');
+      chatSend.classList.add('cursor-not-allowed', 'opacity-50');
+      chatSend.style.pointerEvents = 'none';
+    };
+
+    const unlockInput = () => {
+      chatInput.disabled = false;
+      chatSend.disabled = false;
+      chatInput.classList.remove('cursor-not-allowed', 'opacity-50');
+      chatSend.classList.remove('cursor-not-allowed', 'opacity-50');
+      chatSend.style.pointerEvents = 'auto';
+      chatInput.focus();
+    };
+
+    const generateAIResponse = async (userText, typingId) => {
+      try {
+        const response = await fetch("http://localhost:5000/api/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            bot: "overarc", // secure identifier maps backend prompt dictionary
+            message: userText,
+            history: chatHistory
+          })
+        });
+
+        if (!response.ok) {
+           const errorData = await response.json();
+           console.error("Backend API Error:", errorData);
+           throw new Error("Backend request failed.");
+        }
+        
+        const data = await response.json();
+        const aiText = data.reply;
+        
+        // Remove typing indicator
+        document.getElementById(typingId).remove();
+        
+        // Add to UI and history
+        appendBotMsg(aiText);
+        
+        // Save to history so the backend remembers context
+        chatHistory.push({ role: "user", content: userText });
+        chatHistory.push({ role: "assistant", content: aiText });
+
+        // Trigger lead form after 2nd user message
+        if (messageCount >= 2 && !leadCaptured && !leadFormShown) {
+          leadFormShown = true;
+          setTimeout(() => showLeadForm(), 1500);
+        }
+
+        // Unlock after completion
+        unlockInput();
+
+      } catch (err) {
+        console.error(err);
+        document.getElementById(typingId).remove();
+        appendBotMsg("⚠️ Server is not running or encountered an error. Please contact hello@overarc.co directly.");
+        unlockInput();
+      }
+    };
+
+    const handleSend = () => {
+      const text = chatInput.value.trim();
+      if(!text || chatInput.disabled) return;
+      
+      // Lock visual elements to prevent double clicks (idempotency)
+      lockInput();
+
+      chatInput.value = '';
+      appendUserMsg(text);
+      lastUserMessage = text;
+      messageCount++;
+      
+      const optContainer = document.getElementById('ob-options');
+      if (optContainer && optContainer.style.display !== 'none') {
+        optContainer.style.opacity = '0';
+        setTimeout(() => optContainer.style.display = 'none', 300);
+      }
+
+      const typingId = showTyping();
+      generateAIResponse(text, typingId);
+    };
+
+    chatSend.addEventListener('click', handleSend);
+    chatInput.addEventListener('keypress', (e) => {
+      if(e.key === 'Enter') handleSend();
+    });
+
+    // Option buttons trigger AI as well
+    obOptions.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        if (chatInput.disabled) return;
+        const text = e.target.getAttribute('data-reply');
+        chatInput.value = text;
+        handleSend();
+      });
+    });
+  });
+</script>
+</body>
+</html>

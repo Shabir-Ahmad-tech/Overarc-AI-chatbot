@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SmartBot — AI Business Assistant Demo</title>
+  <meta name="description" content="SmartBot: White-label AI chatbot that captures leads and books appointments 24/7 for any business." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+  <style>
+    /* ============================================================
+       ROOT & RESET
+    ============================================================ */
+    :root {
+      --bg:           #080808;
+      --surface:      #111;
+      --surface-2:    #181818;
+      --border:       rgba(255,255,255,0.07);
+      --border-hover: rgba(255,255,255,0.15);
+      --text:         #F4F4F4;
+      --text-muted:   rgba(244,244,244,0.55);
+      --accent:       #E8471C;
+      --accent-glow:  rgba(232,71,28,0.25);
+      --accent-2:     #FF6235;
+      --success:      #22C55E;
+      --warning:      #F59E0B;
+      --danger:       #EF4444;
+      --bot-bubble:   #222;
+      --user-bubble:  #E8471C;
+      --radius-sm:    8px;
+      --radius-md:    14px;
+      --radius-lg:    22px;
+      --radius-full:  9999px;
+      --shadow:       0 24px 64px rgba(0,0,0,0.5);
+      --transition:   0.22s cubic-bezier(0.4,0,0.2,1);
+
+      /* Per-client theming (overridden by demo switcher) */
+      --brand:        #E8471C;
+      --brand-dark:   #C2410C;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ============================================================
+       LANDING PAGE
+    ============================================================ */
+    .landing {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 40px 20px;
+      position: relative;
+    }
+
+    /* Full-screen Hero background matching index.html */
+    .landing::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: 
+        linear-gradient(to right, rgba(0,0,0,0.95), rgba(0,0,0,0.7)),
+        url('Icons/Hero.png') center/cover no-repeat;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .landing > * { position: relative; z-index: 1; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(232,71,28,0.12);
+      border: 1px solid rgba(232,71,28,0.3);
+      border-radius: var(--radius-full);
+      padding: 6px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 28px;
+    }
+
+    h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2.2rem, 6vw, 4rem);
+      font-weight: 700;
+      text-align: center;
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
+    }
+
+    h1 span {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      text-align: center;
+      max-width: 520px;
+      line-height: 1.7;
+      margin-bottom: 48px;
+    }
+
+    /* Demo selector cards */
+    .demo-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 48px;
+      width: 100%;
+      max-width: 720px;
+    }
+
+    .demo-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 20px 16px;
+      cursor: pointer;
+      transition: var(--transition);
+      text-align: center;
+    }
+
+    .demo-card:hover,
+    .demo-card.active {
+      border-color: var(--brand);
+      background: var(--surface-2);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(232,71,28,0.15);
+    }
+
+    .demo-card .icon {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin: 0 auto 12px;
+    }
+
+    .demo-card h3 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .demo-card p  { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+
+    .launch-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+      color: #fff;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      padding: 16px 36px;
+      border-radius: var(--radius-full);
+      border: none;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: 0 8px 32px rgba(232,71,28,0.35);
+    }
+
+    .launch-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 48px rgba(232,71,28,0.5);
+    }
+
+    /* Stats strip */
+    .stats-strip {
+      display: flex;
+      gap: 40px;
+      margin-top: 56px;
+      padding-top: 40px;
+      border-top: 1px solid var(--border);
+    }
+
+    .stat { text-align: center; }
+    .stat-num {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .stat-lbl { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+    /* ============================================================
+       CHAT WIDGET
+    ============================================================ */
+    /* Floating bubble */
+    #chat-bubble {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      width: 60px;
+      height: 60px;
+      border-radius: var(--radius-full);
+      background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 1000;
+      box-shadow: 0 8px 32px rgba(232,71,28,0.5);
+      transition: var(--transition);
+      border: none;
+    }
+
+    #chat-bubble:hover { transform: scale(1.08); }
+
+    #chat-bubble i { font-size: 22px; color: #fff; }
+
+    #chat-bubble .notif-dot {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      width: 14px;
+      height: 14px;
+      background: var(--danger);
+      border-radius: var(--radius-full);
+      border: 2px solid var(--bg);
+      animation: pulse-dot 2s infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.3); opacity: 0.7; }
+    }
+
+    /* Chat window */
+    #chat-window {
+      position: fixed;
+      bottom: 100px;
+      right: 28px;
+      width: 380px;
+      height: 580px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow);
+      transform: scale(0.9) translateY(20px);
+      opacity: 0;
+      pointer-events: none;
+      transition: 0.28s cubic-bezier(0.34,1.56,0.64,1);
+      overflow: hidden;
+    }
+
+    #chat-window.open {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* Chat header */
+    .chat-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 18px;
+      background: var(--surface-2);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .chat-header-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-full);
+      background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .chat-header-info { flex: 1; }
+    .chat-header-name { font-weight: 600; font-size: 15px; }
+    .chat-header-status {
+      font-size: 12px;
+      color: var(--success);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .chat-header-status::before {
+      content: '';
+      width: 7px;
+      height: 7px;
+      background: var(--success);
+      border-radius: var(--radius-full);
+    }
+
+    .chat-close-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 16px;
+      padding: 6px;
+      border-radius: var(--radius-sm);
+      transition: var(--transition);
+    }
+    .chat-close-btn:hover { background: var(--border); color: var(--text); }
+
+    /* Messages area */
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      scroll-behavior: smooth;
+    }
+
+    .chat-messages::-webkit-scrollbar { width: 4px; }
+    .chat-messages::-webkit-scrollbar-track { background: transparent; }
+    .chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    /* Message bubbles */
+    .msg {
+      display: flex;
+      flex-direction: column;
+      animation: msg-in 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    @keyframes msg-in {
+      from { opacity: 0; transform: translateY(10px) scale(0.95); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .msg.user { align-items: flex-end; }
+    .msg.bot  { align-items: flex-start; }
+
+    .msg-bubble {
+      max-width: 82%;
+      padding: 11px 15px;
+      border-radius: 18px;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .msg.user .msg-bubble {
+      background: var(--user-bubble);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+
+    .msg.bot .msg-bubble {
+      background: var(--bot-bubble);
+      color: var(--text);
+      border-bottom-left-radius: 4px;
+    }
+
+    .msg-time {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      padding: 0 4px;
+    }
+
+    /* Typing indicator */
+    .typing-indicator {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 12px 15px;
+      background: var(--bot-bubble);
+      border-radius: 18px;
+      border-bottom-left-radius: 4px;
+      width: fit-content;
+    }
+
+    .typing-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--text-muted);
+      border-radius: var(--radius-full);
+      animation: typing 1.2s infinite;
+    }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes typing {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+      30% { transform: translateY(-6px); opacity: 1; }
+    }
+
+    /* Lead capture form inside chat */
+    .lead-form {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin: 4px 0;
+    }
+
+    .lead-form p { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
+
+    .lead-form input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      color: var(--text);
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      margin-bottom: 8px;
+      transition: var(--transition);
+    }
+
+    .lead-form input:focus {
+      outline: none;
+      border-color: var(--brand);
+    }
+
+    .lead-form input::placeholder { color: var(--text-muted); }
+
+    .lead-form-btn {
+      width: 100%;
+      background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .lead-form-btn:hover { opacity: 0.9; }
+
+    /* Quick reply chips */
+    .quick-replies {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .qr-chip {
+      background: transparent;
+      border: 1px solid var(--brand);
+      color: var(--accent);
+      border-radius: var(--radius-full);
+      padding: 6px 14px;
+      font-size: 12px;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .qr-chip:hover {
+      background: var(--brand);
+      color: #fff;
+    }
+
+    /* Chat input bar */
+    .chat-input-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 16px;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+
+    #chat-input {
+      flex: 1;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-full);
+      padding: 10px 16px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: var(--transition);
+    }
+
+    #chat-input:focus { border-color: var(--brand); }
+    #chat-input::placeholder { color: var(--text-muted); }
+
+    #chat-send {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-full);
+      background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+      border: none;
+      color: #fff;
+      font-size: 15px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+      flex-shrink: 0;
+    }
+
+    #chat-send:hover { transform: scale(1.1); box-shadow: 0 4px 16px rgba(232,71,28,0.4); }
+
+    /* Powered by tag */
+    .powered-by {
+      text-align: center;
+      font-size: 10px;
+      color: var(--text-muted);
+      padding: 6px 0 10px;
+      background: var(--surface);
+    }
+    .powered-by a { color: var(--accent); text-decoration: none; }
+
+    /* ============================================================
+       DEMO SWITCHER BAR (shown on landing page for demo purposes)
+    ============================================================ */
+    .demo-switcher {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 8px;
+      background: rgba(17,24,39,0.9);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-full);
+      padding: 6px;
+      z-index: 500;
+      backdrop-filter: blur(12px);
+    }
+
+    .sw-btn {
+      padding: 8px 18px;
+      border-radius: var(--radius-full);
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .sw-btn.active {
+      background: var(--brand);
+      color: #fff;
+    }
+
+    /* API Key modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(8px);
+      opacity: 0;
+      pointer-events: none;
+      transition: var(--transition);
+    }
+
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 36px;
+      width: min(480px, 90vw);
+      position: relative;
+    }
+
+    .modal h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .modal p { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.6; }
+
+    .modal input {
+      width: 100%;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      margin-bottom: 16px;
+      outline: none;
+      transition: var(--transition);
+    }
+
+    .modal input:focus { border-color: var(--brand); }
+
+    .modal-btn {
+      width: 100%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: 'Space Grotesk', sans-serif;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .modal-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    .modal-skip {
+      display: block;
+      text-align: center;
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--text-muted);
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-family: 'Inter', sans-serif;
+      transition: var(--transition);
+    }
+
+    .modal-skip:hover { color: var(--text); }
+
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--success);
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: var(--radius-full);
+      font-size: 14px;
+      font-weight: 600;
+      z-index: 3000;
+      opacity: 0;
+      transition: var(--transition);
+      pointer-events: none;
+    }
+
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ============================================================
+       RESPONSIVE
+    ============================================================ */
+    .back-home-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 2100;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(8, 8, 8, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-full);
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: var(--transition);
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    .back-home-btn:hover {
+      background: rgba(232, 71, 28, 0.1);
+      border-color: var(--brand);
+      color: var(--text);
+      transform: translateX(-2px);
+      box-shadow: 0 4px 20px rgba(232,71,28,0.2);
+    }
+    .back-home-btn i {
+      width: 14px;
+      height: 14px;
+    }
+
+    @media (max-width: 600px) {
+      .demo-grid { grid-template-columns: 1fr; max-width: 340px; }
+      .stats-strip { gap: 24px; }
+      #chat-window { width: calc(100vw - 24px); right: 12px; bottom: 90px; height: 520px; }
+      .demo-switcher { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating Back to Home button -->
+  <a href="index.html" class="back-home-btn">
+    <i data-lucide="arrow-left"></i> Back to Home
+  </a>
+
+  <!-- ======================================================
+       DEMO SWITCHER (top pill — switch between demo bots)
+  ====================================================== -->
+  <div class="demo-switcher">
+    <button class="sw-btn active" onclick="switchDemo('clinic')" id="sw-clinic">🏥 Clinic</button>
+    <button class="sw-btn" onclick="switchDemo('realestate')" id="sw-realestate">🏠 Real Estate</button>
+    <button class="sw-btn" onclick="switchDemo('restaurant')" id="sw-restaurant">🍽️ Restaurant</button>
+  </div>
+
+  <!-- ======================================================
+       LANDING PAGE
+  ====================================================== -->
+  <div class="landing">
+    <div class="badge"><i data-lucide="zap"></i> Live Demo</div>
+
+    <h1>Your Business Deserves an<br /><span>AI That Never Sleeps</span></h1>
+
+    <p class="subtitle">
+      SmartBot answers customer questions 24/7, captures leads automatically,
+      and books appointments — all while you sleep. Try the live demo below.
+    </p>
+
+    <div class="demo-label">Choose a demo to experience ↓</div>
+
+    <div class="demo-grid">
+      <div class="demo-card active" onclick="switchDemo('clinic')" id="card-clinic">
+        <div class="icon" style="background: rgba(16,185,129,0.15); color: #10B981;">🏥</div>
+        <h3>City Dental Clinic</h3>
+        <p>Book appointments, answer patient FAQs</p>
+      </div>
+      <div class="demo-card" onclick="switchDemo('realestate')" id="card-realestate">
+        <div class="icon" style="background: rgba(245,158,11,0.15); color: #F59E0B;">🏠</div>
+        <h3>Al-Noor Real Estate</h3>
+        <p>Property inquiries, site visit bookings</p>
+      </div>
+      <div class="demo-card" onclick="switchDemo('restaurant')" id="card-restaurant">
+        <div class="icon" style="background: rgba(239,68,68,0.15); color: #EF4444;">🍽️</div>
+        <h3>Taste of Swat</h3>
+        <p>Menu queries, table reservations</p>
+      </div>
+    </div>
+
+    <button class="launch-btn" onclick="openChat()">
+      <i data-lucide="message-circle"></i> Try It Live — Chat Now
+    </button>
+
+    <div class="stats-strip">
+      <div class="stat">
+        <div class="stat-num">24/7</div>
+        <div class="stat-lbl">Always Online</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">3 Days</div>
+        <div class="stat-lbl">Delivery Time</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">100%</div>
+        <div class="stat-lbl">White-Label</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">$150</div>
+        <div class="stat-lbl">Starting From</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================
+       CHAT BUBBLE (floating)
+  ====================================================== -->
+  <button id="chat-bubble" onclick="toggleChat()" aria-label="Open chat">
+    <i data-lucide="message-circle" id="bubble-icon"></i>
+    <div class="notif-dot" id="notif-dot"></div>
+  </button>
+
+  <!-- ======================================================
+       CHAT WINDOW
+  ====================================================== -->
+  <div id="chat-window">
+    <!-- Header -->
+    <div class="chat-header" id="chat-header">
+      <div class="chat-header-avatar" id="header-avatar">🏥</div>
+      <div class="chat-header-info">
+        <div class="chat-header-name" id="header-name">City Dental Clinic</div>
+        <div class="chat-header-status">Online · Ready to help</div>
+      </div>
+      <button class="chat-close-btn" onclick="closeChat()">
+        <i data-lucide="x"></i>
+      </button>
+    </div>
+
+    <!-- Messages -->
+    <div class="chat-messages" id="chat-messages"></div>
+
+    <!-- Input bar -->
+    <div class="chat-input-bar">
+      <input
+        id="chat-input"
+        type="text"
+        placeholder="Type your message..."
+        autocomplete="off"
+      />
+      <button id="chat-send">
+        <i data-lucide="send"></i>
+      </button>
+    </div>
+
+    <div class="powered-by">Powered by <a href="index.html" style="color: var(--accent); font-weight: 500;">Overarc</a></div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ============================================================
+    // STATE
+    // ============================================================
+    const state = {
+      chatOpen:       false,
+      apiKey:         "local",
+      demoMode:       false,
+      currentBot:     'clinic',
+      messageCount:   0,
+      leadCaptured:   false,
+      leadFormShown:  false,
+      conversationHistory: [],
+      leads:          JSON.parse(localStorage.getItem('sb_leads') || '[]'),
+    };
+
+    // ============================================================
+    // BOT CONFIGS (simulates Supabase businesses table)
+    // ============================================================
+    const BOTS = {
+      clinic: {
+        name:    'City Dental Clinic',
+        emoji:   '🏥',
+        color:   '#10B981',
+        dark:    '#059669',
+        quickReplies: ['Book appointment', 'Services & prices', 'Working hours', 'Location'],
+        greeting: "Hello! 👋 Welcome to **City Dental Clinic**. I'm your AI assistant — here 24/7 to answer questions and book appointments. How can I help you today?",
+        systemPrompt: `You are a helpful assistant for City Dental Clinic, a professional dental practice in Mingora, Swat.
+
+ABOUT US: We are a modern dental clinic offering high-quality dental care. Our experienced dentists use the latest equipment.
+
+LOCATION: Main Bazaar Road, Mingora, Swat, KPK, Pakistan
+WORKING HOURS: Monday to Saturday, 9 AM to 8 PM. Closed on Sundays.
+CONTACT: +92-324-9116764
+
+OUR SERVICES & PRICING:
+- Dental Checkup: PKR 500
+- Teeth Cleaning: PKR 1,500
+- Tooth Extraction: PKR 1,000 - 3,000
+- Root Canal Treatment: PKR 8,000 - 15,000
+- Teeth Whitening: PKR 5,000
+- Braces / Orthodontics: PKR 30,000 - 80,000
+- Dental Implant: PKR 50,000 - 120,000
+
+YOUR JOB:
+1. Greet visitors warmly
+2. Answer questions about services, pricing, and availability
+3. Help book appointments by collecting: service needed, preferred date and time
+4. Keep responses SHORT — max 3 sentences
+5. Respond in the same language the user writes in (Urdu or English)
+6. Be friendly, professional, and reassuring
+7. Never make up information not listed above`
+      },
+
+      realestate: {
+        name:    'Al-Noor Real Estate',
+        emoji:   '🏠',
+        color:   '#F59E0B',
+        dark:    '#D97706',
+        quickReplies: ['Available properties', 'Schedule site visit', 'Prices', 'Contact agent'],
+        greeting: "As-salamu alaykum! 🏠 Welcome to **Al-Noor Real Estate**. We help you find your dream home or investment property in Swat & beyond. What are you looking for?",
+        systemPrompt: `You are a helpful assistant for Al-Noor Real Estate, a premium property agency in Swat, KPK.
+
+ABOUT US: We specialize in residential and commercial properties across Mingora, Bahrain, Kalam, and Malam Jabba.
+
+LOCATION: Khyaban-e-Sir Syed, Mingora, Swat
+WORKING HOURS: Monday to Saturday, 10 AM to 6 PM
+CONTACT: +92-324-9116764
+
+FEATURED LISTINGS:
+- 5 Marla House, Mingora City: PKR 65 Lakh
+- 10 Marla House, Green Town: PKR 1.2 Crore
+- 1 Kanal House, Bahrain View: PKR 2.5 Crore
+- Commercial Plot, Main Bazaar: PKR 90 Lakh
+- Tourist Cottage, Malam Jabba: PKR 45 Lakh
+
+YOUR JOB:
+1. Help visitors find properties matching their requirements
+2. Answer questions about listings, location, and pricing
+3. Book site visits by collecting: name, phone, preferred date
+4. Keep responses SHORT and enthusiastic about properties
+5. Respond in Urdu or English based on user's language`
+      },
+
+      restaurant: {
+        name:    'Taste of Swat',
+        emoji:   '🍽️',
+        color:   '#EF4444',
+        dark:    '#DC2626',
+        quickReplies: ['View menu', 'Reserve a table', 'Home delivery?', 'Special deals'],
+        greeting: "Welcome to **Taste of Swat** 🍽️! Experience the authentic flavors of KPK. I can show you our menu, help you reserve a table, or take your order inquiry. What would you like?",
+        systemPrompt: `You are a helpful assistant for Taste of Swat, an authentic KPK cuisine restaurant in Mingora.
+
+ABOUT US: We serve traditional Pashtun food — karahi, chapli kebab, pulao, and more. Family-friendly with private dining rooms.
+
+LOCATION: Yadgar Chowk, Mingora, Swat
+WORKING HOURS: Daily 12 PM to 11 PM
+CONTACT: +92-324-9116764
+
+MENU HIGHLIGHTS:
+- Chapli Kebab (6 pcs): PKR 350
+- Mutton Karahi (1kg): PKR 2,200
+- Namkeen Gosht (500g): PKR 1,400
+- Chicken Pulao: PKR 800
+- Kabuli Pulao: PKR 1,200
+- Fresh Naan: PKR 30
+- Special Dessert Platter: PKR 450
+
+TABLE RESERVATIONS: Available for groups of 2-50 people. Private rooms for families.
+HOME DELIVERY: Available within 5km of Mingora city.
+
+YOUR JOB:
+1. Share menu items and prices warmly
+2. Take table reservation details: name, date, time, number of people
+3. Answer questions about delivery, ingredients, or special events
+4. Be enthusiastic about the food — make them hungry!
+5. Respond in Urdu or English`
+      }
+    };
+
+    // ============================================================
+    // STORAGE
+    // ============================================================
+    function saveLeads()  { localStorage.setItem('sb_leads', JSON.stringify(state.leads)); }
+
+    // ============================================================
+    // DEMO SCRIPTED RESPONSES
+    // ============================================================
+    const SCRIPTED = {
+      clinic: [
+        "Great! Our most popular services include teeth cleaning (PKR 1,500) and dental checkups (PKR 500). Would you like to book an appointment?",
+        "We're open Monday to Saturday, 9 AM to 8 PM. Our dentists are experienced in all procedures. Which service were you interested in?",
+        "I can help you book an appointment! Could you tell me your preferred date and time, and which service you need?",
+        "Our root canal treatment ranges from PKR 8,000 to 15,000 depending on complexity. It's completely painless with modern anesthesia. Want to schedule a consultation?",
+        "Perfect! Let me get your contact details to confirm the appointment. What's your name and phone number?",
+      ],
+      realestate: [
+        "We have beautiful properties starting from PKR 65 Lakh! Our most popular is the Green Town 10 Marla house at PKR 1.2 Crore — excellent investment. Interested in a site visit?",
+        "The Bahrain View property is stunning — 1 Kanal with mountain views. We can arrange a visit this weekend. What's a good time for you?",
+        "Our agent will personally guide you through each property. All listings are verified and legally clear. Which area of Swat interests you most?",
+        "Great choice! To book a site visit, I'll need your name and phone number. Our agent will call you within 2 hours.",
+        "We offer flexible payment plans for all properties. Most sellers accept 30% down and easy installments. Want more details on a specific listing?",
+      ],
+      restaurant: [
+        "Our Mutton Karahi is legendary — freshly made, full of flavor, just PKR 2,200 per kg. Paired with our fresh naan, it's unforgettable! Would you like to reserve a table?",
+        "We're open daily from 12 PM to 11 PM. Private dining rooms available for families. How many people will be dining with us?",
+        "Yes, we do home delivery within 5km of Mingora! Minimum order PKR 500. Just share your address and we'll get it to you fresh.",
+        "Our special weekend deal: Chapli Kebab + Pulao + Naan for just PKR 1,100. Great for groups! Want to book a table this weekend?",
+        "Wonderful! To confirm your reservation I just need your name, preferred date, and time. We'll have your table ready!",
+      ]
+    };
+
+    let scriptedIndex = { clinic: 0, realestate: 0, restaurant: 0 };
+
+    // ============================================================
+    // CHAT FUNCTIONS
+    // ============================================================
+    function toggleChat() {
+      state.chatOpen ? closeChat() : openChat();
+    }
+
+    function openChat() {
+      state.chatOpen = true;
+      document.getElementById('chat-window').classList.add('open');
+      
+      const bubbleIcon = document.getElementById('bubble-icon');
+      if (bubbleIcon) {
+        bubbleIcon.setAttribute('data-lucide', 'x');
+        if (window.lucide) window.lucide.createIcons();
+      }
+      
+      document.getElementById('notif-dot').style.display = 'none';
+
+      if (state.messageCount === 0) {
+        setTimeout(() => sendBotMessage(BOTS[state.currentBot].greeting, true), 400);
+        setTimeout(() => showQuickReplies(), 900);
+      }
+
+      document.getElementById('chat-input').focus();
+    }
+
+    function closeChat() {
+      state.chatOpen = false;
+      document.getElementById('chat-window').classList.remove('open');
+      
+      const bubbleIcon = document.getElementById('bubble-icon');
+      if (bubbleIcon) {
+        bubbleIcon.setAttribute('data-lucide', 'message-circle');
+        if (window.lucide) window.lucide.createIcons();
+      }
+    }
+
+    function sendBotMessage(text, isFirst = false) {
+      const bot = BOTS[state.currentBot];
+      const container = document.getElementById('chat-messages');
+
+      // Show typing indicator first
+      const typingEl = document.createElement('div');
+      typingEl.className = 'msg bot';
+      typingEl.id = 'typing-msg';
+      typingEl.innerHTML = `<div class="typing-indicator">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>`;
+      container.appendChild(typingEl);
+      scrollToBottom();
+
+      // Replace with actual message after delay
+      const delay = isFirst ? 600 : 1000 + Math.random() * 500;
+      setTimeout(() => {
+        typingEl.remove();
+        addMessage('bot', text);
+        state.messageCount++;
+      }, delay);
+    }
+
+    function escapeHTML(str) {
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function addMessage(role, text) {
+      const container = document.getElementById('chat-messages');
+      const div = document.createElement('div');
+      div.className = `msg ${role}`;
+
+      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      
+      // Sanitise HTML first to prevent XSS vulnerability, then render bold formatting
+      const sanitized = escapeHTML(text);
+      const formatted = sanitized.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+      div.innerHTML = `
+        <div class="msg-bubble">${formatted}</div>
+        <div class="msg-time">${time}</div>
+      `;
+      container.appendChild(div);
+      scrollToBottom();
+
+      // Add to history for OpenAI
+      state.conversationHistory.push({ role: role === 'bot' ? 'assistant' : 'user', content: text });
+
+      // Trigger lead form after 2nd user message
+      if (role === 'user' && state.messageCount >= 2 && !state.leadCaptured && !state.leadFormShown) {
+        state.leadFormShown = true;
+        setTimeout(() => showLeadForm(), 1500);
+      }
+    }
+
+    function showQuickReplies() {
+      const bot = BOTS[state.currentBot];
+      const container = document.getElementById('chat-messages');
+      const div = document.createElement('div');
+      div.className = 'quick-replies';
+      div.id = 'quick-replies';
+
+      bot.quickReplies.forEach(reply => {
+        const btn = document.createElement('button');
+        btn.className = 'qr-chip';
+        btn.textContent = reply;
+        btn.onclick = () => {
+          div.remove();
+          handleUserInput(reply);
+        };
+        div.appendChild(btn);
+      });
+
+      container.appendChild(div);
+      scrollToBottom();
+    }
+
+    function showLeadForm() {
+      const container = document.getElementById('chat-messages');
+
+      // Bot asks first
+      addMessage('bot', "By the way — can I get your **name and phone number** so our team can follow up with you directly? 😊");
+
+      setTimeout(() => {
+        const formDiv = document.createElement('div');
+        formDiv.className = 'msg bot';
+        formDiv.innerHTML = `
+          <div class="lead-form">
+            <p>Leave your details and we'll reach out shortly:</p>
+            <input type="text" id="lead-name" placeholder="Your full name" />
+            <input type="tel" id="lead-phone" placeholder="Phone number (e.g. 0300-1234567)" />
+            <button class="lead-form-btn" onclick="submitLead()">
+              <i data-lucide="send"></i> Send Details
+            </button>
+          </div>
+        `;
+        container.appendChild(formDiv);
+        scrollToBottom();
+      }, 800);
+    }
+
+    function submitLead() {
+      const name  = document.getElementById('lead-name').value.trim();
+      const phone = document.getElementById('lead-phone').value.trim();
+
+      if (!name || !phone) {
+        showToast('Please enter both name and phone number', 'warn');
+        return;
+      }
+
+      // Save lead locally
+      const lead = {
+        id:         Date.now(),
+        bot:        state.currentBot,
+        business:   BOTS[state.currentBot].name,
+        name,
+        phone,
+        timestamp:  new Date().toISOString(),
+        topic:      'General Inquiry from Demo: ' + BOTS[state.currentBot].name,
+      };
+      state.leads.push(lead);
+      saveLeads();
+      state.leadCaptured = true;
+
+      // Sync lead directly to local Flask secure server database
+      fetch('/api/leads', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: name,
+          phone: phone,
+          message: 'General Inquiry from Demo: ' + BOTS[state.currentBot].name
+        })
+      }).catch(err => console.error("Error syncing lead to backend:", err));
+
+      // Confirm
+      const container = document.getElementById('chat-messages');
+      const formDiv = container.querySelector('.lead-form');
+      if (formDiv) formDiv.closest('.msg').remove();
+
+      addMessage('bot', `Thank you, **${name}**! ✅ I've passed your details to our team. Someone will contact you at **${phone}** shortly. Is there anything else I can help you with?`);
+      showToast(`✅ Lead saved and synced!`);
+    }
+
+    function lockInput() {
+      const input = document.getElementById('chat-input');
+      const sendBtn = document.getElementById('chat-send');
+      if (input) {
+        input.disabled = true;
+        input.placeholder = "AI is thinking...";
+      }
+      if (sendBtn) {
+        sendBtn.disabled = true;
+        sendBtn.style.opacity = '0.5';
+        sendBtn.style.pointerEvents = 'none';
+      }
+    }
+
+    function unlockInput() {
+      const input = document.getElementById('chat-input');
+      const sendBtn = document.getElementById('chat-send');
+      if (input) {
+        input.disabled = false;
+        input.placeholder = "Type your message...";
+      }
+      if (sendBtn) {
+        sendBtn.disabled = false;
+        sendBtn.style.opacity = '1';
+        sendBtn.style.pointerEvents = 'auto';
+      }
+      if (input) input.focus();
+    }
+
+    async function handleUserInput(text) {
+      if (!text.trim()) return;
+
+      addMessage('user', text);
+      state.messageCount++;
+
+      // Lock input to achieve message transaction idempotency and block double-clicks
+      lockInput();
+      await callOpenAI(text);
+    }
+
+    async function callOpenAI(userMessage) {
+      const bot = BOTS[state.currentBot];
+
+      // Show typing
+      const container = document.getElementById('chat-messages');
+      const typingEl = document.createElement('div');
+      typingEl.className = 'msg bot';
+      typingEl.id = 'typing-msg';
+      typingEl.innerHTML = `<div class="typing-indicator">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>`;
+      container.appendChild(typingEl);
+      scrollToBottom();
+
+      try {
+        // Query secure dynamic server endpoint instead of raw client OpenRouter fetches
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            bot: state.currentBot,
+            message: userMessage,
+            history: state.conversationHistory.slice(0, -1) // Excludes the user message pushed during rendering
+          })
+        });
+
+        if (!res.ok) {
+          const errorData = await res.json();
+          console.error("Backend Chat Request Error:", errorData);
+          throw new Error("Backend chat request failed.");
+        }
+
+        const data = await res.json();
+        typingEl.remove();
+        
+        const reply = data.reply;
+        addMessage('bot', reply);
+        state.messageCount++;
+
+        // Unlock input
+        unlockInput();
+
+      } catch (err) {
+        typingEl.remove();
+        addMessage('bot', "I'm having a small technical issue right now. Please contact us directly — our team is standing by!");
+        console.error('Secure Local API Chat Error:', err.message);
+        
+        // Unlock input on error
+        unlockInput();
+      }
+    }
+
+    function scrollToBottom() {
+      const container = document.getElementById('chat-messages');
+      setTimeout(() => {
+        container.scrollTop = container.scrollHeight;
+      }, 50);
+    }
+
+    // ============================================================
+    // DEMO SWITCHER
+    // ============================================================
+    function switchDemo(botId) {
+      state.currentBot = botId;
+      state.messageCount = 0;
+      state.leadCaptured = false;
+      state.leadFormShown = false;
+      state.conversationHistory = [];
+      scriptedIndex[botId] = 0;
+
+      const bot = BOTS[botId];
+
+      // Update CSS vars
+      document.documentElement.style.setProperty('--brand', bot.color);
+      document.documentElement.style.setProperty('--brand-dark', bot.dark);
+
+      // Update header
+      document.getElementById('header-avatar').textContent = bot.emoji;
+      document.getElementById('header-name').textContent  = bot.name;
+
+      // Update switcher buttons
+      document.querySelectorAll('.sw-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(`sw-${botId}`).classList.add('active');
+
+      // Update landing cards
+      document.querySelectorAll('.demo-card').forEach(c => c.classList.remove('active'));
+      document.getElementById(`card-${botId}`).classList.add('active');
+
+      // Clear messages
+      document.getElementById('chat-messages').innerHTML = '';
+
+      if (state.chatOpen) {
+        setTimeout(() => sendBotMessage(bot.greeting, true), 200);
+        setTimeout(() => showQuickReplies(), 800);
+      }
+    }
+
+    // ============================================================
+    // MODAL DEPRECATED (Secure local backend connection is active)
+    // ============================================================
+
+    // ============================================================
+    // TOAST
+    // ============================================================
+    function showToast(msg, type = 'success') {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.style.background = type === 'error' ? 'var(--danger)' :
+                               type === 'warn'  ? 'var(--warning)' : 'var(--success)';
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // ============================================================
+    // EVENTS
+    // ============================================================
+    document.getElementById('chat-send').addEventListener('click', () => {
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+      if (text) {
+        input.value = '';
+        handleUserInput(text);
+      }
+    });
+
+    document.getElementById('chat-input').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const text = e.target.value.trim();
+        if (text) {
+          e.target.value = '';
+          handleUserInput(text);
+        }
+      }
+    });
+
+    // ============================================================
+    // INIT
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', () => {
+      // Show notification dot after 3 seconds to grab attention
+      setTimeout(() => {
+        if (!state.chatOpen) {
+          document.getElementById('notif-dot').style.display = 'block';
+        }
+      }, 3000);
+    });
+  </script>
+  <script>
+    if (typeof lucide !== "undefined") lucide.createIcons();
+  </script>
+</body>
+</html>
