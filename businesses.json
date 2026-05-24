@@ -47,7 +47,8 @@
       }
     ],
     "working_hours": "Monday to Saturday, 9 AM to 8 PM. Closed on Sundays.",
-    "location": "Main Bazaar Road, Mingora, Swat, KPK, Pakistan"
+    "location": "Main Bazaar Road, Mingora, Swat, KPK, Pakistan",
+    "password_hash": "$2b$12$OQ0DcdkLrfZWuN5oJAfcDuk96rza0B7du9PB.iJcTHNy7ff5C7k2W"
   },
   "realestate": {
     "id": "realestate",
@@ -89,17 +90,18 @@
       }
     ],
     "working_hours": "Monday to Saturday, 10 AM to 6 PM",
-    "location": "Khyaban-e-Sir Syed, Mingora, Swat"
+    "location": "Khyaban-e-Sir Syed, Mingora, Swat",
+    "password_hash": "$2b$12$OQ0DcdkLrfZWuN5oJAfcDuk96rza0B7du9PB.iJcTHNy7ff5C7k2W"
   },
   "restaurant": {
     "id": "restaurant",
     "name": "Taste of Swat",
-    "emoji": "🍽️",
+    "emoji": "\ud83c\udfe0",
     "color": "#EF4444",
     "dark_color": "#DC2626",
     "whatsapp": "+923249116764",
-    "greeting": "Welcome to **Taste of Swat** 🍽️! Experience the authentic flavors of KPK. I can show you our menu, help you reserve a table, or take your order inquiry. What would you like?",
-    "system_prompt": "You are a helpful assistant for Taste of Swat, an authentic KPK cuisine restaurant in Mingora.\n\nABOUT US: We serve traditional Pashtun food — karahi, chapli kebab, pulao, and more. Family-friendly with private dining rooms.\n\nLOCATION: Yadgar Chowk, Mingora, Swat\nWORKING HOURS: Daily 12 PM to 11 PM\nCONTACT: +92-324-9116764\n\nMENU HIGHLIGHTS:\n{SERVICES_LIST}\n\nTABLE RESERVATIONS: Available for groups of 2-50 people. Private rooms for families.\nHOME DELIVERY: Available within 5km of Mingora city.\n\nYOUR JOB:\n1. Share menu items and prices warmly\n2. Take table reservation details: name, date, time, number of people\n3. Answer questions about delivery, ingredients, or special events\n4. Be enthusiastic about the food — make them hungry!\n5. Respond in Urdu or English",
+    "greeting": "Welcome to **Taste of Swat** \ud83c\udfe0! Experience the authentic flavors of KPK. I can show you our menu, help you reserve a table, or take your order inquiry. What would you like?",
+    "system_prompt": "You are a helpful assistant for Taste of Swat, an authentic KPK cuisine restaurant in Mingora.\n\nABOUT US: We serve traditional Pashtun food \u2014 karahi, chapli kebab, pulao, and more. Family-friendly with private dining rooms.\n\nLOCATION: Yadgar Chowk, Mingora, Swat\nWORKING HOURS: Daily 12 PM to 11 PM\nCONTACT: +92-324-9116764\n\nMENU HIGHLIGHTS:\n{SERVICES_LIST}\n\nTABLE RESERVATIONS: Available for groups of 2-50 people. Private rooms for families.\nHOME DELIVERY: Available within 5km of Mingora city.\n\nYOUR JOB:\n1. Share menu items and prices warmly\n2. Take table reservation details: name, date, time, number of people\n3. Answer questions about delivery, ingredients, or special events\n4. Be enthusiastic about the food \u2014 make them hungry!\n5. Respond in Urdu or English",
     "quick_replies": [
       "View menu",
       "Reserve a table",
@@ -135,6 +137,7 @@
       }
     ],
     "working_hours": "Daily 12 PM to 11 PM",
-    "location": "Yadgar Chowk, Mingora, Swat"
+    "location": "Yadgar Chowk, Mingora, Swat",
+    "password_hash": "$2b$12$OQ0DcdkLrfZWuN5oJAfcDuk96rza0B7du9PB.iJcTHNy7ff5C7k2W"
   }
 }

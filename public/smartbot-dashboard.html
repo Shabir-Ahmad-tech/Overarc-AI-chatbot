@@ -48,7 +48,7 @@
     }
 
     /* ============================================================
-       PASSWORD GATE MODULE
+       LOGIN MODULE (JWT-based — botId + password)
     ============================================================ */
     #auth-overlay {
       position: fixed;
@@ -118,6 +118,17 @@
     .auth-btn:hover {
       opacity: 0.9;
       transform: translateY(-1px);
+    }
+
+    .auth-error {
+      color: var(--danger);
+      font-size: 13px;
+      margin-top: 12px;
+      display: none;
+    }
+
+    .auth-error.show {
+      display: block;
     }
 
     /* ============================================================
@@ -226,6 +237,22 @@
     .client-role {
       font-size: 11px;
       color: var(--text-muted);
+    }
+
+    .logout-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 6px 10px;
+      font-size: 12px;
+      transition: var(--transition);
+    }
+
+    .logout-btn:hover {
+      border-color: var(--danger);
+      color: var(--danger);
     }
 
     /* ============================================================
@@ -530,6 +557,12 @@
       transform: translateY(-1px);
     }
 
+    .save-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
     /* ============================================================
        LEADS TABLE CRM STYLES
     ============================================================ */
@@ -576,6 +609,388 @@
       font-weight: 600;
     }
 
+    /* ============================================================
+       ACCOUNT / PASSWORD CHANGE STYLES
+    ============================================================ */
+    .password-input-wrapper {
+      position: relative;
+    }
+
+    .password-input-wrapper input {
+      padding-right: 48px;
+    }
+
+    .toggle-pass-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 14px;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+    }
+
+    .toggle-pass-btn:hover {
+      color: var(--text);
+    }
+
+    .pw-strength-bar {
+      height: 4px;
+      background: var(--surface-2);
+      border-radius: 2px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+
+    .pw-strength-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 2px;
+      transition: var(--transition);
+    }
+
+    .pw-strength-fill.weak {
+      background: var(--danger);
+      width: 33%;
+    }
+
+    .pw-strength-fill.medium {
+      background: var(--warning);
+      width: 66%;
+    }
+
+    .pw-strength-fill.strong {
+      background: var(--success);
+      width: 100%;
+    }
+
+    .pw-requirements {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .pw-requirements li {
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pw-requirements li.met {
+      color: var(--success);
+    }
+
+    .pw-requirements li .req-icon {
+      font-size: 10px;
+    }
+
+    /* ============================================================
+       KNOWLEDGE BASE / RAG STYLES
+    ============================================================ */
+    .kb-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .kb-upload-zone {
+      background: var(--surface);
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-md);
+      padding: 32px;
+      text-align: center;
+      transition: var(--transition);
+      cursor: pointer;
+    }
+
+    .kb-upload-zone:hover,
+    .kb-upload-zone.dragover {
+      border-color: var(--accent);
+      background: rgba(232, 71, 28, 0.04);
+    }
+
+    .kb-upload-zone .upload-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .kb-upload-zone h4 {
+      font-family: 'Space Grotesk', sans-serif;
+      margin-bottom: 8px;
+    }
+
+    .kb-upload-zone p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .kb-paste-zone {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .kb-paste-zone h4 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem;
+    }
+
+    .kb-paste-zone textarea {
+      min-height: 140px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      color: #fff;
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      resize: vertical;
+      transition: var(--transition);
+    }
+
+    .kb-paste-zone textarea:focus {
+      border-color: var(--accent);
+    }
+
+    .kb-upload-btn {
+      background: linear-gradient(135deg, var(--accent) 0%, #ff6235 100%);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 12px 24px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .kb-upload-btn:hover {
+      opacity: 0.9;
+    }
+
+    .kb-upload-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Extraction approval card */
+    .extraction-card {
+      background: rgba(34, 197, 94, 0.06);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      margin-bottom: 24px;
+      display: none;
+    }
+
+    .extraction-card.show {
+      display: block;
+    }
+
+    .extraction-card h4 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem;
+      margin-bottom: 8px;
+      color: var(--success);
+    }
+
+    .extraction-card p {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+
+    .extraction-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .extraction-actions button {
+      padding: 10px 20px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: var(--transition);
+      border: none;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .btn-accept {
+      background: var(--success);
+      color: #fff;
+    }
+
+    .btn-accept:hover {
+      opacity: 0.9;
+    }
+
+    .btn-review {
+      background: var(--warning);
+      color: #000;
+    }
+
+    .btn-review:hover {
+      opacity: 0.9;
+    }
+
+    .btn-skip {
+      background: var(--surface-2);
+      color: var(--text-muted);
+      border: 1px solid var(--border) !important;
+    }
+
+    .btn-skip:hover {
+      color: #fff;
+      border-color: var(--text-muted) !important;
+    }
+
+    /* Document list */
+    .doc-list {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .doc-list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .doc-list-header h4 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.05rem;
+    }
+
+    .doc-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      transition: var(--transition);
+    }
+
+    .doc-item:last-child {
+      border-bottom: none;
+    }
+
+    .doc-item:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .doc-info {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .doc-icon {
+      font-size: 24px;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--surface-2);
+      border-radius: var(--radius-sm);
+    }
+
+    .doc-meta {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .doc-name {
+      font-size: 14px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .doc-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .doc-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .doc-action-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      padding: 6px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: inherit;
+      white-space: nowrap;
+    }
+
+    .doc-action-btn:hover {
+      border-color: var(--text);
+      color: #fff;
+    }
+
+    .doc-action-btn.danger:hover {
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+
+    .doc-empty {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--text-muted);
+    }
+
+    .doc-empty .empty-icon {
+      font-size: 36px;
+      margin-bottom: 12px;
+      opacity: 0.4;
+    }
+
+    .doc-empty p {
+      font-size: 14px;
+    }
+
     /* Toast */
     .toast {
       position: fixed;
@@ -597,20 +1012,42 @@
       opacity: 1;
       transform: translateY(0);
     }
+
+    .toast-error {
+      background: var(--danger);
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
   </style>
 </head>
 
 <body>
 
   <!-- ======================================================
-       PASSWORD ACCESS SHIELD
+       JWT LOGIN GATE
   ====================================================== -->
   <div id="auth-overlay">
     <div class="auth-card">
-      <h2>🔑 SmartBot Dashboard Login</h2>
-      <p>Please enter your administrative password to access settings and CRM lead data.</p>
-      <input type="password" id="auth-pass" placeholder="Enter password..." />
-      <button class="auth-btn" onclick="checkAuth()">Authenticate Panel</button>
+      <h2>🔐 SmartBot Dashboard Login</h2>
+      <p>Enter your bot credentials to access settings and CRM lead data.</p>
+      <input type="text" id="login-botId" placeholder="Your Bot ID (e.g. clinic, restaurant)" autocomplete="username" />
+      <input type="password" id="login-pass" placeholder="Enter your password..." autocomplete="current-password" />
+      <button class="auth-btn" onclick="loginWithJWT()">Sign In to Dashboard</button>
+      <div class="auth-error" id="login-error">Invalid bot ID or password.</div>
     </div>
   </div>
 
@@ -627,8 +1064,14 @@
       <button class="nav-item" onclick="switchTab('settings', this)">
         <i data-lucide="sliders"></i> Customize Bot
       </button>
+      <button class="nav-item" onclick="switchTab('knowledge', this)">
+        <i data-lucide="book-open"></i> Knowledge Base
+      </button>
       <button class="nav-item" onclick="switchTab('crm', this)">
         <i data-lucide="users"></i> Leads CRM
+      </button>
+      <button class="nav-item" onclick="switchTab('account', this)">
+        <i data-lucide="lock"></i> Account
       </button>
     </div>
 
@@ -638,6 +1081,7 @@
         <div class="client-name" id="foot-name">Loading Profile...</div>
         <div class="client-role">SaaS Client Portal</div>
       </div>
+      <button class="logout-btn" onclick="logout()">Logout</button>
     </div>
   </div>
 
@@ -662,7 +1106,6 @@
            TAB: OVERVIEW
       ================================================== -->
       <div class="tab-content active" id="tab-overview">
-        <!-- Stats cards -->
         <div class="dashboard-grid">
           <div class="stat-card">
             <div class="stat-lbl">Captured Customer Leads</div>
@@ -678,11 +1121,10 @@
           </div>
         </div>
 
-        <!-- 1-Click Embed Snippet generator -->
         <div class="embed-card">
           <h3>🔌 Copy Embeddable Website Widget Script</h3>
           <p>
-            Copy and paste this script tag right before the closing <code>&lt;/body&gt;</code> tag of your website.
+            Copy and paste this script tag right before the closing <code></body></code> tag of your website.
             The floating AI chatbot widget will instantly mount and handle leads capture 24/7!
           </p>
           <div class="snippet-box">
@@ -696,7 +1138,6 @@
            TAB: BOT SETTINGS
       ================================================== -->
       <div class="tab-content" id="tab-settings">
-        <!-- General branding -->
         <div class="form-section">
           <h3>🎨 Brand Styling & Core Customizations</h3>
 
@@ -734,7 +1175,6 @@
           </div>
         </div>
 
-        <!-- AI System Prompt context -->
         <div class="form-section">
           <h3>🧠 Train AI System Prompt context</h3>
           <div class="form-group">
@@ -744,7 +1184,6 @@
           </div>
         </div>
 
-        <!-- Dynamic FAQ table rows builders -->
         <div class="form-section">
           <h3>❓ Business FAQs Builder</h3>
           <div style="margin-bottom: 16px; font-size: 13px; color: var(--text-muted);">
@@ -755,7 +1194,6 @@
             Pair</button>
         </div>
 
-        <!-- Dynamic Menu Highlights & Services Builder -->
         <div class="form-section">
           <h3>🍽️ Menu Highlights & Services Builder</h3>
           <div style="margin-bottom: 16px; font-size: 13px; color: var(--text-muted);">
@@ -767,11 +1205,66 @@
             Service Item</button>
         </div>
 
-        <!-- Sticky save changes triggers -->
         <div class="submit-bar">
           <button class="save-btn" id="save-settings-btn" onclick="saveSettings()">
             <i data-lucide="save"></i> Save Customizations
           </button>
+        </div>
+      </div>
+
+      <!-- ==================================================
+           TAB: KNOWLEDGE BASE (RAG)
+      ================================================== -->
+      <div class="tab-content" id="tab-knowledge">
+        <!-- Extraction approval card (hidden by default) -->
+        <div class="extraction-card" id="extraction-card">
+          <h4>🧠 AI Extraction Complete</h4>
+          <p id="extraction-summary-text">We found services, FAQs, and policies in your document. Apply to bot config?
+          </p>
+          <div class="extraction-actions">
+            <button class="btn-accept" onclick="acceptExtraction()">✅ Accept All</button>
+            <button class="btn-review" onclick="reviewExtraction()">📝 Review</button>
+            <button class="btn-skip" onclick="skipExtraction()">✋ Skip</button>
+          </div>
+        </div>
+
+        <!-- Upload grid: PDF drag-drop + text paste -->
+        <div class="kb-grid">
+          <!-- PDF Upload Zone -->
+          <div class="kb-upload-zone" id="pdf-drop-zone"
+            ondragover="event.preventDefault(); this.classList.add('dragover')"
+            ondragleave="this.classList.remove('dragover')" ondrop="handleFileDrop(event)"
+            onclick="document.getElementById('pdf-file-input').click()">
+            <div class="upload-icon">📄</div>
+            <h4>Upload PDF Document</h4>
+            <p>Drag & drop a PDF here, or click to browse.<br>Your bot will learn from it automatically.</p>
+            <input type="file" id="pdf-file-input" accept=".pdf" style="display:none"
+              onchange="handleFileSelect(event)" />
+          </div>
+
+          <!-- Paste Text Zone -->
+          <div class="kb-paste-zone">
+            <h4>📝 Paste Business Information</h4>
+            <textarea id="kb-paste-text"
+              placeholder="Paste your menu, services list, policies, FAQs, or any business information here...&#10;&#10;The AI will automatically extract structured data from it."></textarea>
+            <button class="kb-upload-btn" onclick="uploadText()">
+              <i data-lucide="upload"></i> Process & Analyze Text
+            </button>
+          </div>
+        </div>
+
+        <!-- Document List -->
+        <div class="doc-list">
+          <div class="doc-list-header">
+            <h4>📚 Uploaded Documents</h4>
+            <span id="doc-count" style="font-size: 13px; color: var(--text-muted);">0 documents</span>
+          </div>
+          <div id="doc-list-body">
+            <div class="doc-empty">
+              <div class="empty-icon">📂</div>
+              <p>No documents uploaded yet. Upload a PDF or paste text to build your knowledge base.</p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -804,6 +1297,61 @@
         </div>
       </div>
 
+      <!-- ==================================================
+           TAB: ACCOUNT / PASSWORD CHANGE
+      ================================================== -->
+      <div class="tab-content" id="tab-account">
+        <div class="form-section">
+          <h3>🔑 Change Your Password</h3>
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
+            Update your login password. You'll receive a new session token after a successful change.
+          </p>
+
+          <div class="form-group">
+            <label>Current Password</label>
+            <div class="password-input-wrapper">
+              <input type="password" class="form-control" id="acc-current-pass"
+                placeholder="Enter current password..." />
+              <button class="toggle-pass-btn" onclick="togglePassword('acc-current-pass', this)"
+                type="button">👁</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>New Password</label>
+            <div class="password-input-wrapper">
+              <input type="password" class="form-control" id="acc-new-pass"
+                placeholder="At least 8 characters with a number..." oninput="updatePasswordStrength(this.value)" />
+              <button class="toggle-pass-btn" onclick="togglePassword('acc-new-pass', this)" type="button">👁</button>
+            </div>
+            <div class="pw-strength-bar">
+              <div class="pw-strength-fill" id="pw-strength-fill"></div>
+            </div>
+            <ul class="pw-requirements" id="pw-requirements">
+              <li id="req-length"><span class="req-icon">❌</span> At least 8 characters</li>
+              <li id="req-number"><span class="req-icon">❌</span> At least one number (0-9)</li>
+              <li id="req-common"><span class="req-icon">❌</span> Not a common password</li>
+            </ul>
+          </div>
+
+          <div class="form-group">
+            <label>Confirm New Password</label>
+            <div class="password-input-wrapper">
+              <input type="password" class="form-control" id="acc-confirm-pass"
+                placeholder="Re-enter new password..." />
+              <button class="toggle-pass-btn" onclick="togglePassword('acc-confirm-pass', this)"
+                type="button">👁</button>
+            </div>
+          </div>
+
+          <div class="submit-bar">
+            <button class="save-btn" id="change-pass-btn" onclick="changePassword()">
+              <i data-lucide="lock"></i> Update Password
+            </button>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -812,52 +1360,123 @@
 
   <script>
     // =========================================================================
-    // RESOLVE ACTIVE TENANT BOTID
+    // STATE
     // =========================================================================
     const urlParts = window.location.pathname.split('/');
     const botId = urlParts[urlParts.length - 1] || "clinic";
     const baseUrl = window.location.origin;
+    const TOKEN_KEY = 'sb_jwt_' + botId;
 
     const state = {
       profile: null,
-      leads: []
+      leads: [],
+      token: null,
+      documents: [],
+      lastExtraction: null  // stores the last upload's extraction data
     };
 
     // =========================================================================
-    // PASSWORD SECURITY SYSTEM
+    // JWT AUTHENTICATION
     // =========================================================================
-    // =========================================================================
-    // AUTHENTICATION (uses .env ADMIN_PASSWORD via API)
-    // =========================================================================
-    function checkAuth() {
-      const pass = document.getElementById("auth-pass").value.trim();
+    function getToken() {
+      return localStorage.getItem(TOKEN_KEY);
+    }
 
-      // Call the backend to verify the password against .env
-      fetch(`${baseUrl}/api/auth/check`, {
+    function setToken(token) {
+      localStorage.setItem(TOKEN_KEY, token);
+      state.token = token;
+    }
+
+    function clearToken() {
+      localStorage.removeItem(TOKEN_KEY);
+      state.token = null;
+    }
+
+    function isLoggedIn() {
+      return !!getToken();
+    }
+
+    function loginWithJWT() {
+      const botIdInput = document.getElementById("login-botId").value.trim();
+      const password = document.getElementById("login-pass").value;
+      const errorEl = document.getElementById("login-error");
+
+      if (!botIdInput || !password) {
+        errorEl.textContent = "Please enter both Bot ID and password.";
+        errorEl.classList.add("show");
+        return;
+      }
+
+      fetch(`${baseUrl}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: pass })
+        body: JSON.stringify({ botId: botIdInput, password: password })
       })
         .then(res => res.json())
         .then(data => {
-          if (data.authorized) {
-            localStorage.setItem('sb_dash_auth_' + botId, 'authorized');
+          if (data.token) {
+            setToken(data.token);
+            state.token = data.token;
             document.getElementById("auth-overlay").style.display = "none";
             loadDashboardData();
-            showToast("🔒 Administrative access granted!");
+            showToast("✅ Logged in successfully!");
           } else {
-            alert("Invalid administrative password!");
+            errorEl.textContent = "Invalid bot ID or password.";
+            errorEl.classList.add("show");
           }
         })
         .catch(() => {
-          alert("Could not reach the server. Make sure the backend is running.");
+          errorEl.textContent = "Could not reach the server. Make sure the backend is running.";
+          errorEl.classList.add("show");
         });
     }
 
-    // Auto load settings if authorized already
-    if (localStorage.getItem('sb_dash_auth_' + botId) === 'authorized') {
+    document.getElementById("login-botId").addEventListener("keydown", function (e) {
+      if (e.key === "Enter") document.getElementById("login-pass").focus();
+    });
+    document.getElementById("login-pass").addEventListener("keydown", function (e) {
+      if (e.key === "Enter") loginWithJWT();
+    });
+
+    if (isLoggedIn()) {
       document.getElementById("auth-overlay").style.display = "none";
+      state.token = getToken();
       loadDashboardData();
+    }
+
+    function logout() {
+      clearToken();
+      state.token = null;
+      state.profile = null;
+      state.leads = [];
+      state.documents = [];
+      document.getElementById("auth-overlay").style.display = "flex";
+      document.getElementById("login-botId").value = "";
+      document.getElementById("login-pass").value = "";
+      document.getElementById("login-error").classList.remove("show");
+      showToast("🔒 Logged out.");
+    }
+
+    // =========================================================================
+    // AUTHENTICATED FETCH HELPER
+    // =========================================================================
+    function authFetch(url, options = {}) {
+      const headers = options.headers || {};
+      headers['Authorization'] = 'Bearer ' + getToken();
+      if (!headers['Content-Type'] && !(options.body instanceof FormData)) {
+        headers['Content-Type'] = 'application/json';
+      }
+      return fetch(url, { ...options, headers })
+        .then(res => {
+          if (res.status === 401) {
+            clearToken();
+            document.getElementById("auth-overlay").style.display = "flex";
+            document.getElementById("login-error").textContent = "Session expired. Please login again.";
+            document.getElementById("login-error").classList.add("show");
+            throw new Error("Unauthorized");
+          }
+          return res;
+        });
     }
 
     // =========================================================================
@@ -865,7 +1484,7 @@
     // =========================================================================
     function loadDashboardData() {
       // 1. Load active settings profile
-      fetch(`${baseUrl}/api/settings?botId=${botId}`)
+      authFetch(`${baseUrl}/api/settings?botId=${botId}`)
         .then(res => res.json())
         .then(data => {
           state.profile = data;
@@ -875,7 +1494,7 @@
         .catch(err => console.error("Error loading settings:", err));
 
       // 2. Load CRM captured leads
-      fetch(`${baseUrl}/api/leads?botId=${botId}`)
+      authFetch(`${baseUrl}/api/leads?botId=${botId}`)
         .then(res => res.json())
         .then(leads => {
           state.leads = leads;
@@ -883,22 +1502,25 @@
         })
         .catch(err => console.error("Error loading leads:", err));
 
-      // 3. Set snippet text
+      // 3. Load documents
+      loadDocuments();
+
+      // 4. Set snippet text
       const snippet = `<script src="${baseUrl}/widget.js?botId=${botId}"><\/script>`;
       document.getElementById("embed-code-text").textContent = snippet;
     }
 
     function populateSettingsForm() {
       const biz = state.profile;
-      document.getElementById("form-name").value = biz.name;
-      document.getElementById("form-emoji").value = biz.emoji;
-      document.getElementById("form-whatsapp").value = biz.whatsapp;
-      document.getElementById("form-greeting").value = biz.greeting;
-      document.getElementById("form-color").value = biz.color;
-      document.getElementById("form-color-picker").value = biz.color;
-      document.getElementById("form-prompt").value = biz.system_prompt;
+      if (!biz) return;
+      document.getElementById("form-name").value = biz.name || '';
+      document.getElementById("form-emoji").value = biz.emoji || '';
+      document.getElementById("form-whatsapp").value = biz.whatsapp || '';
+      document.getElementById("form-greeting").value = biz.greeting || '';
+      document.getElementById("form-color").value = biz.color || '#10B981';
+      document.getElementById("form-color-picker").value = biz.color || '#10B981';
+      document.getElementById("form-prompt").value = biz.system_prompt || '';
 
-      // Populate FAQ rows builders
       const faqs = biz.faqs || [];
       const container = document.getElementById("faq-rows-container");
       container.innerHTML = "";
@@ -906,7 +1528,6 @@
         addFaqRow(faq.q, faq.a);
       });
 
-      // Populate Service rows builders
       const services = biz.services || [];
       const sContainer = document.getElementById("service-rows-container");
       sContainer.innerHTML = "";
@@ -917,15 +1538,15 @@
 
     function updateHeaderProfile() {
       const biz = state.profile;
-      document.getElementById("foot-avatar").textContent = biz.emoji;
-      document.getElementById("foot-name").textContent = biz.name;
-      document.getElementById("page-head-title").textContent = `${biz.name} — Settings Panel`;
+      if (!biz) return;
+      document.getElementById("foot-avatar").textContent = biz.emoji || '🏥';
+      document.getElementById("foot-name").textContent = biz.name || 'Unnamed Business';
+      document.getElementById("page-head-title").textContent = `${biz.name || 'Business'} — Settings Panel`;
     }
 
     function populateLeadsCRM() {
       const tableBody = document.getElementById("crm-table-body");
       tableBody.innerHTML = "";
-
       document.getElementById("stat-total-leads").textContent = state.leads.length;
 
       if (!state.leads.length) {
@@ -936,7 +1557,6 @@
       state.leads.forEach(lead => {
         const tr = document.createElement("tr");
         const date = new Date(lead.timestamp).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-
         tr.innerHTML = `
           <td style="font-weight:600; color:#fff;">${lead.name}</td>
           <td>${lead.phone}</td>
@@ -968,28 +1588,30 @@
       const row = document.createElement("div");
       row.className = "faq-builder-row";
       row.innerHTML = `
-        <input type="text" class="form-control faq-q" placeholder="Common question..." value="${q}" />
-        <input type="text" class="form-control faq-a" placeholder="Answer text..." value="${a}" />
+        <input type="text" class="form-control faq-q" placeholder="Common question..." value="${escapeHtml(q)}" />
+        <input type="text" class="form-control faq-a" placeholder="Answer text..." value="${escapeHtml(a)}" />
         <button class="remove-row-btn" onclick="this.closest('.faq-builder-row').remove()"><i data-lucide="trash" class="w-4 h-4"></i></button>
       `;
       container.appendChild(row);
       if (window.lucide) window.lucide.createIcons();
     }
 
-    // =========================================================================
-    // SERVICE/MENU BUILDER DYNAMICS ROW ACTIONS
-    // =========================================================================
     function addServiceRow(name = "", price = "") {
       const container = document.getElementById("service-rows-container");
       const row = document.createElement("div");
       row.className = "service-builder-row";
       row.innerHTML = `
-        <input type="text" class="form-control service-name" placeholder="Item/Service Name (e.g. Chapli Kebab)..." value="${name}" />
-        <input type="text" class="form-control service-price" placeholder="Price (e.g. PKR 350)..." value="${price}" />
+        <input type="text" class="form-control service-name" placeholder="Item/Service Name (e.g. Chapli Kebab)..." value="${escapeHtml(name)}" />
+        <input type="text" class="form-control service-price" placeholder="Price (e.g. PKR 350)..." value="${escapeHtml(price)}" />
         <button class="remove-row-btn" onclick="this.closest('.service-builder-row').remove()"><i data-lucide="trash" class="w-4 h-4"></i></button>
       `;
       container.appendChild(row);
       if (window.lucide) window.lucide.createIcons();
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>').replace(/"/g, '"').replace(/'/g, '&#039;');
     }
 
     // =========================================================================
@@ -1002,11 +1624,8 @@
       if (window.lucide) window.lucide.createIcons();
 
       const color = document.getElementById("form-color").value.trim();
+      const darkColor = color;
 
-      // Calculate simple shading for dark hover colors dynamically
-      const darkColor = color; // can fallback to same, or simply match hex values
-
-      // Reconstruct FAQ arrays
       const faqRows = document.querySelectorAll(".faq-builder-row");
       const faqs = [];
       faqRows.forEach(row => {
@@ -1017,7 +1636,6 @@
         }
       });
 
-      // Reconstruct Service arrays
       const serviceRows = document.querySelectorAll(".service-builder-row");
       const services = [];
       serviceRows.forEach(row => {
@@ -1041,9 +1659,8 @@
         services: services
       };
 
-      fetch(`${baseUrl}/api/settings`, {
+      authFetch(`${baseUrl}/api/settings`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updatedPayload)
       })
         .then(res => res.json())
@@ -1051,7 +1668,6 @@
           btn.disabled = false;
           btn.innerHTML = `<i data-lucide="save"></i> Save Customizations`;
           if (window.lucide) window.lucide.createIcons();
-
           state.profile = updatedPayload;
           updateHeaderProfile();
           showToast("🎨 Settings updated successfully!");
@@ -1061,8 +1677,440 @@
           btn.innerHTML = `<i data-lucide="save"></i> Save Customizations`;
           if (window.lucide) window.lucide.createIcons();
           console.error("Save error:", err);
-          alert("Failed to save settings.");
+          showToast("❌ Failed to save settings.", true);
         });
+    }
+
+    // =========================================================================
+    // PASSWORD CHANGE
+    // =========================================================================
+    function togglePassword(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (input.type === "password") {
+        input.type = "text";
+        btn.textContent = "🙈";
+      } else {
+        input.type = "password";
+        btn.textContent = "👁";
+      }
+    }
+
+    function updatePasswordStrength(password) {
+      const fill = document.getElementById("pw-strength-fill");
+      const reqLength = document.getElementById("req-length");
+      const reqNumber = document.getElementById("req-number");
+      const reqCommon = document.getElementById("req-common");
+
+      const hasLength = password.length >= 8;
+      const hasNumber = /\d/.test(password);
+      const commonPasswords = new Set([
+        "123456", "password", "12345678", "qwerty", "123456789",
+        "12345", "1234", "111111", "1234567", "sunshine",
+        "qwerty123", "0", "admin", "letmein", "123123",
+        "dragon", "baseball", "abc123", "monkey", "password123"
+      ]);
+      const notCommon = !commonPasswords.has(password.toLowerCase());
+
+      reqLength.className = hasLength ? "met" : "";
+      reqLength.innerHTML = `<span class="req-icon">${hasLength ? '✅' : '❌'}</span> At least 8 characters`;
+      reqNumber.className = hasNumber ? "met" : "";
+      reqNumber.innerHTML = `<span class="req-icon">${hasNumber ? '✅' : '❌'}</span> At least one number (0-9)`;
+      reqCommon.className = notCommon ? "met" : "";
+      reqCommon.innerHTML = `<span class="req-icon">${notCommon ? '✅' : '❌'}</span> Not a common password`;
+
+      fill.className = "pw-strength-fill";
+      if (!password) {
+        fill.style.width = "0%";
+      } else if (hasLength && hasNumber && notCommon) {
+        fill.classList.add("strong");
+      } else if ((hasLength && hasNumber) || (hasLength && notCommon) || (hasNumber && notCommon)) {
+        fill.classList.add("medium");
+      } else {
+        fill.classList.add("weak");
+      }
+    }
+
+    function changePassword() {
+      const currentPassword = document.getElementById("acc-current-pass").value;
+      const newPassword = document.getElementById("acc-new-pass").value;
+      const confirmPassword = document.getElementById("acc-confirm-pass").value;
+      const btn = document.getElementById("change-pass-btn");
+
+      if (!currentPassword) { showToast("❌ Please enter your current password.", true); return; }
+      if (!newPassword) { showToast("❌ Please enter a new password.", true); return; }
+      if (newPassword !== confirmPassword) { showToast("❌ New passwords do not match.", true); return; }
+      if (newPassword.length < 8) { showToast("❌ New password must be at least 8 characters.", true); return; }
+      if (!/\d/.test(newPassword)) { showToast("❌ New password must contain at least one number.", true); return; }
+
+      btn.disabled = true;
+      btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Updating...`;
+      if (window.lucide) window.lucide.createIcons();
+
+      authFetch(`${baseUrl}/api/client/change-password`, {
+        method: 'POST',
+        body: JSON.stringify({ currentPassword: currentPassword, newPassword: newPassword })
+      })
+        .then(res => res.json())
+        .then(data => {
+          btn.disabled = false;
+          btn.innerHTML = `<i data-lucide="lock"></i> Update Password`;
+          if (window.lucide) window.lucide.createIcons();
+          if (data.success) {
+            setToken(data.token);
+            showToast("✅ Password changed successfully!");
+            document.getElementById("acc-current-pass").value = "";
+            document.getElementById("acc-new-pass").value = "";
+            document.getElementById("acc-confirm-pass").value = "";
+            updatePasswordStrength("");
+          } else {
+            showToast("❌ " + (data.error || "Failed to change password."), true);
+          }
+        })
+        .catch(err => {
+          btn.disabled = false;
+          btn.innerHTML = `<i data-lucide="lock"></i> Update Password`;
+          if (window.lucide) window.lucide.createIcons();
+          console.error("Password change error:", err);
+          showToast("❌ Failed to change password.", true);
+        });
+    }
+
+    // =========================================================================
+    // KNOWLEDGE BASE / RAG FUNCTIONS
+    // =========================================================================
+
+    // -----------------------------------------------------------------------
+    // Load documents list
+    // -----------------------------------------------------------------------
+    function loadDocuments() {
+      authFetch(`${baseUrl}/api/documents`)
+        .then(res => res.json())
+        .then(docs => {
+          state.documents = docs || [];
+          renderDocumentList();
+        })
+        .catch(err => console.error("Error loading documents:", err));
+    }
+
+    // -----------------------------------------------------------------------
+    // Render the document list in the UI
+    // -----------------------------------------------------------------------
+    function renderDocumentList() {
+      const container = document.getElementById("doc-list-body");
+      const countEl = document.getElementById("doc-count");
+      countEl.textContent = `${state.documents.length} document${state.documents.length !== 1 ? 's' : ''}`;
+
+      if (!state.documents.length) {
+        container.innerHTML = `
+          <div class="doc-empty">
+            <div class="empty-icon">📂</div>
+            <p>No documents uploaded yet. Upload a PDF or paste text to build your knowledge base.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = "";
+      state.documents.forEach(doc => {
+        const ext = doc.extraction_summary || {};
+        const itemsFound = [];
+        if (ext.extracted_services && ext.extracted_services.length) itemsFound.push(`${ext.extracted_services.length} services`);
+        if (ext.extracted_faqs && ext.extracted_faqs.length) itemsFound.push(`${ext.extracted_faqs.length} FAQs`);
+        if (ext.extracted_policies && ext.extracted_policies.length) itemsFound.push(`${ext.extracted_policies.length} policies`);
+        if (ext.extracted_hours) itemsFound.push('hours');
+        const desc = itemsFound.length ? `Extracted: ${itemsFound.join(', ')}` : `${doc.chunk_count || 0} chunks stored`;
+
+        const date = new Date(doc.created_at).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+        const icon = doc.source_type === 'pdf' ? '📄' : '📝';
+
+        const item = document.createElement("div");
+        item.className = "doc-item";
+        item.innerHTML = `
+          <div class="doc-info">
+            <div class="doc-icon">${icon}</div>
+            <div class="doc-meta">
+              <div class="doc-name">${escapeHtml(doc.source_name || 'Untitled')}</div>
+              <div class="doc-desc">${desc} • ${date}</div>
+            </div>
+          </div>
+          <div class="doc-actions">
+            <button class="doc-action-btn" onclick="previewDocument('${escapeHtml(doc.source_name || '')}')">👁 Preview</button>
+            <button class="doc-action-btn" onclick="reanalyzeDocument('${escapeHtml(doc.source_name || '')}')">🔄 Re-analyze</button>
+            <button class="doc-action-btn danger" onclick="deleteDocument('${doc.id}')">🗑 Delete</button>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    // -----------------------------------------------------------------------
+    // Handle PDF file selection via browse
+    // -----------------------------------------------------------------------
+    function handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (file) uploadFile(file);
+    }
+
+    // -----------------------------------------------------------------------
+    // Handle PDF file drop
+    // -----------------------------------------------------------------------
+    function handleFileDrop(event) {
+      event.preventDefault();
+      document.getElementById('pdf-drop-zone').classList.remove('dragover');
+      const file = event.dataTransfer.files[0];
+      if (file) uploadFile(file);
+    }
+
+    // -----------------------------------------------------------------------
+    // Upload a PDF file
+    // -----------------------------------------------------------------------
+    function uploadFile(file) {
+      if (!file.name.toLowerCase().endsWith('.pdf')) {
+        showToast("❌ Please upload a PDF file.", true);
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const btn = document.querySelector('.kb-upload-btn');
+      const originalText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = `<span class="spinner"></span> Uploading & analyzing...`;
+
+      authFetch(`${baseUrl}/api/documents/upload`, {
+        method: 'POST',
+        body: formData
+      })
+        .then(res => res.json())
+        .then(data => {
+          btn.disabled = false;
+          btn.innerHTML = originalText;
+          if (window.lucide) window.lucide.createIcons();
+
+          if (data.success) {
+            showToast(`✅ ${data.summary_text || 'Document processed!'}`);
+            state.lastExtraction = data;
+            loadDocuments();
+
+            // Show extraction approval card if there's data to approve
+            if (data.pending_approval) {
+              showExtractionCard(data);
+            }
+          } else {
+            showToast("❌ " + (data.error || "Upload failed."), true);
+          }
+        })
+        .catch(err => {
+          btn.disabled = false;
+          btn.innerHTML = originalText;
+          if (window.lucide) window.lucide.createIcons();
+          console.error("Upload error:", err);
+          showToast("❌ Upload failed. Check server connection.", true);
+        });
+    }
+
+    // -----------------------------------------------------------------------
+    // Upload pasted text
+    // -----------------------------------------------------------------------
+    function uploadText() {
+      const text = document.getElementById("kb-paste-text").value.trim();
+      if (!text) {
+        showToast("❌ Please paste some text first.", true);
+        return;
+      }
+      if (text.length < 20) {
+        showToast("❌ Please paste at least 20 characters.", true);
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('text', text);
+
+      const btn = document.querySelector('.kb-upload-btn');
+      const originalText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = `<span class="spinner"></span> Analyzing text...`;
+
+      authFetch(`${baseUrl}/api/documents/upload`, {
+        method: 'POST',
+        body: formData
+      })
+        .then(res => res.json())
+        .then(data => {
+          btn.disabled = false;
+          btn.innerHTML = originalText;
+          if (window.lucide) window.lucide.createIcons();
+
+          if (data.success) {
+            showToast(`✅ ${data.summary_text || 'Text processed!'}`);
+            document.getElementById("kb-paste-text").value = "";
+            state.lastExtraction = data;
+            loadDocuments();
+
+            if (data.pending_approval) {
+              showExtractionCard(data);
+            }
+          } else {
+            showToast("❌ " + (data.error || "Processing failed."), true);
+          }
+        })
+        .catch(err => {
+          btn.disabled = false;
+          btn.innerHTML = originalText;
+          if (window.lucide) window.lucide.createIcons();
+          console.error("Text upload error:", err);
+          showToast("❌ Processing failed. Check server connection.", true);
+        });
+    }
+
+    // -----------------------------------------------------------------------
+    // Preview document content
+    // -----------------------------------------------------------------------
+    function previewDocument(sourceName) {
+      authFetch(`${baseUrl}/api/documents/preview?source_name=${encodeURIComponent(sourceName)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.preview) {
+            // Show preview in a simple modal-like alert
+            const previewLines = data.preview.split('\n').slice(0, 30).join('\n');
+            showToast(`📄 ${data.source_name}: ${data.total_characters} chars, ${data.total_chunks} chunks`);
+            alert(`📄 Document Preview: "${data.source_name}"\n\n${data.total_characters} characters in ${data.total_chunks} chunks\n\n--- Preview (first 3000 chars) ---\n\n${previewLines}\n\n${data.total_characters > 3000 ? '...(truncated)' : ''}`);
+          } else {
+            showToast("❌ Could not load preview.", true);
+          }
+        })
+        .catch(err => {
+          console.error("Preview error:", err);
+          showToast("❌ Failed to load preview.", true);
+        });
+    }
+
+    // -----------------------------------------------------------------------
+    // Re-analyze a document
+    // -----------------------------------------------------------------------
+    function reanalyzeDocument(sourceName) {
+      authFetch(`${baseUrl}/api/documents/analyze`, {
+        method: 'POST',
+        body: JSON.stringify({ source_name: sourceName })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && data.extraction) {
+            state.lastExtraction = { extraction: data.extraction, pending_approval: data.pending_approval };
+            if (data.pending_approval) {
+              showExtractionCard(state.lastExtraction);
+            }
+            showToast("🔄 Re-analysis complete! Extraction updated.");
+            loadDocuments();
+          } else {
+            showToast("❌ Re-analysis failed.", true);
+          }
+        })
+        .catch(err => {
+          console.error("Re-analyze error:", err);
+          showToast("❌ Re-analysis failed.", true);
+        });
+    }
+
+    // -----------------------------------------------------------------------
+    // Delete a document
+    // -----------------------------------------------------------------------
+    function deleteDocument(docId) {
+      if (!confirm("Delete this document and all its knowledge chunks? This cannot be undone.")) return;
+
+      authFetch(`${baseUrl}/api/documents/${docId}`, { method: 'DELETE' })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            showToast(`🗑 ${data.message}`);
+            loadDocuments();
+          } else {
+            showToast("❌ " + (data.error || "Delete failed."), true);
+          }
+        })
+        .catch(err => {
+          console.error("Delete error:", err);
+          showToast("❌ Delete failed.", true);
+        });
+    }
+
+    // -----------------------------------------------------------------------
+    // Show the extraction approval card
+    // -----------------------------------------------------------------------
+    function showExtractionCard(data) {
+      const card = document.getElementById("extraction-card");
+      const summaryEl = document.getElementById("extraction-summary-text");
+      const ext = data.extraction || {};
+
+      const services = (ext.extracted_services || []).length;
+      const faqs = (ext.extracted_faqs || []).length;
+      const policies = (ext.extracted_policies || []).length;
+      const hours = ext.extracted_hours ? '✓' : '✗';
+      const greeting = ext.suggested_greeting ? '✓' : '✗';
+      const type = ext.detected_type || 'general_info';
+      const confidence = Math.round((ext.confidence || 0) * 100);
+
+      summaryEl.innerHTML = `
+        <strong>Document Type:</strong> ${type.replace(/_/g, ' ')} (${confidence}% confidence)<br>
+        <strong>Detected:</strong> ${services} services, ${faqs} FAQs, ${policies} policies<br>
+        <strong>Hours:</strong> ${hours} &nbsp;|&nbsp; <strong>Greeting:</strong> ${greeting}
+      `;
+      card.classList.add("show");
+    }
+
+    // -----------------------------------------------------------------------
+    // Accept extraction
+    // -----------------------------------------------------------------------
+    function acceptExtraction() {
+      if (!state.lastExtraction) return;
+      const extraction = state.lastExtraction.extraction || state.lastExtraction;
+
+      authFetch(`${baseUrl}/api/documents/apply-extraction`, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'accept', extraction: extraction })
+      })
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("extraction-card").classList.remove("show");
+          if (data.success) {
+            showToast(`✅ ${data.message || 'Extraction applied!'}`);
+            // Refresh settings to show new data
+            authFetch(`${baseUrl}/api/settings?botId=${botId}`)
+              .then(res => res.json())
+              .then(settings => {
+                state.profile = settings;
+                populateSettingsForm();
+              })
+              .catch(() => { });
+          } else {
+            showToast("❌ " + (data.error || "Failed to apply."), true);
+          }
+        })
+        .catch(err => {
+          console.error("Accept error:", err);
+          showToast("❌ Failed to apply extraction.", true);
+        });
+    }
+
+    // -----------------------------------------------------------------------
+    // Review extraction (switch to settings tab with data)
+    // -----------------------------------------------------------------------
+    function reviewExtraction() {
+      document.getElementById("extraction-card").classList.remove("show");
+      showToast("📝 Switch to the Customize Bot tab to manually edit the extracted data.");
+      // Switch to settings tab
+      const settingsBtn = document.querySelectorAll('.nav-item')[1];
+      if (settingsBtn) settingsBtn.click();
+    }
+
+    // -----------------------------------------------------------------------
+    // Skip extraction
+    // -----------------------------------------------------------------------
+    function skipExtraction() {
+      state.lastExtraction = null;
+      document.getElementById("extraction-card").classList.remove("show");
+      showToast("✋ Extraction skipped. No changes made.");
     }
 
     // =========================================================================
@@ -1073,7 +2121,12 @@
       document.getElementById("tab-" + tabId).classList.add("active");
 
       document.querySelectorAll(".nav-item").forEach(i => i.classList.remove("active"));
-      btn.classList.add("active");
+      if (btn) btn.classList.add("active");
+
+      // Refresh knowledge base data when switching to that tab
+      if (tabId === 'knowledge') {
+        loadDocuments();
+      }
     }
 
     function copyEmbed() {
@@ -1085,7 +2138,7 @@
 
     function exportCSV() {
       if (!state.leads.length) {
-        alert("No leads available to export.");
+        showToast("❌ No leads available to export.", true);
         return;
       }
 
@@ -1104,9 +2157,11 @@
       showToast("💾 CSV Leads log exported!");
     }
 
-    function showToast(msg) {
+    function showToast(msg, isError = false) {
       const toast = document.getElementById("toast");
       toast.textContent = msg;
+      toast.classList.remove("toast-error");
+      if (isError) toast.classList.add("toast-error");
       toast.classList.add("show");
       setTimeout(() => toast.classList.remove("show"), 3000);
     }
